@@ -397,6 +397,8 @@ void ngap_handle_initial_ue_message(amf_gnb_t *gnb, ogs_ngap_message_t *message)
 
     ogs_debug("    IP[%s] RAN_ID[%d]",
             OGS_ADDR(gnb->sctp.addr, buf), gnb->gnb_id);
+    ogs_ad("    IP[%s] RAN_ID[%d]",
+            OGS_ADDR(gnb->sctp.addr, buf), gnb->gnb_id);
 
     if (!RAN_UE_NGAP_ID) {
         ogs_error("No RAN_UE_NGAP_ID");
@@ -409,6 +411,8 @@ void ngap_handle_initial_ue_message(amf_gnb_t *gnb, ogs_ngap_message_t *message)
 
     ran_ue = ran_ue_find_by_ran_ue_ngap_id(gnb, *RAN_UE_NGAP_ID);
     if (!ran_ue) {
+            ogs_ad("ran_ue not found! Has to call to ran_ue_add(): %lu", *RAN_UE_NGAP_ID);
+
         ran_ue = ran_ue_add(gnb, *RAN_UE_NGAP_ID);
         if (ran_ue == NULL) {
             r = ngap_send_error_indication(gnb, NULL, NULL,
@@ -476,6 +480,7 @@ void ngap_handle_initial_ue_message(amf_gnb_t *gnb, ogs_ngap_message_t *message)
                     ogs_expect(r == OGS_OK);
                     ogs_assert(r != OGS_ERROR);
                 }
+
                 amf_ue_associate_ran_ue(amf_ue, ran_ue);
 
                 /*
@@ -535,6 +540,11 @@ void ngap_handle_initial_ue_message(amf_gnb_t *gnb, ogs_ngap_message_t *message)
         ran_ue->ran_ue_ngap_id, (long long)ran_ue->amf_ue_ngap_id,
         ran_ue->saved.nr_tai.tac.v, (long long)ran_ue->saved.nr_cgi.cell_id);
 
+    ogs_ad("    RAN_UE_NGAP_ID[%d] AMF_UE_NGAP_ID[%lld] "
+                "TAC[%d] CellID[0x%llx]",
+            ran_ue->ran_ue_ngap_id, (long long)ran_ue->amf_ue_ngap_id,
+            ran_ue->saved.nr_tai.tac.v, (long long)ran_ue->saved.nr_cgi.cell_id);
+            
     if (UEContextRequest) {
         if (*UEContextRequest == NGAP_UEContextRequest_requested) {
             ran_ue->ue_context_requested = true;
@@ -799,6 +809,7 @@ void ngap_handle_ue_radio_capability_info_indication(
 void ngap_handle_initial_context_setup_response(
         amf_gnb_t *gnb, ogs_ngap_message_t *message)
 {
+    //look for making pdu session
     char buf[OGS_ADDRSTRLEN];
     int i, r;
 
@@ -956,6 +967,8 @@ void ngap_handle_initial_context_setup_response(
         }
 
         ogs_debug("    SUPI[%s] PSI[%d] OLD ACTIVATED[0x%x]",
+                amf_ue->supi, sess->psi, ran_ue->psimask.activated);
+                ogs_ad("    SUPI[%s] PSI[%d] OLD ACTIVATED[0x%x]",
                 amf_ue->supi, sess->psi, ran_ue->psimask.activated);
         ran_ue->psimask.activated |= ((1 << sess->psi));
         ogs_debug("    NEW ACTIVATED[0x%x]", ran_ue->psimask.activated);

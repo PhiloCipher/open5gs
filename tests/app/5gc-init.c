@@ -53,13 +53,15 @@ int app_initialize(const char *const argv[])
 
     if (ogs_app()->parameter.no_nrf == 0)
         nrf_thread = test_child_create("nrf", argv_out);
-    if (ogs_app()->parameter.no_scp == 0)
-        scp_thread = test_child_create("scp", argv_out);
+       ogs_msleep(1000);
+    // if (ogs_app()->parameter.no_scp == 0)
+    //     scp_thread = test_child_create("scp", argv_out);
+    //     ogs_msleep(2000);
 
-    if (ogs_app()->parameter.no_upf == 0)
-        upf_thread = test_child_create("upf", argv_out);
-    if (ogs_app()->parameter.no_smf == 0)
-        smf_thread = test_child_create("smf", argv_out);
+//    if (ogs_app()->parameter.no_upf == 0)
+//        upf_thread = test_child_create("upf", argv_out);
+//     if (ogs_app()->parameter.no_smf == 0)
+//        smf_thread = test_child_create("smf", argv_out);
 
     if (ogs_app()->parameter.no_amf == 0)
         amf_thread = test_child_create("amf", argv_out);

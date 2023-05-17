@@ -163,7 +163,7 @@ ogs_sock_t *ogs_sctp_client(
                 ogs_assert(rv == OGS_OK);
             }
 
-            if (ogs_sock_connect(new, addr) == OGS_OK) {
+            if (ogs_sock_connect(new, addr) == OGS_OK) { // it makes AMF_EVENT_NGAP_LO_ACCEPT event 
                 ogs_debug("sctp_client() [%s]:%d",
                         OGS_ADDR(addr, buf), OGS_PORT(addr));
                 break;

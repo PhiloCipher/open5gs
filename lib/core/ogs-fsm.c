@@ -38,7 +38,6 @@ static void fsm_entry(ogs_fsm_t *sm, ogs_fsm_handler_t state, fsm_event_t *e)
 {
     ogs_assert(sm);
     ogs_assert(state);
-
     if (e) {
         e->id = OGS_FSM_ENTRY_SIG;
         (*state)(sm, e);
@@ -122,7 +121,6 @@ void ogs_fsm_dispatch(void *fsm, void *event)
 
     tmp = sm->state;
     ogs_assert(tmp);
-
     if (e)
         (*tmp)(sm, e);
 

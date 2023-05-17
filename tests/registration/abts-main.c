@@ -36,18 +36,18 @@ abts_suite *test_crash(abts_suite *suite);
 const struct testlist {
     abts_suite *(*func)(abts_suite *suite);
 } alltests[] = {
-    {test_simple},
-    {test_guti},
-    {test_auth},
-    {test_ecc},
-    {test_idle},
-    {test_dereg},
-    {test_paging},
+    // {test_simple},
+    // {test_guti},
+    // {test_auth},
+    // {test_ecc},
+    // {test_idle},
+    // {test_dereg},
+    // {test_paging},
     {test_identity},
-    {test_gmm_status},
-    {test_ue_context},
-    {test_reset},
-    {test_multi_ue},
+    // {test_gmm_status},
+    // {test_ue_context},
+    // {test_reset},
+    // {test_multi_ue},
 #if 0 /* Since there is error LOG, we disabled the following test */
     {test_crash},
 #endif

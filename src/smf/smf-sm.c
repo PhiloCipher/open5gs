@@ -83,6 +83,7 @@ void smf_state_operational(ogs_fsm_t *s, smf_event_t *e)
     smf_sm_debug(e);
 
     ogs_assert(s);
+    ogs_ad("SMF state %d: %s", e->h.id, smf_event_get_name(e));
 
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:

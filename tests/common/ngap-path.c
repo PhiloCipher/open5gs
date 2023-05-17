@@ -37,6 +37,7 @@ void testngap_recv(test_ue_t *test_ue, ogs_pkbuf_t *pkbuf)
 
     pdu = &message;
     ogs_assert(pdu);
+    ogs_ad("ngap state: %d", pdu->present);
 
     switch (pdu->present) {
     case NGAP_NGAP_PDU_PR_initiatingMessage:

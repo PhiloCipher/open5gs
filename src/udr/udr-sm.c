@@ -51,6 +51,7 @@ void udr_state_operational(ogs_fsm_t *s, udr_event_t *e)
     udr_sm_debug(e);
 
     ogs_assert(s);
+    ogs_ad("UDR state: %d", e->h.id);
 
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:

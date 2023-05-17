@@ -23,9 +23,10 @@
 int app_initialize(const char *const argv[])
 {
     int rv;
-
     ogs_sctp_init(ogs_app()->usrsctp.udp_port);
     rv = amf_initialize();
+    //ogs_ad("usrsctp.udp_port %d",ogs_app()->usrsctp.udp_port);
+
     if (rv != OGS_OK) {
         ogs_error("Failed to intialize AMF");
         return rv;

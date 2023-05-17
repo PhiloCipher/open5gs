@@ -1263,6 +1263,8 @@ amf_gnb_t *amf_gnb_cycle(amf_gnb_t *gnb)
 /** ran_ue_context handling function */
 ran_ue_t *ran_ue_add(amf_gnb_t *gnb, uint32_t ran_ue_ngap_id)
 {
+    ogs_ad("ran_ue_add: ran_ue_ngap_id= %d", ran_ue_ngap_id);
+
     ran_ue_t *ran_ue = NULL;
 
     ogs_assert(gnb);
@@ -1458,6 +1460,7 @@ void amf_ue_confirm_guti(amf_ue_t *amf_ue)
 
 amf_ue_t *amf_ue_add(ran_ue_t *ran_ue)
 {
+    ogs_ad("amf_ue_add");
     amf_gnb_t *gnb = NULL;
     amf_ue_t *amf_ue = NULL;
 
@@ -1474,6 +1477,7 @@ amf_ue_t *amf_ue_add(ran_ue_t *ran_ue)
     memset(amf_ue, 0, sizeof *amf_ue);
 
     /* Add All Timers */
+    ogs_ad("amf_ue_add t3513.timer");
     amf_ue->t3513.timer = ogs_timer_add(
             ogs_app()->timer_mgr, amf_timer_t3513_expire, amf_ue);
     if (!amf_ue->t3513.timer) {
@@ -1562,7 +1566,8 @@ amf_ue_t *amf_ue_add(ran_ue_t *ran_ue)
 
     ogs_info("[Added] Number of AMF-UEs is now %d",
             ogs_list_count(&self.amf_ue_list));
-
+    ogs_ad("[Added] Number of AMF-UEs is now %d",
+                ogs_list_count(&self.amf_ue_list));
     return amf_ue;
 }
 
@@ -1985,9 +1990,13 @@ OpenAPI_rat_type_e amf_ue_rat_type(amf_ue_t *amf_ue)
 
 void amf_ue_associate_ran_ue(amf_ue_t *amf_ue, ran_ue_t *ran_ue)
 {
+    
+    ogs_ad("amf_ue_associate_ran_ue: amf_ue: SUCI%s GUTI:%u  <------> RAN_UE_NGAP_ID[%d] AMF_UE_NGAP_ID[%lld] "
+                "TAC[%d] CellID[0x%llx]",amf_ue->suci, amf_ue->current.guti.m_tmsi,
+            ran_ue->ran_ue_ngap_id, (long long)ran_ue->amf_ue_ngap_id,
+            ran_ue->saved.nr_tai.tac.v, (long long)ran_ue->saved.nr_cgi.cell_id);
     ogs_assert(amf_ue);
     ogs_assert(ran_ue);
-
     amf_ue->ran_ue = ran_ue;
     ran_ue->amf_ue = amf_ue;
 }

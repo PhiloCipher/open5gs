@@ -86,6 +86,7 @@ ogs_pkbuf_t *testgmm_build_registration_request(
             &mobile_identity_guti;
 
     } else {
+        ogs_ad("No GUIT, SUCI is %s",ogs_nas_5gs_suci_from_mobile_identity(&(test_ue->mobile_identity)));
         registration_request->mobile_identity.length =
             test_ue->mobile_identity.length;
         registration_request->mobile_identity.buffer =

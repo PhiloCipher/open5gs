@@ -80,7 +80,7 @@ void gmm_state_de_registered(ogs_fsm_t *s, amf_event_t *e)
         amf_ue = e->amf_ue;
         ogs_assert(amf_ue);
     }
-
+    ogs_ad("gmm_state_de_registered %d: %s", e->h.id, amf_event_get_name(e));
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:
         AMF_UE_CLEAR_PAGING_INFO(amf_ue);
@@ -456,6 +456,7 @@ void gmm_state_registered(ogs_fsm_t *s, amf_event_t *e)
         amf_ue = e->amf_ue;
         ogs_assert(amf_ue);
     }
+    ogs_ad("gmm_state_registered %d: %s", e->h.id, amf_event_get_name(e));
 
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:

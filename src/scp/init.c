@@ -97,8 +97,9 @@ static void scp_main(void *data)
     ogs_fsm_init(&scp_sm, scp_state_initial, scp_state_final, 0);
 
     for ( ;; ) {
+
         ogs_pollset_poll(ogs_app()->pollset,
-                ogs_timer_mgr_next(ogs_app()->timer_mgr));
+                ogs_timer_mgr_next(ogs_app()->timer_mgr)); //stuck here until the end of heart bit
 
         /*
          * After ogs_pollset_poll(), ogs_timer_mgr_expire() must be called.
@@ -111,6 +112,7 @@ static void scp_main(void *data)
          * because 'if rv == OGS_DONE' statement is exiting and
          * not calling ogs_timer_mgr_expire().
          */
+
         ogs_timer_mgr_expire(ogs_app()->timer_mgr);
 
         for ( ;; ) {

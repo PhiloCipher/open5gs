@@ -128,6 +128,7 @@ ogs_thread_t *test_child_create(const char *name, const char *const argv[])
             name, OGS_DIR_SEPARATOR_S "open5gs-", name);
     commandLine[0] = command;
 
+    //ogs_ad("commandLine: %s\n",(commandLine[0]));//run NF daemons
     child = ogs_thread_create(child_main, commandLine);
     ogs_msleep(50);
 

@@ -32,8 +32,8 @@ void amf_state_initial(ogs_fsm_t *s, amf_event_t *e)
     amf_sm_debug(e);
 
     ogs_assert(s);
-
     OGS_FSM_TRAN(s, &amf_state_operational);
+
 }
 
 void amf_state_final(ogs_fsm_t *s, amf_event_t *e)
@@ -78,6 +78,7 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
     amf_sm_debug(e);
 
     ogs_assert(s);
+    ogs_ad("AMF state %d: %s", e->h.id, amf_event_get_name(e));
 
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:
@@ -232,7 +233,36 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
                         sbi_message.h.resource.component[1]));
             END
             break;
+        CASE(OGS_SBI_SERVICE_NAME_ANONYMOUS)
+            SWITCH(sbi_message.h.resource.component[1])
+            CASE(OGS_SBI_RESOURCE_NAME_SM_CONTEXT_STATUS)
+                amf_namf_callback_handle_sm_context_status(
+                        stream, &sbi_message);
+                break;
 
+            CASE(OGS_SBI_RESOURCE_NAME_DEREG_NOTIFY)
+                amf_namf_callback_handle_dereg_notify(stream, &sbi_message);
+                break;
+
+            CASE(OGS_SBI_RESOURCE_NAME_SDMSUBSCRIPTION_NOTIFY)
+                amf_namf_callback_handle_sdm_data_change_notify(
+                        stream, &sbi_message);
+                break;
+
+            CASE(OGS_SBI_RESOURCE_NAME_AM_POLICY_NOTIFY)
+                ogs_assert(true == ogs_sbi_send_http_status_no_content(stream));
+                break;
+
+            DEFAULT
+                ogs_error("Invalid resource name [%s]",
+                        sbi_message.h.resource.component[1]);
+                ogs_assert(true ==
+                    ogs_sbi_server_send_error(stream,
+                        OGS_SBI_HTTP_STATUS_BAD_REQUEST, &sbi_message,
+                        "Invalid resource name",
+                        sbi_message.h.resource.component[1]));
+            END
+            break;
         DEFAULT
             ogs_error("Invalid API name [%s]", sbi_message.h.service.name);
             ogs_assert(true ==
@@ -244,6 +274,7 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
         /* In lib/sbi/server.c, notify_completed() releases 'request' buffer. */
         ogs_sbi_message_free(&sbi_message);
         break;
+
 
     case OGS_EVENT_SBI_CLIENT:
         ogs_assert(e);
@@ -819,6 +850,7 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
         if (rc == OGS_OK) {
             e->gnb = gnb;
             e->ngap.message = &ngap_message;
+            ogs_ad("ngap state");
             ogs_fsm_dispatch(&gnb->sm, e);
         } else {
             ogs_error("Cannot decode NGAP message");
@@ -879,6 +911,7 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
         if (!amf_ue) {
             amf_ue = amf_ue_find_by_message(&nas_message);
             if (!amf_ue) {
+                ogs_ad("the AMF_UE Context is not found");
                 amf_ue = amf_ue_add(ran_ue);
                 if (amf_ue == NULL) {
                     r = ngap_send_ran_ue_context_release_command(
@@ -892,6 +925,8 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
                     break;
                 }
             } else {
+                ogs_ad("the AMF_UE Context is found");
+
                 /* Here, if the AMF_UE Context is found,
                  * the integrity check is not performed
                  * For example, REGISTRATION_REQUEST,

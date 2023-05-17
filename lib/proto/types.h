@@ -331,6 +331,7 @@ typedef struct ogs_bitrate_s {
     uint64_t uplink;          /* bits per seconds */
 } ogs_bitrate_t;
 
+//important
 /**********************************
  * QoS Structure                 */
 typedef struct ogs_qos_s {

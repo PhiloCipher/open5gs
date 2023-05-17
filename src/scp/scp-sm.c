@@ -51,6 +51,7 @@ void scp_state_operational(ogs_fsm_t *s, scp_event_t *e)
     scp_sm_debug(e);
 
     ogs_assert(s);
+    ogs_ad("SCP state: %d", e->h.id);
 
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:
