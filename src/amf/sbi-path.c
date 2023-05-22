@@ -113,6 +113,7 @@ int amf_ue_sbi_discover_and_send(
     }
 
     xact->state = state;
+    ogs_ad("ogs_sbi_discover_and_send");
 
     rv = ogs_sbi_discover_and_send(xact);
     if (rv != OGS_OK) {

@@ -25,6 +25,7 @@
 bool smf_namf_comm_handle_n1_n2_message_transfer(
         smf_sess_t *sess, int state, ogs_sbi_message_t *recvmsg)
 {
+    ogs_ad("smf_namf_comm_handle_n1_n2_message_transfer");
     smf_ue_t *smf_ue = NULL;
     OpenAPI_n1_n2_message_transfer_rsp_data_t *N1N2MessageTransferRspData;
 

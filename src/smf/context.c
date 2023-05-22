@@ -1159,6 +1159,7 @@ static ogs_pfcp_node_t *selected_upf_node(
 
 void smf_sess_select_upf(smf_sess_t *sess)
 {
+    ogs_ad("smf_sess_select_upf");
     char buf[OGS_ADDRSTRLEN];
 
     ogs_assert(sess);
