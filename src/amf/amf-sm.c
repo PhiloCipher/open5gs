@@ -233,36 +233,36 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
                         sbi_message.h.resource.component[1]));
             END
             break;
-        CASE(OGS_SBI_SERVICE_NAME_ANONYMOUS)
-            SWITCH(sbi_message.h.resource.component[1])
-            CASE(OGS_SBI_RESOURCE_NAME_SM_CONTEXT_STATUS)
-                amf_namf_callback_handle_sm_context_status(
-                        stream, &sbi_message);
-                break;
+        // CASE(OGS_SBI_SERVICE_NAME_ANONYMOUS)
+        //     SWITCH(sbi_message.h.resource.component[1])
+        //     CASE(OGS_SBI_RESOURCE_NAME_SM_CONTEXT_STATUS)
+        //         amf_namf_callback_handle_sm_context_status(
+        //                 stream, &sbi_message);
+        //         break;
 
-            CASE(OGS_SBI_RESOURCE_NAME_DEREG_NOTIFY)
-                amf_namf_callback_handle_dereg_notify(stream, &sbi_message);
-                break;
+        //     CASE(OGS_SBI_RESOURCE_NAME_DEREG_NOTIFY)
+        //         amf_namf_callback_handle_dereg_notify(stream, &sbi_message);
+        //         break;
 
-            CASE(OGS_SBI_RESOURCE_NAME_SDMSUBSCRIPTION_NOTIFY)
-                amf_namf_callback_handle_sdm_data_change_notify(
-                        stream, &sbi_message);
-                break;
+        //     CASE(OGS_SBI_RESOURCE_NAME_SDMSUBSCRIPTION_NOTIFY)
+        //         amf_namf_callback_handle_sdm_data_change_notify(
+        //                 stream, &sbi_message);
+        //         break;
 
-            CASE(OGS_SBI_RESOURCE_NAME_AM_POLICY_NOTIFY)
-                ogs_assert(true == ogs_sbi_send_http_status_no_content(stream));
-                break;
+        //     CASE(OGS_SBI_RESOURCE_NAME_AM_POLICY_NOTIFY)
+        //         ogs_assert(true == ogs_sbi_send_http_status_no_content(stream));
+        //         break;
 
-            DEFAULT
-                ogs_error("Invalid resource name [%s]",
-                        sbi_message.h.resource.component[1]);
-                ogs_assert(true ==
-                    ogs_sbi_server_send_error(stream,
-                        OGS_SBI_HTTP_STATUS_BAD_REQUEST, &sbi_message,
-                        "Invalid resource name",
-                        sbi_message.h.resource.component[1]));
-            END
-            break;
+        //     DEFAULT
+        //         ogs_error("Invalid resource name [%s]",
+        //                 sbi_message.h.resource.component[1]);
+        //         ogs_assert(true ==
+        //             ogs_sbi_server_send_error(stream,
+        //                 OGS_SBI_HTTP_STATUS_BAD_REQUEST, &sbi_message,
+        //                 "Invalid resource name",
+        //                 sbi_message.h.resource.component[1]));
+        //     END
+        //     break;
         DEFAULT
             ogs_error("Invalid API name [%s]", sbi_message.h.service.name);
             ogs_assert(true ==
