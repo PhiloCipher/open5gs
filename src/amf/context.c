@@ -29,6 +29,7 @@ static OGS_POOL(amf_ue_pool, amf_ue_t);
 static OGS_POOL(ran_ue_pool, ran_ue_t);
 static OGS_POOL(amf_sess_pool, amf_sess_t);
 
+static OGS_POOL(amf_loc_pool, amf_loc_t);
 static OGS_POOL(m_tmsi_pool, amf_m_tmsi_t);
 
 static int context_initialized = 0;
@@ -62,6 +63,7 @@ void amf_context_init(void)
     ogs_pool_init(&amf_ue_pool, ogs_app()->max.ue);
     ogs_pool_init(&ran_ue_pool, ogs_app()->max.ue);
     ogs_pool_init(&amf_sess_pool, ogs_app()->pool.sess);
+    ogs_pool_init(&amf_loc_pool, ogs_app()->max.ue);
     ogs_pool_init(&m_tmsi_pool, ogs_app()->max.ue*2);
     ogs_pool_random_id_generate(&m_tmsi_pool);
 
@@ -103,6 +105,7 @@ void amf_context_final(void)
 
     ogs_pool_final(&m_tmsi_pool);
     ogs_pool_final(&amf_sess_pool);
+    ogs_pool_final(&amf_loc_pool);
     ogs_pool_final(&amf_ue_pool);
     ogs_pool_final(&ran_ue_pool);
     ogs_pool_final(&amf_gnb_pool);
@@ -1553,6 +1556,7 @@ amf_ue_t *amf_ue_add(ran_ue_t *ran_ue)
     amf_ue->rat_restrictions = OpenAPI_list_create();
 
     ogs_list_init(&amf_ue->sess_list);
+    ogs_list_init(&amf_ue->loc_list);
 
     /* Initialization */
     amf_ue->guami = &amf_self()->served_guami[0];
@@ -2134,6 +2138,73 @@ void amf_sess_remove_all(amf_ue_t *amf_ue)
 
     ogs_list_for_each_safe(&amf_ue->sess_list, next_sess, sess)
         amf_sess_remove(sess);
+}
+
+amf_loc_t *amf_loc_create(ogs_5gs_tai_t *nr_tai, ogs_nr_cgi_t *nr_cgi, ogs_time_t ue_location_timestamp)
+{
+    amf_loc_t *loc = NULL;
+    ogs_pool_alloc(&amf_loc_pool, &loc);
+    if (loc == NULL) {
+        ogs_error("Could not allocate loc context from pool");
+        return NULL;
+    }
+    memset(loc, 0, sizeof *loc);
+    
+    loc->nr_location = ogs_sbi_build_nr_location(nr_tai, nr_cgi);
+    loc->ue_location_timestamp = ue_location_timestamp;
+    ogs_list_init(&loc->amf_ue_list);
+    
+    return loc;
+}
+
+void amf_loc_associate(amf_ue_t *amf_ue, amf_loc_t *loc)
+{
+    ogs_assert(amf_ue);
+    ogs_assert(&amf_ue->loc_list);
+    ogs_assert(loc);
+    ogs_assert(&loc->amf_ue_list);
+
+    ogs_list_add(&amf_ue->loc_list, loc);
+    ogs_list_add(&loc->amf_ue_list, amf_ue);
+}
+
+void amf_ue_loc_deassociate(amf_ue_t *amf_ue, amf_loc_t *loc)
+{
+    ogs_assert(amf_ue);
+    ogs_assert(&amf_ue->loc_list); 
+    ogs_assert(loc);
+    ogs_assert(&loc->amf_ue_list); 
+
+    ogs_list_remove(&amf_ue->loc_list, loc);
+    ogs_list_remove(&loc->amf_ue_list, amf_ue);
+}
+
+void amf_ue_loc_deassociate_all(amf_ue_t *amf_ue)
+{
+    ogs_assert(amf_ue);
+    ogs_assert(&amf_ue->loc_list); 
+
+    amf_loc_t *loc = NULL, *next_loc = NULL;
+    ogs_list_for_each_safe(&amf_ue->loc_list, next_loc, loc)
+        amf_ue_loc_deassociate(amf_ue, loc);
+}
+
+void amf_loc_remove(amf_loc_t *loc)
+{
+    ogs_assert(loc);
+
+    amf_ue_t *amf_ue = NULL, *next_amf_ue = NULL;
+    ogs_list_for_each_safe(&loc->amf_ue_list, next_amf_ue, amf_ue)
+        amf_ue_loc_deassociate(amf_ue, loc);
+
+    ogs_sbi_free_nr_location(loc->nr_location);
+    ogs_pool_free(&amf_loc_pool, loc);
+    ogs_free(loc);
+}
+
+amf_loc_t *amf_loc_cycle(amf_loc_t *loc) // what is this?
+{
+    return ogs_pool_cycle(&amf_loc_pool, loc);
 }
 
 amf_sess_t *amf_sess_find_by_psi(amf_ue_t *amf_ue, uint8_t psi)

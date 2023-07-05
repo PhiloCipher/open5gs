@@ -434,6 +434,7 @@ struct amf_ue_s {
     } explict_de_registered;
 
     ogs_list_t      sess_list;
+    ogs_list_t      loc_list;
 };
 
 typedef struct amf_sess_s {
@@ -650,6 +651,18 @@ typedef struct amf_sess_s {
 
 } amf_sess_t;
 
+
+typedef struct amf_loc_s {
+    //ogs_sbi_object_t sbi; ?
+
+    OpenAPI_nr_location_t *nr_location;
+    ogs_time_t            ue_location_timestamp;
+
+    ogs_list_t            amf_ue_list;   
+
+} amf_loc_t;
+
+
 void amf_context_init(void);
 void amf_context_final(void);
 amf_context_t *amf_self(void);
@@ -775,6 +788,13 @@ void amf_sess_remove(amf_sess_t *sess);
 void amf_sess_remove_all(amf_ue_t *amf_ue);
 amf_sess_t *amf_sess_find_by_psi(amf_ue_t *amf_ue, uint8_t psi);
 amf_sess_t *amf_sess_find_by_dnn(amf_ue_t *amf_ue, char *dnn);
+
+amf_loc_t *amf_loc_create(ogs_5gs_tai_t *nr_tai, ogs_nr_cgi_t *nr_cgi, ogs_time_t ue_location_timestamp);
+void amf_loc_associate(amf_ue_t *amf_ue, amf_loc_t *loc);
+void amf_ue_loc_deassociate(amf_ue_t *amf_ue, amf_loc_t *loc);
+void amf_ue_loc_deassociate_all(amf_ue_t *amf_ue);
+void amf_loc_remove(amf_loc_t *loc);
+amf_loc_t *amf_loc_cycle(amf_loc_t *loc);
 
 amf_ue_t *amf_ue_cycle(amf_ue_t *amf_ue);
 amf_sess_t *amf_sess_cycle(amf_sess_t *sess);
