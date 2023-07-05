@@ -223,6 +223,7 @@ bool ausf_nudm_ueau_handle_get(ausf_ue_t *ausf_ue,
     response = ogs_sbi_build_response(&sendmsg,
         OGS_SBI_HTTP_STATUS_CREATED);
     ogs_assert(response);
+    ogs_ad("sending SUPI to AMF");
     ogs_assert(true == ogs_sbi_server_send_response(stream, response));
 
     OpenAPI_list_free(UeAuthenticationCtx._links);

@@ -23,6 +23,7 @@
 int amf_nausf_auth_handle_authenticate(
         amf_ue_t *amf_ue, ogs_sbi_message_t *message)
 {
+    ogs_ad("amf_nausf_auth_handle_authenticate");
     int r;
     OpenAPI_ue_authentication_ctx_t *UeAuthenticationCtx = NULL;
     OpenAPI_ue_authentication_ctx_5g_auth_data_t *AV5G_AKA = NULL;

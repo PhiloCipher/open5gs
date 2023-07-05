@@ -980,7 +980,7 @@ static void common_register_state(ogs_fsm_t *s, amf_event_t *e,
         h.type = e->nas.type;
 
         xact_count = amf_sess_xact_count(amf_ue);
-
+        ogs_ad("AMF_EVENT_5GMM_MESSAGE type: %d", nas_message->gmm.h.message_type);
         switch (nas_message->gmm.h.message_type) {
         case OGS_NAS_5GS_REGISTRATION_REQUEST:
             ogs_info("Registration request");
@@ -1024,7 +1024,7 @@ static void common_register_state(ogs_fsm_t *s, amf_event_t *e,
             }
 
             if (h.integrity_protected && SECURITY_CONTEXT_IS_VALID(amf_ue)) {
-
+                ogs_ad("gmm_handle_registration_update");
                 gmm_cause = gmm_handle_registration_update(
                         amf_ue, &nas_message->gmm.registration_request);
                 if (gmm_cause != OGS_5GMM_CAUSE_REQUEST_ACCEPTED) {
@@ -1191,7 +1191,7 @@ static void common_register_state(ogs_fsm_t *s, amf_event_t *e,
 
         case OGS_NAS_5GS_DEREGISTRATION_REQUEST_FROM_UE:
             ogs_info("[%s] Deregistration request", amf_ue->supi);
-
+            ogs_ad("gmm_handle_deregistration_request");
             gmm_handle_deregistration_request(
                     amf_ue, &nas_message->gmm.deregistration_request_from_ue);
             OGS_FSM_TRAN(s, &gmm_state_de_registered);
@@ -1304,6 +1304,7 @@ void gmm_state_authentication(ogs_fsm_t *s, amf_event_t *e)
         amf_ue = e->amf_ue;
         ogs_assert(amf_ue);
     }
+    ogs_ad("gmm_state_authentication %d: %s", e->h.id, amf_event_get_name(e));
 
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:
@@ -1422,6 +1423,7 @@ void gmm_state_authentication(ogs_fsm_t *s, amf_event_t *e)
 
         case OGS_NAS_5GS_DEREGISTRATION_REQUEST_FROM_UE:
             ogs_warn("[%s] Deregistration request", amf_ue->supi);
+            ogs_ad("gmm_handle_deregistration_request");
 
             gmm_handle_deregistration_request(
                     amf_ue, &nas_message->gmm.deregistration_request_from_ue);
@@ -1552,6 +1554,7 @@ void gmm_state_security_mode(ogs_fsm_t *s, amf_event_t *e)
 
     amf_ue = e->amf_ue;
     ogs_assert(amf_ue);
+    ogs_ad("gmm_state_security_mode %d: %s", e->h.id, amf_event_get_name(e));
 
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:
@@ -1684,6 +1687,7 @@ void gmm_state_security_mode(ogs_fsm_t *s, amf_event_t *e)
 
         case OGS_NAS_5GS_DEREGISTRATION_REQUEST_FROM_UE:
             ogs_warn("[%s] Deregistration request", amf_ue->supi);
+            ogs_ad("OGS_NAS_5GS_DEREGISTRATION_REQUEST_FROM_UE");
 
             gmm_handle_deregistration_request(
                     amf_ue, &nas_message->gmm.deregistration_request_from_ue);
@@ -1752,6 +1756,7 @@ void gmm_state_initial_context_setup(ogs_fsm_t *s, amf_event_t *e)
         amf_ue = e->amf_ue;
         ogs_assert(amf_ue);
     }
+    ogs_ad("gmm_state_initial_context_setup %d: %s", e->h.id, amf_event_get_name(e));
 
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:
@@ -2043,6 +2048,7 @@ void gmm_state_initial_context_setup(ogs_fsm_t *s, amf_event_t *e)
 
         case OGS_NAS_5GS_DEREGISTRATION_REQUEST_FROM_UE:
             ogs_warn("[%s] Deregistration request", amf_ue->supi);
+            ogs_ad("gmm_handle_deregistration_request");
 
             gmm_handle_deregistration_request(
                     amf_ue, &nas_message->gmm.deregistration_request_from_ue);
@@ -2099,6 +2105,7 @@ void gmm_state_ue_context_will_remove(ogs_fsm_t *s, amf_event_t *e)
         amf_ue = e->amf_ue;
         ogs_assert(amf_ue);
     }
+    ogs_ad("gmm_state_ue_context_will_remove %d: %s", e->h.id, amf_event_get_name(e));
 
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:
@@ -2137,6 +2144,7 @@ void gmm_state_exception(ogs_fsm_t *s, amf_event_t *e)
         amf_ue = e->amf_ue;
         ogs_assert(amf_ue);
     }
+    ogs_ad("gmm_state_exception %d: %s", e->h.id, amf_event_get_name(e));
 
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:
@@ -2194,6 +2202,7 @@ void gmm_state_exception(ogs_fsm_t *s, amf_event_t *e)
                 r = nas_5gs_send_identity_request(amf_ue);
                 ogs_expect(r == OGS_OK);
                 ogs_assert(r != OGS_ERROR);
+            ogs_ad("AMF_UE_HAVE_SUCI is false");
 
                 OGS_FSM_TRAN(s, &gmm_state_de_registered);
                 break;

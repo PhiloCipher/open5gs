@@ -103,6 +103,7 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
                     NULL, "cannot parse HTTP sbi_message", NULL));
             break;
         }
+        ogs_ad("OGS_EVENT_SBI_SERVER: %s", sbi_message.h.service.name);
 
         SWITCH(sbi_message.h.service.name)
         CASE(OGS_SBI_SERVICE_NAME_NUDM_SDM)
@@ -288,7 +289,7 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
             ogs_sbi_response_free(sbi_response);
             break;
         }
-
+        ogs_ad("OGS_EVENT_SBI_CLIENT: %s",sbi_message.h.service.name);
         SWITCH(sbi_message.h.service.name)
         CASE(OGS_SBI_SERVICE_NAME_NUDM_SDM)
         CASE(OGS_SBI_SERVICE_NAME_NNSSF_NSSELECTION)
@@ -308,6 +309,7 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
 
         SWITCH(sbi_message.h.service.name)
         CASE(OGS_SBI_SERVICE_NAME_NNRF_NFM)
+            ogs_ad("OGS_SBI_SERVICE_NAME_NNRF_NFM: %s",sbi_message.h.resource.component[0]);
 
             SWITCH(sbi_message.h.resource.component[0])
             CASE(OGS_SBI_RESOURCE_NAME_NF_INSTANCES)
@@ -435,7 +437,7 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
             e->amf_ue = amf_ue;
             e->h.sbi.message = &sbi_message;;
             e->h.sbi.state = state;
-
+            ogs_ad("ogs_fsm_dispatch OGS_SBI_SERVICE_NAME_NPCF_AM_POLICY_CONTROL");
             ogs_fsm_dispatch(&amf_ue->sm, e);
             break;
 
@@ -971,6 +973,7 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
                  * Newly associated NG(ran_ue_t) context holding timer
                  * is stopped. */
                 ogs_debug("[%s] Start NG Holding Timer", amf_ue->suci);
+                ogs_ad("[%s] Start NG Holding Timer", amf_ue->suci);
                 ogs_debug("[%s]    RAN_UE_NGAP_ID[%d] AMF_UE_NGAP_ID[%lld]",
                         amf_ue->suci, amf_ue->ran_ue->ran_ue_ngap_id,
                         (long long)amf_ue->ran_ue->amf_ue_ngap_id);
@@ -1004,6 +1007,7 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
 
         e->amf_ue = amf_ue;
         e->nas.message = &nas_message;
+            ogs_ad("ogs_fsm_dispatch AMF_EVENT_5GMM_MESSAGE");
 
         ogs_fsm_dispatch(&amf_ue->sm, e);
 
@@ -1018,6 +1022,7 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
         }
 
         ogs_assert(OGS_FSM_STATE(&amf_ue->sm));
+            ogs_ad("ogs_fsm_dispatch AMF_EVENT_5GMM_TIMER");
 
         ogs_fsm_dispatch(&amf_ue->sm, e);
         break;

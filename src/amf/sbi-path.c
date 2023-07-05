@@ -92,6 +92,7 @@ int amf_ue_sbi_discover_and_send(
         ogs_sbi_request_t *(*build)(amf_ue_t *amf_ue, void *data),
         amf_ue_t *amf_ue, int state, void *data)
 {
+    ogs_ad("amf_ue_sbi_discover_and_send service_type %d", service_type);
     int r;
     int rv;
     ogs_sbi_xact_t *xact = NULL;

@@ -51,8 +51,7 @@ void scp_state_operational(ogs_fsm_t *s, scp_event_t *e)
     scp_sm_debug(e);
 
     ogs_assert(s);
-    ogs_ad("SCP state: %d", e->h.id);
-
+    ogs_ad("SCP state %d: %s", e->h.id, scp_event_get_name(e));
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:
         break;
@@ -151,7 +150,7 @@ void scp_state_operational(ogs_fsm_t *s, scp_event_t *e)
 
         SWITCH(message.h.service.name)
         CASE(OGS_SBI_SERVICE_NAME_NNRF_NFM)
-
+            ogs_ad("OGS_SBI_SERVICE_NAME_NNRF_NFM: %s", message.h.resource.component[0]);
             SWITCH(message.h.resource.component[0])
             CASE(OGS_SBI_RESOURCE_NAME_NF_INSTANCES)
                 nf_instance = e->h.sbi.data;

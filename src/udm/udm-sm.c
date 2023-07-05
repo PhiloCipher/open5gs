@@ -53,7 +53,7 @@ void udm_state_operational(ogs_fsm_t *s, udm_event_t *e)
     udm_sm_debug(e);
 
     ogs_assert(s);
-    ogs_ad("UDM state: %d", e->h.id);
+    ogs_ad("UDM state %d: %s", e->h.id, udm_event_get_name(e));
 
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:
@@ -96,7 +96,7 @@ void udm_state_operational(ogs_fsm_t *s, udm_event_t *e)
             ogs_sbi_message_free(&message);
             break;
         }
-
+        ogs_ad("UDM OGS_EVENT_SBI_SERVER: %s", message.h.service.name);
         SWITCH(message.h.service.name)
         CASE(OGS_SBI_SERVICE_NAME_NNRF_NFM)
 
@@ -181,6 +181,7 @@ void udm_state_operational(ogs_fsm_t *s, udm_event_t *e)
             e->udm_ue = udm_ue;
             e->h.sbi.message = &message;
             ogs_fsm_dispatch(&udm_ue->sm, e);
+
             if (OGS_FSM_CHECK(&udm_ue->sm, udm_ue_state_exception)) {
                 ogs_error("[%s] State machine exception", udm_ue->suci);
                 udm_ue_remove(udm_ue);
@@ -352,7 +353,7 @@ void udm_state_operational(ogs_fsm_t *s, udm_event_t *e)
 
                 e->udm_ue = udm_ue;
                 e->h.sbi.message = &message;
-
+                ogs_ad("OGS_SBI_RESOURCE_NAME_SUBSCRIPTION_DATA");
                 ogs_fsm_dispatch(&udm_ue->sm, e);
                 if (OGS_FSM_CHECK(&udm_ue->sm, udm_ue_state_exception)) {
                     ogs_error("[%s] State machine exception", udm_ue->suci);

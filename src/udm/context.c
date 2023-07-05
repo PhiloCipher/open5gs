@@ -123,6 +123,7 @@ int udm_context_parse_config(void)
 
 udm_ue_t *udm_ue_add(char *suci)
 {
+    ogs_ad("udm_ue_add");
     udm_event_t e;
     udm_ue_t *udm_ue = NULL;
 

@@ -175,6 +175,7 @@ int ngap_send_to_nas(ran_ue_t *ran_ue,
     ogs_assert(sh);
 
     memset(&security_header_type, 0, sizeof(ogs_nas_security_header_type_t));
+    ogs_ad("OGS_NAS_SECURITY_HEADER: %d",sh->security_header_type);
     switch(sh->security_header_type) {
     case OGS_NAS_SECURITY_HEADER_PLAIN_NAS_MESSAGE:
         break;

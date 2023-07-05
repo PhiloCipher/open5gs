@@ -112,7 +112,8 @@ void ngap_accept_handler(ogs_sock_t *sock)
 
         ogs_info("gNB-N2 accepted[%s]:%d in ng-path module",
             OGS_ADDR(addr, buf), OGS_PORT(addr));
-        ogs_ad("ngap_accept_handler");
+        ogs_ad("gNB-N2 accepted[%s]:%d in ng-path module",
+            OGS_ADDR(addr, buf), OGS_PORT(addr));
         ngap_event_push(AMF_EVENT_NGAP_LO_ACCEPT,
                 new, addr, NULL, 0, 0);
     } else {
@@ -165,7 +166,7 @@ void ngap_recv_handler(ogs_sock_t *sock)
                 addr = ogs_calloc(1, sizeof(ogs_sockaddr_t));
                 ogs_assert(addr);
                 memcpy(addr, &from, sizeof(ogs_sockaddr_t));
-
+                ogs_ad("AMF_EVENT_NGAP_LO_SCTP_COMM_UP");
                 ngap_event_push(AMF_EVENT_NGAP_LO_SCTP_COMM_UP,
                         sock, addr, NULL,
                         not->sn_assoc_change.sac_inbound_streams,

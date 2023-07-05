@@ -33,7 +33,6 @@ int scp_sbi_open(void)
 {
     ogs_sbi_nf_instance_t *nf_instance = NULL, *nrf_instance = NULL;
     ogs_sbi_client_t *nrf_client = NULL, *next_scp = NULL;
-                 ogs_ad("ssstate0");
 
     /* Initialize SELF NF instance */
     nf_instance = ogs_sbi_self()->nf_instance;
@@ -51,7 +50,7 @@ int scp_sbi_open(void)
     nrf_client = NF_INSTANCE_CLIENT(ogs_sbi_self()->nrf_instance);
 
     if (nrf_client) {
-                 ogs_ad("ssstate1");
+        ogs_ad("scp_sbi_open: Initialize NRF NF Instance");
 
         /* Initialize NRF NF Instance */
         if (nrf_instance)

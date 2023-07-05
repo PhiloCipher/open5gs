@@ -1140,6 +1140,7 @@ int amf_context_nf_info(void)
 
 amf_gnb_t *amf_gnb_add(ogs_sock_t *sock, ogs_sockaddr_t *addr)
 {
+    ogs_ad("amf_gnb_add");
     amf_gnb_t *gnb = NULL;
     amf_event_t e;
 
@@ -1158,6 +1159,7 @@ amf_gnb_t *amf_gnb_add(ogs_sock_t *sock, ogs_sockaddr_t *addr)
     gnb->sctp.type = amf_gnb_sock_type(gnb->sctp.sock);
 
     if (gnb->sctp.type == SOCK_STREAM) {
+        ogs_ad("ogs_pollset_add");
         gnb->sctp.poll.read = ogs_pollset_add(ogs_app()->pollset,
             OGS_POLLIN, sock->fd, ngap_recv_upcall, sock);
         ogs_assert(gnb->sctp.poll.read);
@@ -1173,6 +1175,7 @@ amf_gnb_t *amf_gnb_add(ogs_sock_t *sock, ogs_sockaddr_t *addr)
 
     memset(&e, 0, sizeof(e));
     e.gnb = gnb;
+    ogs_ad("ogs_fsm_init");
     ogs_fsm_init(&gnb->sm, ngap_state_initial, ngap_state_final, &e);
 
     ogs_list_add(&self.gnb_list, gnb);
@@ -1582,7 +1585,7 @@ void amf_ue_remove(amf_ue_t *amf_ue)
     ogs_assert(amf_ue);
 
     ogs_list_remove(&self.amf_ue_list, amf_ue);
-
+    ogs_ad("amf_ue_fsm_fini");
     amf_ue_fsm_fini(amf_ue);
 
     /* Clear Paging Info */

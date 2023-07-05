@@ -52,6 +52,7 @@ void ausf_state_operational(ogs_fsm_t *s, ausf_event_t *e)
     ausf_sm_debug(e);
 
     ogs_assert(s);
+    ogs_ad("AUSF state %d: %s", e->h.id, ausf_event_get_name(e));
 
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:
@@ -86,6 +87,7 @@ void ausf_state_operational(ogs_fsm_t *s, ausf_event_t *e)
             ogs_sbi_message_free(&message);
             break;
         }
+        ogs_ad("AUSF OGS_EVENT_SBI_SERVER: %s", message.h.service.name);
 
         SWITCH(message.h.service.name)
         CASE(OGS_SBI_SERVICE_NAME_NNRF_NFM)

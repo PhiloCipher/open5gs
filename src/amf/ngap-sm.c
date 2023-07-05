@@ -84,8 +84,7 @@ void ngap_state_operational(ogs_fsm_t *s, amf_event_t *e)
                 ngap_handle_ng_setup_request(gnb, pdu);
                 break;
             case NGAP_ProcedureCode_id_InitialUEMessage:
-                ogs_ad("amf_ue_iniiiiiiiiit in NGAP_ProcedureCode_id_InitialUEMessage");
-
+                ogs_ad("amf_ue_init in NGAP_ProcedureCode_id_InitialUEMessage");
                 ngap_handle_initial_ue_message(gnb, pdu);
                 break;
             case NGAP_ProcedureCode_id_UplinkNASTransport:

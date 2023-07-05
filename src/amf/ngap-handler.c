@@ -458,6 +458,11 @@ void ngap_handle_initial_ue_message(amf_gnb_t *gnb, ogs_ngap_message_t *message)
                         AMF_UE_HAVE_SUCI(amf_ue) ? amf_ue->suci : "Unknown ID",
                         ogs_amf_id_hexdump(&amf_ue->current.guti.amf_id),
                         amf_ue->current.guti.m_tmsi);
+
+                        ogs_ad("[%s]    5G-S_TMSI[AMF_ID:0x%x,M_TMSI:0x%x]",
+                        AMF_UE_HAVE_SUCI(amf_ue) ? amf_ue->suci : "Unknown ID",
+                        ogs_amf_id_hexdump(&amf_ue->current.guti.amf_id),
+                        amf_ue->current.guti.m_tmsi);
                 /* If NAS(amf_ue_t) has already been associated with
                  * older NG(ran_ue_t) context */
                 if (CM_CONNECTED(amf_ue)) {
@@ -548,6 +553,7 @@ void ngap_handle_initial_ue_message(amf_gnb_t *gnb, ogs_ngap_message_t *message)
     if (UEContextRequest) {
         if (*UEContextRequest == NGAP_UEContextRequest_requested) {
             ran_ue->ue_context_requested = true;
+            ogs_ad("NGAP_UEContextRequest_requested");
         }
     }
 
@@ -697,6 +703,7 @@ void ngap_handle_uplink_nas_transport(
         ran_ue->ran_ue_ngap_id, (long long)ran_ue->amf_ue_ngap_id,
         ran_ue->saved.nr_tai.tac.v, (long long)ran_ue->saved.nr_cgi.cell_id);
 
+    ogs_ad("Copy NR-TAI/NR-CGI from ran_ue to amf_ue");
     /* Copy NR-TAI/NR-CGI from ran_ue */
     memcpy(&amf_ue->nr_tai, &ran_ue->saved.nr_tai, sizeof(ogs_5gs_tai_t));
     memcpy(&amf_ue->nr_cgi, &ran_ue->saved.nr_cgi, sizeof(ogs_nr_cgi_t));
@@ -2785,6 +2792,7 @@ void ngap_handle_path_switch_request(
     ogs_ngap_ASN_to_5gs_tai(
             &UserLocationInformationNR->tAI, &ran_ue->saved.nr_tai);
 
+    ogs_ad("Copy NR-TAI/NR-CGI from ran_ue to amf_ue");
     /* Copy Stream-No/TAI/ECGI from ran_ue */
     amf_ue->gnb_ostream_id = ran_ue->gnb_ostream_id;
     memcpy(&amf_ue->nr_tai, &ran_ue->saved.nr_tai, sizeof(ogs_5gs_tai_t));
@@ -4019,6 +4027,7 @@ void ngap_handle_handover_notification(
         target_ue->saved.nr_tai.tac.v,
         (long long)target_ue->saved.nr_cgi.cell_id);
 
+    ogs_ad("Copy Stream-No/TAI/ECGI from ran_ue to amf_ue");
     /* Copy Stream-No/TAI/ECGI from ran_ue */
     amf_ue->gnb_ostream_id = target_ue->gnb_ostream_id;
     memcpy(&amf_ue->nr_tai, &target_ue->saved.nr_tai, sizeof(ogs_5gs_tai_t));
