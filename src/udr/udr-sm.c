@@ -51,7 +51,7 @@ void udr_state_operational(ogs_fsm_t *s, udr_event_t *e)
     udr_sm_debug(e);
 
     ogs_assert(s);
-    ogs_ad("UDR state: %d", e->h.id);
+    ogs_ad("UDR state %d: %s", e->h.id, udr_event_get_name(e));
 
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:
@@ -86,6 +86,7 @@ void udr_state_operational(ogs_fsm_t *s, udr_event_t *e)
             ogs_sbi_message_free(&message);
             break;
         }
+        ogs_ad("UDR OGS_EVENT_SBI_SERVER: %s", message.h.service.name);
 
         SWITCH(message.h.service.name)
         CASE(OGS_SBI_SERVICE_NAME_NNRF_NFM)
@@ -119,8 +120,10 @@ void udr_state_operational(ogs_fsm_t *s, udr_event_t *e)
             break;
 
         CASE(OGS_SBI_SERVICE_NAME_NUDR_DR)
+            ogs_ad("UDR OGS_SBI_SERVICE_NAME_NUDR_DR: %s", message.h.resource.component[0]);
             SWITCH(message.h.resource.component[0])
             CASE(OGS_SBI_RESOURCE_NAME_SUBSCRIPTION_DATA)
+                ogs_ad("UDR OGS_SBI_RESOURCE_NAME_SUBSCRIPTION_DATA: %s", message.h.resource.component[2]);
                 SWITCH(message.h.resource.component[2])
                 CASE(OGS_SBI_RESOURCE_NAME_AUTHENTICATION_DATA)
                     udr_nudr_dr_handle_subscription_authentication(

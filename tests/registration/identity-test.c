@@ -63,12 +63,12 @@ static void test1_func(abts_case *tc, void *data)
 
     test_ue->k_string = "465b5ce8b199b49faa5f0a2ee238a6bc";
     test_ue->opc_string = "e8ed289deba952e4283b54e88e6183ca";
-    ogs_ad("gNB connects to AMF ");
+    ogs_ad("make a socket for gnb");
     /* gNB connects to AMF */
     ngap = testngap_client(AF_INET);
     ABTS_PTR_NOTNULL(tc, ngap);
     // sleep(1);
-    ogs_ad("gNB connected to AMF ");
+    ogs_ad("gNB socket made to connect to AMF ");
 
 //     /* gNB connects to UPF */
 //     gtpu = test_gtpu_server(1, AF_INET);
@@ -84,9 +84,9 @@ static void test1_func(abts_case *tc, void *data)
     ogs_ad("Sent NG-Setup Reqeust");
 
     /* Receive NG-Setup Response */
+    ogs_ad("ngap_recv want to receive NG-Setup Response");
     recvbuf = testgnb_ngap_read(ngap);
     ABTS_PTR_NOTNULL(tc, recvbuf);
-    ogs_ad("ngap_recv want to receive NG-Setup Response: %s", recvbuf->data);
     testngap_recv(test_ue, recvbuf);
     ogs_ad("Received NG-Setup Response: %s", recvbuf->data);
     // sleep(1);

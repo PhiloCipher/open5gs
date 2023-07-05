@@ -150,6 +150,9 @@ void testgmm_handle_authentication_request(test_ue_t *test_ue,
 
     memcpy(test_ue->rand, authentication_parameter_rand->rand, OGS_RAND_LEN);
     memcpy(test_ue->autn, authentication_parameter_autn->autn, OGS_AUTN_LEN);
+    ogs_ad("testgmm_handle_authentication_request ksi: %d rand:%s autn: %s", 
+            test_ue->nas.ksi , test_ue->rand, test_ue->autn);
+
 }
 
 void testgmm_handle_security_mode_command(test_ue_t *test_ue,

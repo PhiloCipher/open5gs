@@ -51,7 +51,7 @@ void upf_state_operational(ogs_fsm_t *s, upf_event_t *e)
     upf_sm_debug(e);
 
     ogs_assert(s);
-    ogs_ad("UPF state: %d", e->id);
+    ogs_ad("UPF state %d: %s", e->id, upf_event_get_name(e));
     switch (e->id) {
     case OGS_FSM_ENTRY_SIG:
         break;

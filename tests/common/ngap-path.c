@@ -37,7 +37,7 @@ void testngap_recv(test_ue_t *test_ue, ogs_pkbuf_t *pkbuf)
 
     pdu = &message;
     ogs_assert(pdu);
-    ogs_ad("ngap state: %d", pdu->present);
+    ogs_ad("ngap recv state: %d", pdu->present);
 
     switch (pdu->present) {
     case NGAP_NGAP_PDU_PR_initiatingMessage:
@@ -46,6 +46,7 @@ void testngap_recv(test_ue_t *test_ue, ogs_pkbuf_t *pkbuf)
 
         if (test_ue)
             test_ue->ngap_procedure_code = initiatingMessage->procedureCode;
+        ogs_ad("NGAP_NGAP_PDU_PR_initiatingMessage: %li", initiatingMessage->procedureCode);
 
         switch (initiatingMessage->procedureCode) {
         case NGAP_ProcedureCode_id_DownlinkNASTransport:
@@ -141,6 +142,8 @@ void testngap_recv(test_ue_t *test_ue, ogs_pkbuf_t *pkbuf)
 
 void testngap_send_to_nas(test_ue_t *test_ue, NGAP_NAS_PDU_t *nasPdu)
 {
+    ogs_ad("testngap_send_to_nas");
+
     ogs_nas_5gs_security_header_t *sh = NULL;
     ogs_nas_security_header_type_t security_header_type;
 
