@@ -34,6 +34,7 @@ extern "C" {
 
 #define ogs_fatal(...) ogs_log_message(OGS_LOG_FATAL, 0, __VA_ARGS__)
 #define ogs_error(...) ogs_log_message(OGS_LOG_ERROR, 0, __VA_ARGS__)
+#define ogs_tmp(...) ogs_log_message(OGS_LOG_TMP, 0, __VA_ARGS__)
 #define ogs_ad(...) ogs_log_message(OGS_LOG_AD, 0, __VA_ARGS__)
 #define ogs_warn(...) ogs_log_message(OGS_LOG_WARN, 0, __VA_ARGS__)
 #define ogs_info(...) ogs_log_message(OGS_LOG_INFO, 0, __VA_ARGS__)
@@ -57,6 +58,7 @@ typedef enum {
     OGS_LOG_NONE,
     OGS_LOG_FATAL,
     OGS_LOG_ERROR,
+    OGS_LOG_TMP,
     OGS_LOG_AD,
     OGS_LOG_WARN,
     OGS_LOG_INFO,
