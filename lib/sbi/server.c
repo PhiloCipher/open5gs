@@ -141,6 +141,12 @@ bool ogs_sbi_server_send_rspmem_persistent(
 bool ogs_sbi_server_send_response(
         ogs_sbi_stream_t *stream, ogs_sbi_response_t *response)
 {
+    if( strcmp(OpenAPI_nf_type_ToString(NF_INSTANCE_TYPE(ogs_sbi_self()->nf_instance)) , "SCP")){
+        ogs_com("SENDING at %s: %d", OpenAPI_nf_type_ToString(NF_INSTANCE_TYPE(ogs_sbi_self()->nf_instance)), (int)response->http.content_length);
+        ogs_com("Content Start:%sContent Stop",response->http.content);
+        ogs_com("Status %d", response->status);
+
+    }
     return ogs_sbi_server_actions.send_response(stream, response);
 }
 

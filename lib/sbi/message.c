@@ -634,7 +634,7 @@ ogs_sbi_response_t *ogs_sbi_build_response(
             return NULL;
         }
     }
-
+    ogs_com("message->http.location %s",message->http.location);
     if (message->http.location) {
         ogs_sbi_header_set(response->http.headers, "Location",
                 message->http.location);
@@ -656,7 +656,7 @@ int ogs_sbi_parse_request(
 
     ogs_assert(request);
     ogs_assert(message);
-
+    // ogs_com("ogs_sbi_parse_request %s", request->h.uri);
     rv = ogs_sbi_parse_header(message, &request->h);
     if (rv != OGS_OK) {
         ogs_error("ogs_sbi_parse_header() failed");

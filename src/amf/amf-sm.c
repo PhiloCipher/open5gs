@@ -90,6 +90,8 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
     case OGS_EVENT_SBI_SERVER:
         sbi_request = e->h.sbi.request;
         ogs_assert(sbi_request);
+        ogs_com("AMF OGS_EVENT_SBI_SERVER h.resource.component[0]: %s  h.resource.component[1]: %s  Content: %s", sbi_request->h.resource.component[0], sbi_request->h.resource.component[1], sbi_request->http.content);
+
         stream = e->h.sbi.data;
         ogs_assert(stream);
 

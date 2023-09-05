@@ -26,6 +26,8 @@ static void build_default_discovery_parameter(
 
 int ogs_sbi_server_handler(ogs_sbi_request_t *request, void *data)
 {
+    ogs_com("RECEIVED at %s: %d ", OpenAPI_nf_type_ToString(NF_INSTANCE_TYPE(ogs_sbi_self()->nf_instance)), (int)request->http.content_length);
+    ogs_com("Content Start:%sContent Stop",request->http.content);
     ogs_event_t *e = NULL;
     int rv;
 
@@ -52,6 +54,8 @@ int ogs_sbi_server_handler(ogs_sbi_request_t *request, void *data)
 int ogs_sbi_client_handler(
         int status, ogs_sbi_response_t *response, void *data)
 {
+    ogs_com("RECEIVED at %s: %d ", OpenAPI_nf_type_ToString(NF_INSTANCE_TYPE(ogs_sbi_self()->nf_instance)), (int)response->http.content_length);
+    ogs_com("Content Start:%sContent Stop",response->http.content);
     ogs_event_t *e = NULL;
     int rv;
 
@@ -231,6 +235,11 @@ int ogs_sbi_discover_and_send(ogs_sbi_xact_t *xact)
         client = ogs_sbi_client_find(scheme, addr);
         ogs_freeaddrinfo(addr);
     }
+    // ogs_com("Target NF: %s  Requester NF: %s  Service: %s  Method: %s URI: %s h.resource.component[0]: %s  h.resource.component[1]: %s", OpenAPI_nf_type_ToString(target_nf_type), OpenAPI_nf_type_ToString(requester_nf_type), ogs_sbi_service_type_to_name(service_type),request->h.method, request->h.uri, request->h.resource.component[0], request->h.resource.component[1]);
+    // ogs_com("Content Start:%sContent Stop",request->http.content);
+    ogs_com("SENDING at %s: %d", OpenAPI_nf_type_ToString(NF_INSTANCE_TYPE(ogs_sbi_self()->nf_instance)), (int)request->http.content_length);
+    ogs_com("Content Start:%sContent Stop",request->http.content);
+    // ogs_com("[%s] %s", request->h.method, request->h.uri);
 
     if (scp_client) {
         /*************************
