@@ -128,8 +128,6 @@ void nrf_state_operational(ogs_fsm_t *s, nrf_event_t *e)
                             ogs_assert(nf_instance);
                             ogs_sbi_nf_instance_set_id(nf_instance,
                                     message.h.resource.component[1]);
-                            ogs_ad("OGS_SBI_RESOURCE_NAME_NF_INSTANCES OGS_SBI_HTTP_METHOD_GET: %s", message.h.resource.component[1]);
-
                             nrf_nf_fsm_init(nf_instance);
                             break;
                         DEFAULT
