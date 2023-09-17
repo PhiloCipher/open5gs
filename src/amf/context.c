@@ -30,6 +30,7 @@ static OGS_POOL(ran_ue_pool, ran_ue_t);
 static OGS_POOL(amf_sess_pool, amf_sess_t);
 
 static OGS_POOL(amf_loc_pool, amf_loc_t);
+static OGS_POOL(amf_loc_node_pool, amf_loc_node_t);
 static OGS_POOL(m_tmsi_pool, amf_m_tmsi_t);
 
 static int context_initialized = 0;
@@ -64,6 +65,7 @@ void amf_context_init(void)
     ogs_pool_init(&ran_ue_pool, ogs_app()->max.ue);
     ogs_pool_init(&amf_sess_pool, ogs_app()->pool.sess);
     ogs_pool_init(&amf_loc_pool, ogs_app()->max.ue);
+    ogs_pool_init(&amf_loc_node_pool, ogs_app()->max.ue); //AD_TODO increase it
     ogs_pool_init(&m_tmsi_pool, ogs_app()->max.ue*2);
     ogs_pool_random_id_generate(&m_tmsi_pool);
 
@@ -90,6 +92,7 @@ void amf_context_final(void)
 
     amf_gnb_remove_all();
     amf_ue_remove_all();
+    amf_loc_remove_all();
 
     ogs_assert(self.gnb_addr_hash);
     ogs_hash_destroy(self.gnb_addr_hash);
@@ -1308,6 +1311,7 @@ ran_ue_t *ran_ue_add(amf_gnb_t *gnb, uint32_t ran_ue_ngap_id)
         OGS_NEXT_ID(gnb->ostream_id, 1, gnb->max_num_of_ostreams-1);
 
     ran_ue->gnb = gnb;
+    ran_ue->amf_loc = NULL;
 
     ogs_list_add(&gnb->ran_ue_list, ran_ue);
 
@@ -1549,6 +1553,17 @@ amf_ue_t *amf_ue_add(ran_ue_t *ran_ue)
     }
     amf_ue->implicit_deregistration.pkbuf = NULL;
 
+    ogs_ad("amf_ue_add t_ad.timer");
+    amf_ue->t_ad.timer = ogs_timer_add(
+            ogs_app()->timer_mgr, amf_timer_t_ad_expire, amf_ue);
+    if (!amf_ue->t_ad.timer) {
+        ogs_error("ogs_timer_add() failed");
+        ogs_pool_free(&amf_ue_pool, amf_ue);
+        return NULL;
+    }
+    ogs_timer_start(amf_ue->t_ad.timer, amf_timer_cfg(AMF_TIMER_T_AD)->duration);
+    ogs_ad("timer t_ad started!");
+
     /* SBI Type */
     amf_ue->sbi.type = OGS_SBI_OBJ_UE_TYPE;
 
@@ -1602,6 +1617,10 @@ void amf_ue_remove(amf_ue_t *amf_ue)
     /* Remove all session context */
     amf_sess_remove_all(amf_ue);
 
+    /* Remove all Location context */
+    amf_ue_deassociate_all_loc(amf_ue);
+    amf_loc_remove(amf_ue->ran_ue->amf_loc);
+
     if (amf_ue->current.m_tmsi) {
         ogs_hash_set(self.guti_ue_hash,
                 &amf_ue->current.guti, sizeof(ogs_nas_5gs_guti_t), NULL);
@@ -1654,6 +1673,7 @@ void amf_ue_remove(amf_ue_t *amf_ue)
     ogs_timer_delete(amf_ue->t3570.timer);
     ogs_timer_delete(amf_ue->mobile_reachable.timer);
     ogs_timer_delete(amf_ue->implicit_deregistration.timer);
+    ogs_timer_delete(amf_ue->t_ad.timer);
 
     /* Free SBI object memory */
     if (ogs_list_count(&amf_ue->sbi.xact_list))
@@ -1680,6 +1700,20 @@ void amf_ue_remove_all(void)
 
         amf_ue_remove(amf_ue);
     }
+}
+
+//TODO
+void amf_loc_remove_all(void)
+{
+    //amf_ue_t *amf_loc = NULL, *next = NULL;
+
+    // ogs_list_for_each_safe(&self.amf_loc_list, next, amf_loc) {
+    //     amf_loc_t *loc = ran_ue_cycle(amf_loc);
+
+    //     if (loc) ran_ue_remove(ran_ue);
+
+    //     amf_ue_remove(amf_ue);
+    // }
 }
 
 void amf_ue_fsm_init(amf_ue_t *amf_ue)
@@ -2143,6 +2177,7 @@ void amf_sess_remove_all(amf_ue_t *amf_ue)
         amf_sess_remove(sess);
 }
 
+//AD_TODO
 amf_loc_t *amf_loc_create(ogs_5gs_tai_t *nr_tai, ogs_nr_cgi_t *nr_cgi, ogs_time_t ue_location_timestamp)
 {
     amf_loc_t *loc = NULL;
@@ -2151,24 +2186,75 @@ amf_loc_t *amf_loc_create(ogs_5gs_tai_t *nr_tai, ogs_nr_cgi_t *nr_cgi, ogs_time_
         ogs_error("Could not allocate loc context from pool");
         return NULL;
     }
-    memset(loc, 0, sizeof *loc);
+    // memset(loc, 0, sizeof *loc); is it necessary?
     
+    loc->loc_id = rand();
     loc->nr_location = ogs_sbi_build_nr_location(nr_tai, nr_cgi);
     loc->ue_location_timestamp = ue_location_timestamp;
     ogs_list_init(&loc->amf_ue_list);
-    
+    ogs_ad("amf_loc_create: ID=[%d] TAC[%d] CellID[0x%llx]", loc->loc_id, nr_tai->tac.v, (long long)nr_cgi->cell_id);
+    ogs_ad("amf_loc_create %lli",(long long int)loc);
+
     return loc;
 }
 
-void amf_loc_associate(amf_ue_t *amf_ue, amf_loc_t *loc)
+void amf_loc_update(amf_loc_t *loc, ogs_5gs_tai_t *nr_tai, ogs_nr_cgi_t *nr_cgi, ogs_time_t ue_location_timestamp)
+{
+    ogs_assert(loc);
+    ogs_ad("update id %d", loc->loc_id);
+    ogs_assert(loc->nr_location);
+    
+    ogs_sbi_free_nr_location(loc->nr_location);
+    loc->nr_location = ogs_sbi_build_nr_location(nr_tai, nr_cgi);
+    loc->ue_location_timestamp = ue_location_timestamp;  
+    ogs_ad("amf_loc_update %lli",(long long int)loc->nr_location);
+
+    ogs_ad("amf_loc_update: TAC[%d] CellID[0x%llx]", nr_tai->tac.v, (long long)nr_cgi->cell_id);
+}
+
+void amf_ran_ue_location_setter(ran_ue_t *ran_ue, ogs_5gs_tai_t *nr_tai, ogs_nr_cgi_t *nr_cgi, ogs_time_t ue_location_timestamp)
+{
+    ogs_assert(ran_ue);
+    ogs_assert(nr_tai);
+    ogs_assert(nr_cgi);
+    
+    if(!ran_ue->amf_loc)
+    {
+        ran_ue->amf_loc = amf_loc_create(nr_tai, nr_cgi, (ogs_time_t)NULL);
+    }
+    else
+    {
+        amf_loc_update(ran_ue->amf_loc, nr_tai, nr_cgi, (ogs_time_t)NULL);
+    }
+}
+
+uint32_t amf_loc_id_generate(amf_loc_t *loc)
+{
+    ogs_assert(loc);
+
+    loc->loc_id = ogs_random32();
+    return loc->loc_id;
+}
+
+void amf_ue_loc_associate(amf_ue_t *amf_ue, amf_loc_t *loc)
 {
     ogs_assert(amf_ue);
     ogs_assert(&amf_ue->loc_list);
     ogs_assert(loc);
     ogs_assert(&loc->amf_ue_list);
 
-    ogs_list_add(&amf_ue->loc_list, loc);
-    ogs_list_add(&loc->amf_ue_list, amf_ue);
+    if( ogs_list_count(&amf_ue->loc_list) < 10 )
+    {
+        ogs_ad("ogs_list_count %d",  ogs_list_count(&amf_ue->loc_list) );
+        amf_loc_node_t *amf_loc_node = NULL;
+        ogs_pool_alloc(&amf_loc_node_pool, &amf_loc_node);
+        memset(amf_loc_node, 0, sizeof *amf_loc_node);
+        amf_loc_node->amf_loc = loc;
+        ogs_list_add(&amf_ue->loc_list, amf_loc_node);
+        ogs_list_add(&loc->amf_ue_list, amf_ue);
+        ogs_ad("ogs_list_count %d",  ogs_list_count(&amf_ue->loc_list) );
+    }
+    ogs_ad("Location: ID=[%d] associated with amf_ue %s",  loc->loc_id, amf_ue->supi);
 }
 
 void amf_ue_loc_deassociate(amf_ue_t *amf_ue, amf_loc_t *loc)
@@ -2182,7 +2268,7 @@ void amf_ue_loc_deassociate(amf_ue_t *amf_ue, amf_loc_t *loc)
     ogs_list_remove(&loc->amf_ue_list, amf_ue);
 }
 
-void amf_ue_loc_deassociate_all(amf_ue_t *amf_ue)
+void amf_ue_deassociate_all_loc(amf_ue_t *amf_ue)
 {
     ogs_assert(amf_ue);
     ogs_assert(&amf_ue->loc_list); 
@@ -2192,8 +2278,19 @@ void amf_ue_loc_deassociate_all(amf_ue_t *amf_ue)
         amf_ue_loc_deassociate(amf_ue, loc);
 }
 
+void amf_loc_deassociate_all_amf_ue(amf_loc_t *loc)
+{
+    ogs_assert(loc);
+    ogs_assert(&loc->amf_ue_list); 
+
+    amf_ue_t *amf_ue = NULL, *next_amf_ue = NULL;
+    ogs_list_for_each_safe(&loc->amf_ue_list, next_amf_ue, amf_ue)
+        amf_ue_loc_deassociate(amf_ue, loc);
+}
+
 void amf_loc_remove(amf_loc_t *loc)
 {
+    ogs_ad("amf_loc_remove %d",loc->loc_id);
     ogs_assert(loc);
 
     amf_ue_t *amf_ue = NULL, *next_amf_ue = NULL;
@@ -2208,6 +2305,147 @@ void amf_loc_remove(amf_loc_t *loc)
 amf_loc_t *amf_loc_cycle(amf_loc_t *loc) // what is this?
 {
     return ogs_pool_cycle(&amf_loc_pool, loc);
+}
+
+void amf_loc_associate_randomly(amf_ue_t *amf_ue, amf_loc_t *loc1, amf_loc_t *loc2)
+{
+    if(random()< RAND_MAX/2) // inclusive?
+    {
+        amf_ue_loc_associate(amf_ue, loc1);
+        amf_ue_loc_associate(amf_ue, loc2);
+    }
+    else
+    {
+        amf_ue_loc_associate(amf_ue, loc2);
+        amf_ue_loc_associate(amf_ue, loc1);
+    }
+}
+
+void amf_loc_deassociate_all_amf_ue_randomly(amf_loc_t *loc1, amf_loc_t *loc2)
+{
+    if(random()< RAND_MAX/2) // inclusive?
+    {
+        amf_loc_deassociate_all_amf_ue(loc1);
+        amf_loc_deassociate_all_amf_ue(loc2);
+    }
+    else
+    {
+        amf_loc_deassociate_all_amf_ue(loc2);
+        amf_loc_deassociate_all_amf_ue(loc1);
+    }
+}
+
+amf_loc_t *find_nearest_loc(amf_loc_t *loc0)
+{
+    amf_loc_t *loc = NULL;    
+    int n = ogs_pool_size(&amf_loc_pool) - ogs_pool_avail(&amf_loc_pool);
+    ogs_ad("find_nearest_loc to ID:%d", loc0->loc_id);
+    for (int index = 1; index <= n; index++) {
+        loc = ogs_pool_find(&amf_loc_pool, index);
+        ogs_ad("index %d loc %lli", index, (long long int)loc);
+        if (loc != NULL) {
+            if(loc0 != loc)
+                if(distance_nr_location(loc0, loc)<100)
+                    {
+                        ogs_ad("find_nearest_loc to ID:%d is ID=%d", loc0->loc_id, loc->loc_id);
+                        return loc;
+                    }
+        }
+    }
+
+    return NULL;
+}
+
+int distance_nr_location(amf_loc_t *loc1, amf_loc_t *loc2)
+{
+    ogs_ad("distance_nr_location");
+    ogs_ad("distance_nr_location1 %lli",(long long int)loc1->nr_location);
+    ogs_ad("distance_nr_location2 %lli",(long long int)loc2->nr_location);
+    ogs_ad("nr_cell_id %s %s",loc1->nr_location->ncgi->nr_cell_id,loc2->nr_location->ncgi->nr_cell_id);
+    if( !strcmp(loc1->nr_location->ncgi->nr_cell_id, loc2->nr_location->ncgi->nr_cell_id)) // todo
+        return 0;
+    else
+        return 10000; 
+}
+
+void amf_loc_swapper(amf_loc_t *loc1, amf_loc_t *loc2)
+{
+    ogs_list_t mergedList = merge_ogs_lists(&loc1->amf_ue_list, &loc2->amf_ue_list); // maybe shuffle the list?
+    amf_loc_deassociate_all_amf_ue_randomly(loc1, loc2);// is it necessary to do it randomly?
+
+    amf_ue_t *amf_ue = NULL, *next_amf_ue = NULL;
+    ogs_list_for_each_safe(&mergedList, next_amf_ue, amf_ue)
+        amf_loc_associate_randomly(amf_ue, loc1, loc2);
+
+    // remove merged list. is this the best way?
+    amf_ue = NULL, next_amf_ue = NULL;
+    ogs_list_for_each_safe(&mergedList, next_amf_ue, amf_ue)
+        ogs_list_remove(&mergedList, amf_ue);
+}
+
+ogs_list_t merge_ogs_lists(ogs_list_t *list1, ogs_list_t *list2) {
+    
+    ogs_list_t mergedList;
+    ogs_list_init(&mergedList);
+
+    ogs_list_t *node;
+    ogs_list_for_each(list1, node) {
+        ogs_list_prepend(&mergedList, node);
+    }
+
+    ogs_list_for_each(list2, node) {
+        // Check if the node exists in mergedList
+        bool exists = false;
+        ogs_list_t *iter;
+        ogs_list_for_each(&mergedList, iter) {
+            if (iter == node) {
+                exists = true;
+                break;
+            }
+        }
+        
+        // Add the node to mergedList if it doesn't exist
+        if (!exists) {
+            ogs_list_prepend(&mergedList, node);
+        }
+    }
+    
+    return mergedList;
+}
+
+void amf_loc_print(amf_loc_t *loc)
+{
+    ogs_assert(loc);
+
+    ogs_tmp("Location Info: ID=[%d] TAC[%s] CellID[%s]", loc->loc_id, loc->nr_location->tai->tac, loc->nr_location->ncgi->nr_cell_id);
+}
+
+void amf_ue_loc_list_print(amf_ue_t *amf_ue)
+{
+    ogs_assert(amf_ue);
+    ogs_assert(&amf_ue->loc_list); 
+
+    ogs_tmp("Location info List for AMF UE: %s", amf_ue->supi);
+    amf_loc_node_t *loc = NULL, *next_loc = NULL;
+    ogs_list_for_each_safe(&amf_ue->loc_list, next_loc, loc)
+        amf_loc_print(loc->amf_loc);
+    ogs_tmp("End of Location info List for AMF UE: %s", amf_ue->supi);
+
+}
+
+bool amf_ue_loc_exists(amf_ue_t *amf_ue, amf_loc_t *loc)
+{
+    ogs_assert(amf_ue);
+    ogs_assert(&amf_ue->loc_list); 
+    ogs_assert(loc); 
+
+    amf_loc_node_t *loc_node = NULL, *next_loc_node = NULL;
+    ogs_list_for_each_safe(&amf_ue->loc_list, next_loc_node, loc_node)
+        if(loc_node->amf_loc == loc)
+            return true;
+    return false;
+    ogs_ad("End of Location info List for AMF UE: %s", amf_ue->supi);
+
 }
 
 amf_sess_t *amf_sess_find_by_psi(amf_ue_t *amf_ue, uint8_t psi)
@@ -2658,6 +2896,7 @@ static bool check_smf_info_s_nssai(
 static bool check_smf_info_nr_tai(
         ogs_sbi_smf_info_t *smf_info, amf_sess_t *sess)
 {
+    ogs_ad("check_smf_info_nr_tai");
     amf_ue_t *amf_ue = NULL;
     int i, j;
 

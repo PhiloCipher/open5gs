@@ -158,6 +158,8 @@ ogs_sbi_request_t *amf_nsmf_pdusession_build_create_sm_context(
         goto end;
     }
 
+    SmContextCreateData.loc_id = 1;
+
     pcf_nf_instance = amf_ue->sbi.service_type_array[
         OGS_SBI_SERVICE_TYPE_NPCF_AM_POLICY_CONTROL].nf_instance;
     if (!pcf_nf_instance) {

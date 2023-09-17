@@ -210,6 +210,7 @@ struct ran_ue_s {
     /* Related Context */
     amf_gnb_t       *gnb;
     amf_ue_t        *amf_ue;
+    amf_loc_t       *amf_loc;
 }; 
 
 struct amf_ue_s {
@@ -391,7 +392,7 @@ struct amf_ue_s {
         ogs_pkbuf_t     *pkbuf;
         ogs_timer_t     *timer;
         uint32_t        retry_count;;
-    } t3513, t3522, t3550, t3555, t3560, t3570, mobile_reachable, implicit_deregistration;
+    } t3513, t3522, t3550, t3555, t3560, t3570, mobile_reachable, implicit_deregistration, t_ad;
 
     /* UE Radio Capability */
     OCTET_STRING_t  ueRadioCapability;
@@ -653,15 +654,22 @@ typedef struct amf_sess_s {
 
 
 typedef struct amf_loc_s {
-    //ogs_sbi_object_t sbi; ?
+    ogs_sbi_object_t sbi; //without this the first data will be 0 in the list when access later. why?
 
     OpenAPI_nr_location_t *nr_location;
-    ogs_time_t            ue_location_timestamp;
 
-    ogs_list_t            amf_ue_list;   
+    ogs_time_t            ue_location_timestamp;
+    uint32_t              loc_id;
+    ogs_list_t            amf_ue_list;  
 
 } amf_loc_t;
 
+typedef struct amf_loc_node_s {
+    ogs_lnode_t             lnode;
+
+    amf_loc_t *amf_loc;
+
+} amf_loc_node_t;
 
 void amf_context_init(void);
 void amf_context_final(void);
@@ -694,6 +702,10 @@ void amf_ue_confirm_guti(amf_ue_t *amf_ue);
 amf_ue_t *amf_ue_add(ran_ue_t *ran_ue);
 void amf_ue_remove(amf_ue_t *amf_ue);
 void amf_ue_remove_all(void);
+void amf_loc_remove_all(void);
+
+void amf_loc_print(amf_loc_t *loc);
+void amf_ue_loc_list_print(amf_ue_t *amf_ue);
 
 void amf_ue_fsm_init(amf_ue_t *amf_ue);
 void amf_ue_fsm_fini(amf_ue_t *amf_ue);
@@ -790,12 +802,22 @@ amf_sess_t *amf_sess_find_by_psi(amf_ue_t *amf_ue, uint8_t psi);
 amf_sess_t *amf_sess_find_by_dnn(amf_ue_t *amf_ue, char *dnn);
 
 amf_loc_t *amf_loc_create(ogs_5gs_tai_t *nr_tai, ogs_nr_cgi_t *nr_cgi, ogs_time_t ue_location_timestamp);
-void amf_loc_associate(amf_ue_t *amf_ue, amf_loc_t *loc);
+void amf_loc_update(amf_loc_t *loc, ogs_5gs_tai_t *nr_tai, ogs_nr_cgi_t *nr_cgi, ogs_time_t ue_location_timestamp);
+void amf_ran_ue_location_setter(ran_ue_t *ran_ue, ogs_5gs_tai_t *nr_tai, ogs_nr_cgi_t *nr_cgi, ogs_time_t ue_location_timestamp);
+uint32_t amf_loc_id_generate(amf_loc_t *loc);
+void amf_ue_loc_associate(amf_ue_t *amf_ue, amf_loc_t *loc);
 void amf_ue_loc_deassociate(amf_ue_t *amf_ue, amf_loc_t *loc);
-void amf_ue_loc_deassociate_all(amf_ue_t *amf_ue);
+void amf_loc_deassociate_all_amf_ue(amf_loc_t *loc);
+void amf_ue_deassociate_all_loc(amf_ue_t *amf_ue);
 void amf_loc_remove(amf_loc_t *loc);
 amf_loc_t *amf_loc_cycle(amf_loc_t *loc);
-
+void amf_loc_associate_randomly(amf_ue_t *amf_ue, amf_loc_t *loc1, amf_loc_t *loc2);
+void amf_loc_deassociate_all_amf_ue_randomly(amf_loc_t *loc1, amf_loc_t *loc2);
+amf_loc_t *find_nearest_loc(amf_loc_t *loc0);
+int distance_nr_location(amf_loc_t *loc1, amf_loc_t *loc2);
+ogs_list_t merge_ogs_lists(ogs_list_t *list1, ogs_list_t *list2);
+void amf_loc_swapper(amf_loc_t *loc1, amf_loc_t *loc2);
+bool amf_ue_loc_exists(amf_ue_t *amf_ue, amf_loc_t *loc);
 amf_ue_t *amf_ue_cycle(amf_ue_t *amf_ue);
 amf_sess_t *amf_sess_cycle(amf_sess_t *sess);
 

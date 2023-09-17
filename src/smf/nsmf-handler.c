@@ -223,10 +223,26 @@ bool smf_nsmf_handle_create_sm_context(
 
     sess->sbi_rat_type = SmContextCreateData->rat_type;
 
-    ogs_sbi_parse_nr_location(&sess->nr_tai, &sess->nr_cgi, NrLocation);
-    if (NrLocation->ue_location_timestamp)
-        ogs_sbi_time_from_string(&sess->ue_location_timestamp,
-                NrLocation->ue_location_timestamp);
+    // ogs_sbi_parse_nr_location(&sess->nr_tai, &sess->nr_cgi, NrLocation);
+    // if (NrLocation->ue_location_timestamp)
+    //     ogs_sbi_time_from_string(&sess->ue_location_timestamp,
+    //             NrLocation->ue_location_timestamp);
+    int loc_id = SmContextCreateData->loc_id;
+    bool does_location_exist = false;
+    smf_ue_loc_t * smf_ue_loc = NULL;
+    ogs_list_for_each(&sess->smf_ue->loc_list, smf_ue_loc) {
+        if (smf_ue_loc->lid == loc_id)
+            does_location_exist = true;
+    }
+
+    if(does_location_exist)
+    {
+        smf_ue_loc_update(sess->smf_ue, NrLocation, loc_id);
+    }
+    else
+    {
+        smf_ue_loc_add(sess->smf_ue, NrLocation, loc_id);
+    }
 
     sess->s_nssai.sst = sNssai->sst;
     sess->s_nssai.sd = ogs_s_nssai_sd_from_string(sNssai->sd);
@@ -235,6 +251,9 @@ bool smf_nsmf_handle_create_sm_context(
         sess->mapped_hplmn.sd = ogs_s_nssai_sd_from_string(
                                     SmContextCreateData->hplmn_snssai->sd);
     }
+
+
+
 
     smf_metrics_inst_by_slice_add(&sess->plmn_id, &sess->s_nssai,
             SMF_METR_GAUGE_SM_SESSIONNBR, 1);
@@ -318,6 +337,7 @@ bool smf_nsmf_handle_update_sm_context(
         return false;
     }
 
+    int loc_id = SmContextUpdateData->loc_id;
     if (SmContextUpdateData->ue_location &&
         SmContextUpdateData->ue_location->nr_location) {
         OpenAPI_nr_location_t *NrLocation =
@@ -327,16 +347,21 @@ bool smf_nsmf_handle_update_sm_context(
             NrLocation->ncgi &&
             NrLocation->ncgi->plmn_id && NrLocation->ncgi->nr_cell_id) {
 
-            ogs_sbi_parse_nr_location(&sess->nr_tai, &sess->nr_cgi, NrLocation);
-            if (NrLocation->ue_location_timestamp)
-                ogs_sbi_time_from_string(&sess->ue_location_timestamp,
-                        NrLocation->ue_location_timestamp);
 
-            ogs_debug("    TAI[PLMN_ID:%06x,TAC:%d]",
-                ogs_plmn_id_hexdump(&sess->nr_tai.plmn_id), sess->nr_tai.tac.v);
-            ogs_debug("    NR_CGI[PLMN_ID:%06x,CELL_ID:0x%llx]",
-                ogs_plmn_id_hexdump(&sess->nr_cgi.plmn_id),
-                (long long)sess->nr_cgi.cell_id);
+                smf_ue_loc_update(sess->smf_ue, NrLocation, loc_id);
+
+            // smf_ue_loc_t *ue_loc;
+            // ogs_sbi_parse_nr_location(&sess->nr_tai, &sess->nr_cgi, NrLocation);
+            // if (NrLocation->ue_location_timestamp)
+            //     ogs_sbi_time_from_string(&sess->ue_location_timestamp,
+            //             NrLocation->ue_location_timestamp);
+
+
+            // ogs_debug("    TAI[PLMN_ID:%06x,TAC:%d]",
+            //     ogs_plmn_id_hexdump(&sess->nr_tai.plmn_id), sess->nr_tai.tac.v);
+            // ogs_debug("    NR_CGI[PLMN_ID:%06x,CELL_ID:0x%llx]",
+            //     ogs_plmn_id_hexdump(&sess->nr_cgi.plmn_id),
+            //     (long long)sess->nr_cgi.cell_id);
         }
     }
 
@@ -726,18 +751,18 @@ bool smf_nsmf_handle_release_sm_context(
                 NrLocation->ncgi &&
                 NrLocation->ncgi->plmn_id && NrLocation->ncgi->nr_cell_id) {
 
-                ogs_sbi_parse_nr_location(
-                        &sess->nr_tai, &sess->nr_cgi, NrLocation);
-                if (NrLocation->ue_location_timestamp)
-                    ogs_sbi_time_from_string(&sess->ue_location_timestamp,
-                            NrLocation->ue_location_timestamp);
+                // ogs_sbi_parse_nr_location(
+                //         &sess->nr_tai, &sess->nr_cgi, NrLocation);
+                // if (NrLocation->ue_location_timestamp)
+                //     ogs_sbi_time_from_string(&sess->ue_location_timestamp,
+                //             NrLocation->ue_location_timestamp);
 
-                ogs_debug("    TAI[PLMN_ID:%06x,TAC:%d]",
-                    ogs_plmn_id_hexdump(&sess->nr_tai.plmn_id),
-                    sess->nr_tai.tac.v);
-                ogs_debug("    NR_CGI[PLMN_ID:%06x,CELL_ID:0x%llx]",
-                    ogs_plmn_id_hexdump(&sess->nr_cgi.plmn_id),
-                    (long long)sess->nr_cgi.cell_id);
+                // ogs_debug("    TAI[PLMN_ID:%06x,TAC:%d]",
+                //     ogs_plmn_id_hexdump(&sess->nr_tai.plmn_id),
+                //     sess->nr_tai.tac.v);
+                // ogs_debug("    NR_CGI[PLMN_ID:%06x,CELL_ID:0x%llx]",
+                //     ogs_plmn_id_hexdump(&sess->nr_cgi.plmn_id),
+                //     (long long)sess->nr_cgi.cell_id);
             }
 
             param.ue_location = true;

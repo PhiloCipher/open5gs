@@ -639,6 +639,22 @@ void gmm_state_registered(ogs_fsm_t *s, amf_event_t *e)
                     ogs_assert(r != OGS_ERROR);
             }
             break;
+        case AMF_TIMER_T_AD:
+            amf_loc_t *nearest_amf_loc = find_nearest_loc(amf_ue->ran_ue->amf_loc);
+            if(nearest_amf_loc)
+            {
+            //     amf_loc_swapper(ran_ue->amf_loc, nearest_amf_loc);
+                if(!amf_ue_loc_exists(amf_ue, nearest_amf_loc))
+                    amf_ue_loc_associate(amf_ue, nearest_amf_loc);
+            }
+            else
+            {
+                ogs_ad("Couldn't find any near user!");
+            }
+            amf_ue_loc_list_print(amf_ue);
+            ogs_timer_start(amf_ue->t_ad.timer, amf_timer_cfg(AMF_TIMER_T_AD)->duration);
+            ogs_ad("timer t_ad started!");
+            break;
         default:
             ogs_error("Unknown timer[%s:%d]",
                     amf_timer_get_name(e->h.timer_id), e->h.timer_id);

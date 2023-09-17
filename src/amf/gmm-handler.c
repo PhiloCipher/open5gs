@@ -307,6 +307,10 @@ ogs_nas_5gmm_cause_t gmm_handle_registration_request(amf_ue_t *amf_ue,
     memcpy(&amf_ue->nr_cgi, &ran_ue->saved.nr_cgi, sizeof(ogs_nr_cgi_t));
     amf_ue->ue_location_timestamp = ogs_time_now();
 
+    amf_ran_ue_location_setter(ran_ue, &ran_ue->saved.nr_tai, &ran_ue->saved.nr_cgi, (ogs_time_t)NULL);
+    amf_ue_loc_associate(amf_ue, ran_ue->amf_loc);
+
+
     /* Check PLMN-ID access control */
     gmm_cause = gmm_cause_from_access_control(&amf_ue->nr_tai.plmn_id);
     if (gmm_cause != OGS_5GMM_CAUSE_REQUEST_ACCEPTED) {
