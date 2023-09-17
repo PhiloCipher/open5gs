@@ -33,6 +33,7 @@ open5gs_conf = '''
     ausf.yaml
     udm.yaml
     udr.yaml
+    tdf.yaml
     pcf.yaml
     nssf.yaml
     bsf.yaml

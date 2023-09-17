@@ -70,6 +70,9 @@ void nrf_terminate(void);
 int udr_initialize(void);
 void udr_terminate(void);
 
+int tdf_initialize(void);
+void tdf_terminate(void);
+
 int udm_initialize(void);
 void udm_terminate(void);
 

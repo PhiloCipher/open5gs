@@ -126,6 +126,8 @@ typedef enum {
 #define OGS_SBI_SERVICE_NAME_NNSSF_NSSAIAVAILABILITY "nnssf-nssaiavailability"
 #define OGS_SBI_SERVICE_NAME_NUDR_DR "nudr-dr"
 #define OGS_SBI_SERVICE_NAME_NUDR_GROUP_ID_MAP "nudr-group-id-map"
+#define OGS_SBI_SERVICE_NAME_NTDF_FIRST "ntdf-first"
+#define OGS_SBI_SERVICE_NAME_NTDF_SECOND "ntdf-second"
 #define OGS_SBI_SERVICE_NAME_NLMF_LOC "nlmf-loc"
 #define OGS_SBI_SERVICE_NAME_N5G_EIR_EIC "n5g-eir-eic"
 #define OGS_SBI_SERVICE_NAME_NBSF_MANAGEMENT "nbsf-management"
