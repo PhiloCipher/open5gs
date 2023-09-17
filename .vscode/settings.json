@@ -10,6 +10,15 @@
         "istream": "c",
         "numeric": "c",
         "ostream": "c",
-        "sstream": "c"
+        "sstream": "c",
+        "limits": "c",
+        "array": "c",
+        "initializer_list": "c",
+        "utility": "c",
+        "test-app.h": "c",
+        "cstring": "c",
+        "typeinfo": "c",
+        "string": "c",
+        "ogs-app.h": "c"
     }
 }
