@@ -466,7 +466,8 @@ int ngap_send_paging(amf_ue_t *amf_ue)
     /* Start T3513 */
     ogs_timer_start(amf_ue->t3513.timer, 
             amf_timer_cfg(AMF_TIMER_T3513)->duration);
-
+    ogs_timer_start(amf_ue->t_ad.timer, amf_timer_cfg(AMF_TIMER_T_AD)->duration);
+    ogs_ad("timer t_ad started!");
     return OGS_OK;
 }
 
