@@ -72,9 +72,10 @@ bool udm_nudr_dr_handle_subscription_authentication(
     ogs_assert(server);
 
     ogs_assert(recvmsg);
-
+    ogs_ad("udm_nudr_dr_handle_subscription_authentication: %s", recvmsg->h.resource.component[3]);
     SWITCH(recvmsg->h.resource.component[3])
     CASE(OGS_SBI_RESOURCE_NAME_AUTHENTICATION_SUBSCRIPTION)
+        ogs_ad("OGS_SBI_RESOURCE_NAME_AUTHENTICATION_SUBSCRIPTION: %s", recvmsg->h.method);
         SWITCH(recvmsg->h.method)
         CASE(OGS_SBI_HTTP_METHOD_GET)
             if (recvmsg->res_status != OGS_SBI_HTTP_STATUS_OK) {
@@ -160,7 +161,6 @@ bool udm_nudr_dr_handle_subscription_authentication(
             }
 
             udm_ue->auth_type = OpenAPI_auth_type_5G_AKA;
-
             ogs_ascii_to_hex(
                 AuthenticationSubscription->enc_opc_key,
                 strlen(AuthenticationSubscription->enc_opc_key),
@@ -178,8 +178,7 @@ bool udm_nudr_dr_handle_subscription_authentication(
                 AuthenticationSubscription->sequence_number->sqn,
                 strlen(AuthenticationSubscription->sequence_number->sqn),
                 udm_ue->sqn, sizeof(udm_ue->sqn));
-
-        CASE(OGS_SBI_HTTP_METHOD_PATCH)
+        CASE(OGS_SBI_HTTP_METHOD_PATCH) //this one will be executed as well, brcause there is no break before
             if (recvmsg->res_status != OGS_SBI_HTTP_STATUS_OK &&
                 recvmsg->res_status != OGS_SBI_HTTP_STATUS_NO_CONTENT) {
                 strerror = ogs_msprintf("[%s] HTTP response error [%d]",
@@ -193,7 +192,6 @@ bool udm_nudr_dr_handle_subscription_authentication(
                 ogs_free(strerror);
                 return false;
             }
-
             memset(&AuthenticationInfoResult,
                     0, sizeof(AuthenticationInfoResult));
 

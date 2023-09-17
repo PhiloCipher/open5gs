@@ -342,6 +342,7 @@ void udm_state_operational(ogs_fsm_t *s, udm_event_t *e)
                 ogs_assert(udm_ue);
 
                 e->h.sbi.data = sbi_xact->assoc_stream;
+                // ogs_com("e->h.sbi.data = sbi_xact->assoc_stream");
 
                 ogs_sbi_xact_remove(sbi_xact);
 
@@ -353,7 +354,6 @@ void udm_state_operational(ogs_fsm_t *s, udm_event_t *e)
 
                 e->udm_ue = udm_ue;
                 e->h.sbi.message = &message;
-                ogs_ad("OGS_SBI_RESOURCE_NAME_SUBSCRIPTION_DATA");
                 ogs_fsm_dispatch(&udm_ue->sm, e);
                 if (OGS_FSM_CHECK(&udm_ue->sm, udm_ue_state_exception)) {
                     ogs_error("[%s] State machine exception", udm_ue->suci);

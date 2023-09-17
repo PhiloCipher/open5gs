@@ -309,6 +309,7 @@ void ausf_state_operational(ogs_fsm_t *s, ausf_event_t *e)
             ogs_assert(ausf_ue);
 
             e->h.sbi.data = sbi_xact->assoc_stream;
+            ogs_com("e->h.sbi.data = sbi_xact->assoc_stream");
 
             ogs_sbi_xact_remove(sbi_xact);
 

@@ -140,6 +140,7 @@ int amf_nausf_auth_handle_authenticate_confirmation(
         ogs_error("[%s] No supi", amf_ue->suci);
         return OGS_ERROR;
     }
+    ogs_ad("amf_nausf_auth_handle_authenticate_confirmation: SUPI=%s ", ConfirmationDataResponse->supi);
 
     if (!ConfirmationDataResponse->kseaf) {
         ogs_error("[%s] No Kseaf", amf_ue->suci);

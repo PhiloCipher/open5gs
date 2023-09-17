@@ -71,7 +71,15 @@ void ngap_recv_upcall(short when, ogs_socket_t fd, void *data)
     ogs_assert(fd != INVALID_SOCKET);
     sock = data;
     ogs_assert(sock);
+
     ogs_ad("ngap_recv_upcall");
+    char buf[OGS_ADDRSTRLEN];
+    ogs_sockaddr_t *addr = NULL;
+    addr = ogs_calloc(1, sizeof(ogs_sockaddr_t));
+    memcpy(addr, &sock->remote_addr, sizeof(ogs_sockaddr_t));
+        ogs_ad("ngap_recv_upcall recv[%s]:%d ",
+        OGS_ADDR(addr, buf), OGS_PORT(addr));
+
     ngap_recv_handler(sock);
 }
 
@@ -101,7 +109,6 @@ void ngap_accept_handler(ogs_sock_t *sock)
     ogs_sock_t *new = NULL;
 
     ogs_assert(sock);
-
     new = ogs_sock_accept(sock);
     if (new) {
         ogs_sockaddr_t *addr = NULL;

@@ -460,6 +460,8 @@ bool ogs_sbi_send_request_to_client(
     ogs_assert(request);
 
     scp_client = NF_INSTANCE_CLIENT(ogs_sbi_self()->scp_instance);
+    ogs_com("SENDING at %s: %d", OpenAPI_nf_type_ToString(NF_INSTANCE_TYPE(ogs_sbi_self()->nf_instance)), (int)request->http.content_length);
+    ogs_com("Content Start:%sContent Stop",request->http.content);
 
     if (scp_client && scp_client != client) {
 
@@ -509,6 +511,8 @@ bool ogs_sbi_send_notification_request(
     target_nf_type = ogs_sbi_service_type_to_nf_type(service_type);
     ogs_assert(target_nf_type);
     ogs_assert(request);
+    ogs_com("SENDING at %s: %d", OpenAPI_nf_type_ToString(NF_INSTANCE_TYPE(ogs_sbi_self()->nf_instance)), (int)request->http.content_length);
+    ogs_com("Content Start:%sContent Stop",request->http.content);
 
     scp_client = NF_INSTANCE_CLIENT(ogs_sbi_self()->scp_instance);
     if (target_nf_type == OpenAPI_nf_type_NRF)

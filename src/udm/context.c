@@ -140,7 +140,7 @@ udm_ue_t *udm_ue_add(char *suci)
     udm_ue->suci = ogs_strdup(suci);
     ogs_assert(udm_ue->suci);
     ogs_hash_set(self.suci_hash, udm_ue->suci, strlen(udm_ue->suci), udm_ue);
-
+    ogs_tmp("ogs_supi_from_supi_or_suci %s:",udm_ue->suci);
     udm_ue->supi = ogs_supi_from_supi_or_suci(udm_ue->suci);
     ogs_assert(udm_ue->supi);
     ogs_hash_set(self.supi_hash, udm_ue->supi, strlen(udm_ue->supi), udm_ue);

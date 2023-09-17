@@ -48,8 +48,8 @@ void ngap_close(void)
 
 int ngap_send_to_gnb(amf_gnb_t *gnb, ogs_pkbuf_t *pkbuf, uint16_t stream_no)
 {
-    ogs_ad("ngap_send_to_gnb");
     char buf[OGS_ADDRSTRLEN];
+    ogs_ad("ngap_send_to_gnb IP[%s] RAN_ID[%d]",OGS_ADDR(gnb->sctp.addr, buf), gnb->gnb_id);
 
     ogs_assert(pkbuf);
 

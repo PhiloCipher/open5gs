@@ -165,7 +165,7 @@ void ausf_ue_state_operational(ogs_fsm_t *s, ausf_event_t *e)
                         NULL, "HTTP response error", ausf_ue->suci));
                 break;
             }
-                ogs_ad("OGS_SBI_SERVICE_NAME_NUDM_UEAU: %s", message->h.method);
+            ogs_ad("OGS_SBI_SERVICE_NAME_NUDM_UEAU: %s", message->h.method);
 
             SWITCH(message->h.method)
             CASE(OGS_SBI_HTTP_METHOD_PUT)
