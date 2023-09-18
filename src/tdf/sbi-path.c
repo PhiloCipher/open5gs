@@ -62,3 +62,37 @@ void tdf_sbi_close(void)
     ogs_sbi_client_stop_all();
     ogs_sbi_server_stop_all();
 }
+
+
+int tdf_ue_sbi_discover_and_send(
+        ogs_sbi_service_type_e service_type,
+        ogs_sbi_discovery_option_t *discovery_option,
+        ogs_sbi_request_t *(*build)(tdf_ue_t *amf_ue, void *data),
+        tdf_ue_t *amf_ue, int state, void *data)
+{
+    ogs_ad("amf_ue_sbi_discover_and_send service_type %d", service_type);
+    int r;
+    int rv;
+    ogs_sbi_xact_t *xact = NULL;
+
+    ogs_assert(service_type);
+    ogs_assert(amf_ue);
+    ogs_assert(build);
+
+    xact = ogs_sbi_xact_add(
+            &amf_ue->sbi, service_type, discovery_option,
+            (ogs_sbi_build_f)build, amf_ue, data);
+
+
+    xact->state = state;
+    ogs_ad("ogs_sbi_discover_and_send");
+
+    rv = ogs_sbi_discover_and_send(xact);
+    if (rv != OGS_OK) {
+        ogs_error("amf_ue_sbi_discover_and_send() failed");
+        ogs_sbi_xact_remove(xact);
+        return rv;
+    }
+
+    return OGS_OK;
+}

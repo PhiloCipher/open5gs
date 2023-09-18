@@ -44,6 +44,34 @@ tdf_context_t *tdf_self(void);
 
 int tdf_context_parse_config(void);
 
+
+
+
+struct tdf_ue_s {
+    ogs_sbi_object_t sbi;
+
+    /* UE identity */
+#define AMF_UE_HAVE_SUCI(__aMF) \
+    ((__aMF) && ((__aMF)->suci))
+    char            *suci; /* TS33.501 : SUCI */
+    char            *supi; /* TS33.501 : SUPI */
+    /* PCF sends the RESPONSE
+     * of [POST] /npcf-am-polocy-control/v1/policies */
+#define PCF_AM_POLICY_ASSOCIATED(__aMF) \
+    ((__aMF) && ((__aMF)->policy_association_id))
+
+#define PCF_AM_POLICY_CLEAR(__aMF) \
+    OGS_MEM_CLEAR((__aMF)->policy_association_id);
+#define PCF_AM_POLICY_STORE(__aMF, __iD) \
+    OGS_STRING_DUP((__aMF)->policy_association_id, __iD);
+    char *policy_association_id;
+
+
+};
+ogs_sbi_request_t *tdf_npcf_am_policy_control_build_delete(tdf_ue_t *tdf_ue, void *data);
+void func();
+int tdf_event();
+
 #ifdef __cplusplus
 }
 #endif

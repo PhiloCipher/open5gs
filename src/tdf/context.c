@@ -24,6 +24,7 @@ static tdf_context_t self;
 int __tdf_log_domain;
 
 static int context_initialized = 0;
+static OGS_POOL(tdf_ue_pool, tdf_ue_t);
 
 void tdf_context_init(void)
 {
@@ -34,6 +35,7 @@ void tdf_context_init(void)
 
     ogs_log_install_domain(&__ogs_dbi_domain, "dbi", ogs_core()->log.level);
     ogs_log_install_domain(&__tdf_log_domain, "tdf", ogs_core()->log.level);
+    ogs_pool_init(&tdf_ue_pool, ogs_app()->max.ue);
 
     context_initialized = 1;
 }
@@ -41,6 +43,7 @@ void tdf_context_init(void)
 void tdf_context_final(void)
 {
     ogs_assert(context_initialized == 1);
+    ogs_pool_final(&tdf_ue_pool);
 
     context_initialized = 0;
 }
@@ -98,4 +101,69 @@ int tdf_context_parse_config(void)
     if (rv != OGS_OK) return rv;
 
     return OGS_OK;
+}
+
+
+ogs_sbi_request_t *tdf_npcf_am_policy_control_build_delete(
+        tdf_ue_t *tdf_ue, void *data)
+{
+    ogs_sbi_message_t message;
+    ogs_sbi_request_t *request = NULL;
+
+    ogs_assert(tdf_ue);
+    ogs_assert(tdf_ue->supi);
+    ogs_assert(tdf_ue->policy_association_id);
+
+    memset(&message, 0, sizeof(message));
+    message.h.method = (char *)OGS_SBI_HTTP_METHOD_DELETE;
+    message.h.service.name =
+        (char *)OGS_SBI_SERVICE_NAME_NPCF_AM_POLICY_CONTROL;
+    message.h.api.version = (char *)OGS_SBI_API_V1;
+    message.h.resource.component[0] = (char *)OGS_SBI_RESOURCE_NAME_POLICIES;
+    message.h.resource.component[1] = tdf_ue->policy_association_id;
+    
+    request = ogs_sbi_build_request(&message);
+    ogs_com("SENDING at %s: %d", OpenAPI_nf_type_ToString(NF_INSTANCE_TYPE(ogs_sbi_self()->nf_instance)), (int)request->http.content_length);
+    ogs_com("Content Start:%sContent Stop",request->h.service.name);
+    ogs_expect(request);
+
+    return request;
+}
+
+
+void func(){
+
+    //ogs_msleep(1000);
+    //OGS_SBI_SERVICE_TYPE_NNEF_EVENTEXPOSURE
+    tdf_ue_t *tdf_ue;
+    ogs_pool_alloc(&tdf_ue_pool, &tdf_ue);
+    ogs_assert(tdf_ue);
+    //char *supi = "0000203190";
+    tdf_ue->supi = ogs_strdup("0000203190");
+    ogs_assert(tdf_ue->supi);
+    //ogs_hash_set(self.supi_hash, tdf_ue->supi, strlen(tdf_ue->supi), tdf_ue);
+    tdf_ue->policy_association_id = "asdasd";
+    ogs_sbi_request_t *request2 = tdf_npcf_am_policy_control_build_delete(tdf_ue,NULL);
+
+
+
+}
+
+
+
+int tdf_event()
+{
+    int rv;
+    tdf_event_t *e = NULL;
+
+    e = tdf_event_new(6);
+    ogs_assert(e);
+    //e->pkbuf = esmbuf;
+    rv = ogs_queue_push(ogs_app()->queue, e);
+    if (rv != OGS_OK) {
+        ogs_error("ogs_queue_push() failed:%d", (int)rv);
+        ogs_event_free(e);
+    }
+
+    return rv;
 }

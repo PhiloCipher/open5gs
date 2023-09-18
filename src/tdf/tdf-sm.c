@@ -55,9 +55,8 @@ void tdf_state_operational(ogs_fsm_t *s, tdf_event_t *e)
 
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:
-        //ogs_msleep(1000);
-        //OGS_SBI_SERVICE_TYPE_NNEF_EVENTEXPOSURE
-
+        func();
+        tdf_event();
         break;
 
     case OGS_FSM_EXIT_SIG:

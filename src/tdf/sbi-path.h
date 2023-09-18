@@ -28,7 +28,11 @@ extern "C" {
 
 int tdf_sbi_open(void);
 void tdf_sbi_close(void);
-
+int tdf_ue_sbi_discover_and_send(
+        ogs_sbi_service_type_e service_type,
+        ogs_sbi_discovery_option_t *discovery_option,
+        ogs_sbi_request_t *(*build)(tdf_ue_t *tdf_ue, void *data),
+        tdf_ue_t *tdf_ue, int state, void *data);
 #ifdef __cplusplus
 }
 #endif

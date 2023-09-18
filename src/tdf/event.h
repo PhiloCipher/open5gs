@@ -36,6 +36,8 @@ tdf_event_t *tdf_event_new(int id);
 
 const char *tdf_event_get_name(tdf_event_t *e);
 
+typedef struct tdf_ue_s tdf_ue_t;
+
 #ifdef __cplusplus
 }
 #endif
