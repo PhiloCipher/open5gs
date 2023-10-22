@@ -18,27 +18,27 @@
  */
 
 #include "sbi-path.h"
-#include "nnrf-handler.h"
 #include "ntdf-handler.h"
 
-void udm_state_initial(ogs_fsm_t *s, udm_event_t *e)
+void tdf_state_initial(ogs_fsm_t *s, tdf_event_t *e)
 {
-    udm_sm_debug(e);
+    tdf_sm_debug(e);
 
     ogs_assert(s);
 
-    OGS_FSM_TRAN(s, &udm_state_operational);
+    OGS_FSM_TRAN(s, &tdf_state_operational);
 }
 
-void udm_state_final(ogs_fsm_t *s, udm_event_t *e)
+void tdf_state_final(ogs_fsm_t *s, tdf_event_t *e)
 {
-    udm_sm_debug(e);
+    tdf_sm_debug(e);
+
+    ogs_assert(s);
 }
 
-void udm_state_operational(ogs_fsm_t *s, udm_event_t *e)
+void tdf_state_operational(ogs_fsm_t *s, tdf_event_t *e)
 {
     int rv;
-    const char *api_version = NULL;
 
     ogs_sbi_stream_t *stream = NULL;
     ogs_sbi_request_t *request = NULL;
@@ -47,17 +47,21 @@ void udm_state_operational(ogs_fsm_t *s, udm_event_t *e)
     ogs_sbi_subscription_data_t *subscription_data = NULL;
     ogs_sbi_response_t *response = NULL;
     ogs_sbi_message_t message;
-    ogs_sbi_xact_t *sbi_xact = NULL;
 
-    udm_ue_t *udm_ue = NULL;
-
-    udm_sm_debug(e);
+    tdf_sm_debug(e);
 
     ogs_assert(s);
-    ogs_ad("UDM state %d: %s", e->h.id, udm_event_get_name(e));
+    ogs_ad("TDF state %d: %s", e->h.id, tdf_event_get_name(e));
 
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:
+        func();
+        tdf_event();
+        //ogs_sbi_message_t message2;
+        //ogs_sbi_request_t *request2 = NULL;
+        // ogs_sbi_server_handler(request2, data);
+
+        
         break;
 
     case OGS_FSM_EXIT_SIG:
@@ -80,18 +84,7 @@ void udm_state_operational(ogs_fsm_t *s, udm_event_t *e)
             break;
         }
 
-        SWITCH(message.h.service.name)
-        CASE(OGS_SBI_SERVICE_NAME_NUDM_SDM)
-            api_version = OGS_SBI_API_V2;
-            break;
-        CASE(OGS_SBI_SERVICE_NAME_NUDM_REPORT)
-            api_version = OGS_SBI_API_V2;
-            break;
-        DEFAULT
-            api_version = OGS_SBI_API_V1;
-        END
-
-        if (strcmp(message.h.api.version, api_version) != 0) {
+        if (strcmp(message.h.api.version, OGS_SBI_API_V1) != 0) {
             ogs_error("Not supported version [%s]", message.h.api.version);
             ogs_assert(true ==
                 ogs_sbi_server_send_error(
@@ -100,7 +93,8 @@ void udm_state_operational(ogs_fsm_t *s, udm_event_t *e)
             ogs_sbi_message_free(&message);
             break;
         }
-        ogs_ad("UDM OGS_EVENT_SBI_SERVER: %s", message.h.service.name);
+        ogs_ad("TDF OGS_EVENT_SBI_SERVER: %s", message.h.service.name);
+
         SWITCH(message.h.service.name)
         CASE(OGS_SBI_SERVICE_NAME_NNRF_NFM)
 
@@ -116,8 +110,8 @@ void udm_state_operational(ogs_fsm_t *s, udm_event_t *e)
                             message.h.method);
                     ogs_assert(true ==
                         ogs_sbi_server_send_error(stream,
-                            OGS_SBI_HTTP_STATUS_FORBIDDEN, &message,
-                            "Invalid HTTP method", message.h.method));
+                            OGS_SBI_HTTP_STATUS_FORBIDDEN,
+                            &message, "Invalid HTTP method", message.h.method));
                 END
                 break;
 
@@ -132,81 +126,63 @@ void udm_state_operational(ogs_fsm_t *s, udm_event_t *e)
             END
             break;
 
-        CASE(OGS_SBI_SERVICE_NAME_NUDM_UEAU)
-        CASE(OGS_SBI_SERVICE_NAME_NUDM_UECM)
-        CASE(OGS_SBI_SERVICE_NAME_NUDM_SDM)
-            if (!message.h.resource.component[0]) {
-                ogs_error("Not found [%s]", message.h.method);
-                ogs_assert(true ==
-                    ogs_sbi_server_send_error(stream,
-                        OGS_SBI_HTTP_STATUS_NOT_FOUND,
-                        &message, "Not found", message.h.method));
-                break;
-            }
+        CASE(OGS_SBI_SERVICE_NAME_NTDF_FIRST)
+            ogs_ad("TDF OGS_SBI_SERVICE_NAME_NTDF_FIRST: %s", message.h.resource.component[0]);
+            SWITCH(message.h.resource.component[0])
+            CASE(OGS_SBI_RESOURCE_NAME_SUBSCRIPTION_DATA)
+                SWITCH(message.h.resource.component[2])
+                CASE(OGS_SBI_RESOURCE_NAME_AUTHENTICATION_DATA)
+                    tdf_ntdf_dr_handle_subscription_authentication(
+                            stream, &message);
+                    break;
 
-            if (!message.h.resource.component[1]) {
-                ogs_error("Invalid resource name [%s]", message.h.method);
+                CASE(OGS_SBI_RESOURCE_NAME_CONTEXT_DATA)
+                    tdf_ntdf_dr_handle_subscription_context(stream, &message);
+                    break;
+
+                DEFAULT
+                    SWITCH(message.h.resource.component[3])
+                    CASE(OGS_SBI_RESOURCE_NAME_PROVISIONED_DATA)
+                        SWITCH(message.h.method)
+                        CASE(OGS_SBI_HTTP_METHOD_GET)
+                            tdf_ntdf_dr_handle_subscription_provisioned(
+                                    stream, &message);
+                            break;
+                        DEFAULT
+                            ogs_error("Invalid HTTP method [%s]",
+                                    message.h.method);
+                            ogs_assert(true ==
+                                ogs_sbi_server_send_error(stream,
+                                    OGS_SBI_HTTP_STATUS_FORBIDDEN,
+                                    &message, "Invalid HTTP method",
+                                    message.h.method));
+                        END
+                        break;
+                    DEFAULT
+                        ogs_error("Invalid resource name [%s]",
+                                message.h.resource.component[2]);
+                        ogs_assert(true ==
+                            ogs_sbi_server_send_error(stream,
+                                OGS_SBI_HTTP_STATUS_BAD_REQUEST,
+                                &message, "Unknown resource name",
+                                message.h.resource.component[2]));
+                    END
+                END
+                break;
+
+            CASE(OGS_SBI_RESOURCE_NAME_POLICY_DATA)
+                tdf_ntdf_dr_handle_policy_data(stream, &message);
+                break;
+
+            DEFAULT
+                ogs_error("Invalid resource name [%s]",
+                        message.h.resource.component[0]);
                 ogs_assert(true ==
                     ogs_sbi_server_send_error(stream,
                         OGS_SBI_HTTP_STATUS_BAD_REQUEST,
-                        &message, "Invalid resource name", message.h.method));
-                break;
-            }
-
-            SWITCH(message.h.resource.component[1])
-            CASE(OGS_SBI_RESOURCE_NAME_AUTH_EVENTS)
-                if (message.h.resource.component[2]) {
-                    udm_ue = udm_ue_find_by_ctx_id(
-                            message.h.resource.component[2]);
-                }
-            DEFAULT
+                        &message, "Unknown resource name",
+                        message.h.resource.component[0]));
             END
-
-            if (!udm_ue) {
-                udm_ue = udm_ue_find_by_suci_or_supi(
-                        message.h.resource.component[0]);
-                if (!udm_ue) {
-                    udm_ue = udm_ue_add(message.h.resource.component[0]);
-                    ogs_assert(udm_ue);
-                }
-            }
-
-            if (!udm_ue) {
-                ogs_error("Not found [%s]", message.h.method);
-                ogs_assert(true ==
-                    ogs_sbi_server_send_error(stream,
-                        OGS_SBI_HTTP_STATUS_NOT_FOUND,
-                        &message, "Not found", message.h.method));
-                break;
-            }
-
-            ogs_assert(OGS_FSM_STATE(&udm_ue->sm));
-
-            e->udm_ue = udm_ue;
-            e->h.sbi.message = &message;
-            ogs_fsm_dispatch(&udm_ue->sm, e);
-
-            if (OGS_FSM_CHECK(&udm_ue->sm, udm_ue_state_exception)) {
-                ogs_error("[%s] State machine exception", udm_ue->suci);
-                udm_ue_remove(udm_ue);
-            }
-            break;
-        CASE(OGS_SBI_SERVICE_NAME_NUDM_REPORT)
-
-            udm_ue = udm_ue_find_by_suci_or_supi(
-                    message.h.resource.component[0]);
-        
-            if (!udm_ue) {
-                ogs_error("Not found %s [%s]", message.h.resource.component[0], message.h.method);
-                ogs_assert(true ==
-                    ogs_sbi_server_send_error(stream,
-                        OGS_SBI_HTTP_STATUS_NOT_FOUND,
-                        &message, "Not found", message.h.method));
-                break;
-            }
-
-            udm_nudm_report_handle_ue_info(udm_ue, stream, &message);
-
             break;
 
         DEFAULT
@@ -214,7 +190,7 @@ void udm_state_operational(ogs_fsm_t *s, udm_event_t *e)
             ogs_assert(true ==
                 ogs_sbi_server_send_error(stream,
                     OGS_SBI_HTTP_STATUS_BAD_REQUEST, &message,
-                    "Invalid API name", message.h.service.name));
+                    "Invalid API name", message.h.resource.component[0]));
         END
 
         /* In lib/sbi/server.c, notify_completed() releases 'request' buffer. */
@@ -234,20 +210,13 @@ void udm_state_operational(ogs_fsm_t *s, udm_event_t *e)
             break;
         }
 
-        SWITCH(message.h.service.name)
-        CASE(OGS_SBI_SERVICE_NAME_NUDM_SDM)
-            api_version = OGS_SBI_API_V2;
-            break;
-        DEFAULT
-            api_version = OGS_SBI_API_V1;
-        END
-
-        if (strcmp(message.h.api.version, api_version) != 0) {
+        if (strcmp(message.h.api.version, OGS_SBI_API_V1) != 0) {
             ogs_error("Not supported version [%s]", message.h.api.version);
             ogs_sbi_message_free(&message);
             ogs_sbi_response_free(response);
             break;
         }
+        ogs_ad("TDF OGS_EVENT_SBI_CLIENT: %s", message.h.service.name);
 
         SWITCH(message.h.service.name)
         CASE(OGS_SBI_SERVICE_NAME_NNRF_NFM)
@@ -317,79 +286,6 @@ void udm_state_operational(ogs_fsm_t *s, udm_event_t *e)
             END
             break;
 
-        CASE(OGS_SBI_SERVICE_NAME_NNRF_DISC)
-            SWITCH(message.h.resource.component[0])
-            CASE(OGS_SBI_RESOURCE_NAME_NF_INSTANCES)
-                sbi_xact = e->h.sbi.data;
-                ogs_assert(sbi_xact);
-
-                SWITCH(message.h.method)
-                CASE(OGS_SBI_HTTP_METHOD_GET)
-                    if (message.res_status == OGS_SBI_HTTP_STATUS_OK)
-                        udm_nnrf_handle_nf_discover(sbi_xact, &message);
-                    else
-                        ogs_error("HTTP response error [%d]",
-                                message.res_status);
-                    break;
-
-                DEFAULT
-                    ogs_error("Invalid HTTP method [%s]", message.h.method);
-                    ogs_assert_if_reached();
-                END
-                break;
-
-            DEFAULT
-                ogs_error("Invalid resource name [%s]",
-                        message.h.resource.component[0]);
-                ogs_assert_if_reached();
-            END
-            break;
-
-        CASE(OGS_SBI_SERVICE_NAME_NUDR_DR)
-            SWITCH(message.h.resource.component[0])
-            CASE(OGS_SBI_RESOURCE_NAME_SUBSCRIPTION_DATA)
-                sbi_xact = e->h.sbi.data;
-                ogs_assert(sbi_xact);
-
-                sbi_xact = ogs_sbi_xact_cycle(sbi_xact);
-                if (!sbi_xact) {
-                    /* CLIENT_WAIT timer could remove SBI transaction
-                     * before receiving SBI message */
-                    ogs_error("SBI transaction has already been removed");
-                    break;
-                }
-
-                udm_ue = (udm_ue_t *)sbi_xact->sbi_object;
-                ogs_assert(udm_ue);
-
-                e->h.sbi.data = sbi_xact->assoc_stream;
-                // ogs_com("e->h.sbi.data = sbi_xact->assoc_stream");
-
-                ogs_sbi_xact_remove(sbi_xact);
-
-                udm_ue = udm_ue_cycle(udm_ue);
-                if (!udm_ue) {
-                    ogs_error("UE(udm_ue) Context has already been removed");
-                    break;
-                }
-
-                e->udm_ue = udm_ue;
-                e->h.sbi.message = &message;
-                ogs_fsm_dispatch(&udm_ue->sm, e);
-                if (OGS_FSM_CHECK(&udm_ue->sm, udm_ue_state_exception)) {
-                    ogs_error("[%s] State machine exception", udm_ue->suci);
-                    udm_ue_remove(udm_ue);
-                }
-
-                break;
-
-            DEFAULT
-                ogs_error("Invalid resource name [%s]",
-                        message.h.resource.component[0]);
-                ogs_assert_if_reached();
-            END
-            break;
-
         DEFAULT
             ogs_error("Invalid API name [%s]", message.h.service.name);
             ogs_assert_if_reached();
@@ -411,12 +307,9 @@ void udm_state_operational(ogs_fsm_t *s, udm_event_t *e)
             ogs_assert(nf_instance);
             ogs_assert(OGS_FSM_STATE(&nf_instance->sm));
 
-            ogs_sbi_self()->nf_instance->load = get_ue_load();
-
             ogs_fsm_dispatch(&nf_instance->sm, e);
             if (OGS_FSM_CHECK(&nf_instance->sm, ogs_sbi_nf_state_exception))
-                ogs_error("[%s:%s] State machine exception [%d]",
-                        OpenAPI_nf_type_ToString(nf_instance->nf_type),
+                ogs_error("[%s] State machine exception [%d]",
                         nf_instance->id, e->h.timer_id);
             break;
 
@@ -430,7 +323,7 @@ void udm_state_operational(ogs_fsm_t *s, udm_event_t *e)
                     subscription_data->req_nf_instance_id,
                     subscription_data->subscr_cond.nf_type,
                     subscription_data->subscr_cond.service_name));
-            
+
             ogs_error("[%s] Subscription validity expired",
                 subscription_data->id);
             ogs_sbi_subscription_data_remove(subscription_data);
@@ -447,52 +340,6 @@ void udm_state_operational(ogs_fsm_t *s, udm_event_t *e)
                     subscription_data->id);
             break;
 
-        case OGS_TIMER_SBI_CLIENT_WAIT:
-            /*
-             * ogs_pollset_poll() receives the time of the expiration
-             * of next timer as an argument. If this timeout is
-             * in very near future (1 millisecond), and if there are
-             * multiple events that need to be processed by ogs_pollset_poll(),
-             * these could take more than 1 millisecond for processing,
-             * resulting in the timer already passed the expiration.
-             *
-             * In case that another NF is under heavy load and responds
-             * to an SBI request with some delay of a few seconds,
-             * it can happen that ogs_pollset_poll() adds SBI responses
-             * to the event list for further processing,
-             * then ogs_timer_mgr_expire() is called which will add
-             * an additional event for timer expiration. When all events are
-             * processed one-by-one, the SBI xact would get deleted twice
-             * in a row, resulting in a crash.
-             *
-             * 1. ogs_pollset_poll()
-             *    message was received and put into an event list,
-             * 2. ogs_timer_mgr_expire()
-             *    add an additional event for timer expiration
-             * 3. message event is processed. (free SBI xact)
-             * 4. timer expiration event is processed. (double-free SBI xact)
-             *
-             * To avoid double-free SBI xact,
-             * we need to check ogs_sbi_xact_cycle()
-             */
-            sbi_xact = ogs_sbi_xact_cycle(e->h.sbi.data);
-            if (!sbi_xact) {
-                ogs_error("SBI transaction has already been removed");
-                break;
-            }
-
-            stream = sbi_xact->assoc_stream;
-            ogs_assert(stream);
-
-            ogs_sbi_xact_remove(sbi_xact);
-
-            ogs_error("Cannot receive SBI message");
-            ogs_assert(true ==
-                ogs_sbi_server_send_error(stream,
-                    OGS_SBI_HTTP_STATUS_GATEWAY_TIMEOUT, NULL,
-                    "Cannot receive SBI message", NULL));
-            break;
-
         default:
             ogs_error("Unknown timer[%s:%d]",
                     ogs_timer_get_name(e->h.timer_id), e->h.timer_id);
@@ -500,7 +347,7 @@ void udm_state_operational(ogs_fsm_t *s, udm_event_t *e)
         break;
 
     default:
-        ogs_error("No handler for event %s", udm_event_get_name(e));
+        ogs_error("No handler for event %s", tdf_event_get_name(e));
         break;
     }
 }

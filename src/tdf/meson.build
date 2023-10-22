@@ -15,43 +15,40 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-libudm_sources = files('''
+libtdf_sources = files('''
     context.c
     event.c
 
-    nnrf-handler.c
-    nudm-handler.c
-
-    nudr-build.c
-    nudr-handler.c
-    ue-sm.c
+    ntdf-handler.c
+    
+    nudm-build.c
 
     sbi-path.c
-    udm-sm.c
-    
-    ntdf-handler.c
+    tdf-sm.c
 
     init.c
 '''.split())
 
-libudm = static_library('udm',
-    sources : libudm_sources,
-    dependencies : libsbi_dep,
+libtdf = static_library('tdf',
+    sources : libtdf_sources,
+    dependencies : [libdbi_dep,
+                    libsbi_dep],
     install : false)
 
-libudm_dep = declare_dependency(
-    link_with : libudm,
-    dependencies : libsbi_dep)
+libtdf_dep = declare_dependency(
+    link_with : libtdf,
+    dependencies : [libdbi_dep,
+                    libsbi_dep])
 
-udm_sources = files('''
+tdf_sources = files('''
     app.c
     ../main.c
 '''.split())
 
-executable('open5gs-udmd',
-    sources : udm_sources,
-    c_args : '-DDEFAULT_CONFIG_FILENAME="@0@/udm.yaml"'.format(open5gs_sysconfdir),
+executable('open5gs-tdfd',
+    sources : tdf_sources,
+    c_args : '-DDEFAULT_CONFIG_FILENAME="@0@/tdf.yaml"'.format(open5gs_sysconfdir),
     include_directories : srcinc,
-    dependencies : libudm_dep,
+    dependencies : libtdf_dep,
     install_rpath : libdir,
     install : true)

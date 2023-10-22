@@ -88,6 +88,8 @@ typedef enum {
     OGS_SBI_SERVICE_TYPE_NSPAF_SECURED_PACKET,
     OGS_SBI_SERVICE_TYPE_NUDSF_DR,
     OGS_SBI_SERVICE_TYPE_NNSSAAF_NSSAA,
+    OGS_SBI_SERVICE_NAME_NLMF_LOC,
+    OGS_SBI_SERVICE_TYPE_NUDM_REPORT,
 
     OGS_SBI_MAX_NUM_OF_SERVICE_TYPE,
 } ogs_sbi_service_type_e;
@@ -126,6 +128,8 @@ typedef enum {
 #define OGS_SBI_SERVICE_NAME_NNSSF_NSSAIAVAILABILITY "nnssf-nssaiavailability"
 #define OGS_SBI_SERVICE_NAME_NUDR_DR "nudr-dr"
 #define OGS_SBI_SERVICE_NAME_NUDR_GROUP_ID_MAP "nudr-group-id-map"
+#define OGS_SBI_SERVICE_NAME_NTDF_FIRST "ntdf-first"
+#define OGS_SBI_SERVICE_NAME_NTDF_REPORT "ntdf-report"
 #define OGS_SBI_SERVICE_NAME_NLMF_LOC "nlmf-loc"
 #define OGS_SBI_SERVICE_NAME_N5G_EIR_EIC "n5g-eir-eic"
 #define OGS_SBI_SERVICE_NAME_NBSF_MANAGEMENT "nbsf-management"
@@ -156,10 +160,16 @@ typedef enum {
 #define OGS_SBI_SERVICE_NAME_NAMF_CALLBACK "namf-callback"
 #define OGS_SBI_SERVICE_NAME_NSMF_CALLBACK "nsmf-callback"
 
+#define OGS_SBI_SERVICE_NAME_ANONYMOUS "ngeneral"
+
+#define OGS_SBI_SERVICE_NAME_NLMF_LOC "nlmf-loc"
+#define OGS_SBI_SERVICE_NAME_NUDM_REPORT "nudm-report"
+
 OpenAPI_nf_type_e ogs_sbi_service_type_to_nf_type(
         ogs_sbi_service_type_e service_type);
 const char *ogs_sbi_service_type_to_name(ogs_sbi_service_type_e service_type);
 ogs_sbi_service_type_e ogs_sbi_service_type_from_name(const char *service_name);
+
 
 #ifdef __cplusplus
 }

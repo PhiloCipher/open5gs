@@ -83,6 +83,8 @@ static struct service_desc_s service_desc[] = {
     { OpenAPI_nf_type_SPAF, OGS_SBI_SERVICE_NAME_NSPAF_SECURED_PACKET },
     { OpenAPI_nf_type_UDSF, OGS_SBI_SERVICE_NAME_NUDSF_DR },
     { OpenAPI_nf_type_NSSAAF, OGS_SBI_SERVICE_NAME_NNSSAAF_NSSAA },
+    { OpenAPI_nf_type_LMF, OGS_SBI_SERVICE_NAME_NLMF_LOC },
+    { OpenAPI_nf_type_UDM, OGS_SBI_SERVICE_NAME_NUDM_REPORT}
 };
 
 
