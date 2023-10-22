@@ -1367,6 +1367,7 @@ libsbi_openapi_sources = files('''
     model/wlan_performance_req.c
     model/wlan_per_ss_id_performance_info.c
     model/wlan_per_ts_performance_info.c
+    model/udm_ue.c
 '''.split())
 
 libsbi_openapi_inc = include_directories('.')

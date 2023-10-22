@@ -1190,6 +1190,11 @@ static char *build_json(ogs_sbi_message_t *message)
             message->ModificationNotification);
         ogs_assert(item);
     }
+    else if (message->udm_ue) {
+        item = OpenAPI_udm_ue_convertToJSON(
+            message->udm_ue);
+        ogs_assert(item);
+    }
 
     if (item) {
         content = cJSON_Print(item);
@@ -2230,6 +2235,13 @@ static int parse_json(ogs_sbi_message_t *message,
                 ogs_error("Unknown resource name [%s]",
                         message->h.resource.component[0]);
             END
+            break;
+        CASE(OGS_SBI_SERVICE_NAME_NUDM_REPORT)
+            message->udm_ue = OpenAPI_udm_ue_parseFromJSON(item);
+            if (!message->udm_ue) {
+                rv = OGS_ERROR;
+                ogs_error("JSON parse error");
+            }
             break;
 
         DEFAULT
