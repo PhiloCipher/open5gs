@@ -55,6 +55,7 @@ void tdf_state_operational(ogs_fsm_t *s, tdf_event_t *e)
 
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:
+        ogs_msleep(4000);
         func();
         tdf_event();
         //ogs_sbi_message_t message2;
@@ -84,7 +85,7 @@ void tdf_state_operational(ogs_fsm_t *s, tdf_event_t *e)
             break;
         }
 
-        if (strcmp(message.h.api.version, OGS_SBI_API_V1) != 0) {
+        if (strcmp(message.h.api.version, OGS_SBI_API_V2) != 0) {
             ogs_error("Not supported version [%s]", message.h.api.version);
             ogs_assert(true ==
                 ogs_sbi_server_send_error(
@@ -285,6 +286,10 @@ void tdf_state_operational(ogs_fsm_t *s, tdf_event_t *e)
                 ogs_assert_if_reached();
             END
             break;
+
+        CASE(OGS_SBI_SERVICE_NAME_NUDM_REPORT)
+            ogs_tmp("SUCI is %s", message.udm_ue->suci);
+            break;;
 
         DEFAULT
             ogs_error("Invalid API name [%s]", message.h.service.name);

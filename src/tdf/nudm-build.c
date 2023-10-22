@@ -57,20 +57,20 @@ ogs_sbi_request_t *tdf_nudm_report_build_ue_info(
     //ogs_assert(amf_ue->data_change_subscription_id);
 
     memset(&message, 0, sizeof(message));
-    message.h.method = (char *)OGS_SBI_HTTP_METHOD_PUT;
+    message.h.method = (char *)OGS_SBI_HTTP_METHOD_GET;
     message.h.service.name = (char *)OGS_SBI_SERVICE_NAME_NUDM_REPORT;
-    message.h.api.version = (char *)OGS_SBI_API_V2;
+    message.h.api.version = (char *)OGS_SBI_API_V1;
     message.h.resource.component[0] = tdf_ue->supi;
     //message.h.resource.component[1] =
-            (char *)OGS_SBI_RESOURCE_NAME_SDM_SUBSCRIPTIONS;
+            // (char *)OGS_SBI_RESOURCE_NAME_SDM_SUBSCRIPTIONS;
     //message.h.resource.component[2] = amf_ue->data_change_subscription_id;
-    OpenAPI_sm_context_update_data_t SmContextUpdateData;
-    memset(&SmContextUpdateData, 0, sizeof(SmContextUpdateData));
-        SmContextUpdateData.is_failed_to_be_switched = true; // TODO, reveresed!! ogs bug?
-        SmContextUpdateData.ma_nw_upgrade_ind = 3; 
-        ogs_tmp("is_failed_to_be_switched");
-    message.SmContextUpdateData = &SmContextUpdateData;
-    SmContextUpdateData.an_type_can_be_changed = 0;
+    // OpenAPI_sm_context_update_data_t SmContextUpdateData;
+    // memset(&SmContextUpdateData, 0, sizeof(SmContextUpdateData));
+    //     SmContextUpdateData.is_failed_to_be_switched = true; // TODO, reveresed!! ogs bug?
+    //     SmContextUpdateData.ma_nw_upgrade_ind = 3; 
+    //     ogs_tmp("is_failed_to_be_switched");
+    // message.SmContextUpdateData = &SmContextUpdateData;
+    // SmContextUpdateData.an_type_can_be_changed = 0;
     
     //OpenAPI_auth_event_t AuthEvent;
     //memset(&AuthEvent, 0, sizeof(AuthEvent));

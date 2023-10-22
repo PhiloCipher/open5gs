@@ -84,9 +84,6 @@ void udm_state_operational(ogs_fsm_t *s, udm_event_t *e)
         CASE(OGS_SBI_SERVICE_NAME_NUDM_SDM)
             api_version = OGS_SBI_API_V2;
             break;
-        CASE(OGS_SBI_SERVICE_NAME_NUDM_REPORT)
-            api_version = OGS_SBI_API_V2;
-            break;
         DEFAULT
             api_version = OGS_SBI_API_V1;
         END

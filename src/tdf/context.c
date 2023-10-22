@@ -140,7 +140,7 @@ void func(){
     ogs_pool_alloc(&tdf_ue_pool, &tdf_ue);
     ogs_assert(tdf_ue);
     //char *supi = "0000203190";
-    tdf_ue->supi = ogs_strdup("0000203190");
+    tdf_ue->supi = ogs_strdup("imsi-999700000021309");
     ogs_assert(tdf_ue->supi);
     //ogs_hash_set(self.supi_hash, tdf_ue->supi, strlen(tdf_ue->supi), tdf_ue);
     tdf_ue->policy_association_id = "asdasd";

@@ -26,7 +26,6 @@ bool udm_nudm_report_handle_ue_info(
 {
     ogs_sbi_message_t sendmsg;
     ogs_sbi_response_t *response = NULL;
-    ogs_sbi_server_t *server = NULL;
 
     ogs_assert(udm_ue);
     ogs_assert(stream);
@@ -37,13 +36,18 @@ bool udm_nudm_report_handle_ue_info(
         udm_ue->data_change_callback_uri = NULL;
     }
 
-    server = ogs_sbi_server_from_stream(stream);
-    ogs_assert(server);
-
     memset(&sendmsg, 0, sizeof(sendmsg));
-    response = ogs_sbi_build_response(&sendmsg, OGS_SBI_HTTP_STATUS_NO_CONTENT);
+    OpenAPI_udm_ue_t udm_ue_ie;
+    memset(&udm_ue_ie, 0, sizeof(udm_ue_ie));
+
+    sendmsg.udm_ue = &udm_ue_ie;
+
+    udm_ue_ie.suci = udm_ue->suci;
+
+    response = ogs_sbi_build_response(&sendmsg, OGS_SBI_HTTP_STATUS_OK);
     ogs_assert(response);
-    ogs_sbi_server_send_response(stream, response);
+    ogs_assert(true == ogs_sbi_server_send_response(stream, response));
+
 
     return true;
 }
