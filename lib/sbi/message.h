@@ -143,6 +143,8 @@ extern "C" {
 
 #define OGS_SBI_RESOURCE_NAME_PCF_BINDINGS          "pcfBindings"
 
+#define OGS_SBI_RESOURCE_NAME_DETERMINE_LOCATION          "determine-location"
+
 #define OGS_SBI_PATCH_PATH_NF_STATUS                "/nfStatus"
 #define OGS_SBI_PATCH_PATH_LOAD                     "/load"
 #define OGS_SBI_PATCH_PATH_VALIDITY_TIME            "/validityTime"
@@ -509,7 +511,9 @@ typedef struct ogs_sbi_message_s {
     OpenAPI_deregistration_data_t *DeregistrationData;
     OpenAPI_sdm_subscription_t *SDMSubscription;
     OpenAPI_modification_notification_t *ModificationNotification;
+    // OpenAPI_input_data_t *InputData;
     OpenAPI_udm_ue_t *udm_ue;
+    OpenAPI_ausf_ue_t *ausf_ue;
 
     ogs_sbi_links_t *links;
 

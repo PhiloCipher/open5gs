@@ -55,8 +55,8 @@ void tdf_state_operational(ogs_fsm_t *s, tdf_event_t *e)
 
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:
-        ogs_msleep(4000);
-        func();
+        ogs_msleep(3000);
+        func("imsi-999700000021309");
         tdf_event();
         //ogs_sbi_message_t message2;
         //ogs_sbi_request_t *request2 = NULL;
@@ -288,8 +288,41 @@ void tdf_state_operational(ogs_fsm_t *s, tdf_event_t *e)
             break;
 
         CASE(OGS_SBI_SERVICE_NAME_NUDM_REPORT)
-            ogs_tmp("SUCI is %s", message.udm_ue->suci);
-            break;;
+            tdf_ue_t* tdf_ue = tdf_ue_find_by_suti(message.h.resource.component[0]);
+            if (!tdf_ue){
+                tdf_ue = tdf_ue_add(message.h.resource.component[0]);
+                ogs_assert(tdf_ue);
+            }
+
+            int i;
+            for (i = 0; i < OGS_KEY_LEN; i++)
+            {
+                tdf_ue->udm_ue->opc[i] = message.udm_ue->opc[i];
+            }
+            char opc_string[2*OGS_RAND_LEN];
+            ogs_hex_to_ascii(tdf_ue->udm_ue->opc, sizeof(tdf_ue->udm_ue->opc),
+                    opc_string, sizeof(opc_string));
+            ogs_tmp("opc is %s", opc_string);
+            ogs_sbi_xact_remove(e->h.sbi.data);
+
+            break;
+
+        CASE(OGS_SBI_SERVICE_NAME_NAUSF_REPORT)
+            tdf_ue_t* tdf_ue = tdf_ue_find_by_suti(
+                        message.h.resource.component[0]);
+
+            if (!tdf_ue) {
+                tdf_ue = tdf_ue_add(message.h.resource.component[0]);
+                ogs_assert(tdf_ue);
+                }
+            tdf_ue->ausf_ue->auth_type = message.ausf_ue->auth_type;
+            tdf_ue->ausf_ue->serving_network_name = ogs_strdup(message.ausf_ue->serving_network_name);
+            tdf_ue->ausf_ue->suci = message.ausf_ue->suci;
+            ogs_tmp("serving_network_name is %s", tdf_ue->ausf_ue->serving_network_name);
+            //ogs_tmp("serving_network_name is %s", message.ausf_ue->serving_network_name);
+            ogs_sbi_xact_remove(e->h.sbi.data);
+            // func("imsi-999700000021309");
+            break;
 
         DEFAULT
             ogs_error("Invalid API name [%s]", message.h.service.name);

@@ -11,19 +11,19 @@ OpenAPI_udm_ue_t *OpenAPI_udm_ue_create(
     // OpenAPI_auth_event_t *auth_event,
     // OpenAPI_amf3_gpp_access_registration_t *amf_3gpp_access_registration,
 
-    // char *ctx_id,
+    char *ctx_id,
     char *suci,
-    char *supi
-    // char *serving_network_name,
+    char *supi,
+    char *serving_network_name,
 
-    // char *ausf_instance_id,
-    // char *amf_instance_id,
+    char *ausf_instance_id,
+    char *amf_instance_id,
 
-    // char *dereg_callback_uri,
-    // char *data_change_callback_uri,
+    char *dereg_callback_uri,
+    char *data_change_callback_uri,
 
     // uint8_t k[OGS_KEY_LEN],
-    // uint8_t opc[OGS_KEY_LEN],
+    uint8_t opc[OGS_KEY_LEN]
     // uint8_t amf[OGS_AMF_LEN],
     // uint8_t rand[OGS_RAND_LEN],
     // uint8_t sqn[OGS_SQN_LEN],
@@ -40,16 +40,23 @@ OpenAPI_udm_ue_t *OpenAPI_udm_ue_create(
     // udm_ue_local_var->sbi = sbi;
     // udm_ue_local_var->sm = sm;
     // udm_ue_local_var->auth_event = auth_event;
-    // udm_ue_local_var->ctx_id = ctx_id;
+    udm_ue_local_var->ctx_id = ctx_id;
     udm_ue_local_var->suci = suci;
     udm_ue_local_var->supi = supi;
-    // udm_ue_local_var->serving_network_name = serving_network_name;
-    // udm_ue_local_var->ausf_instance_id = ausf_instance_id;
-    // udm_ue_local_var->amf_instance_id = amf_instance_id;
-    // udm_ue_local_var->dereg_callback_uri = dereg_callback_uri;
-    // udm_ue_local_var->data_change_callback_uri = data_change_callback_uri;
+    udm_ue_local_var->serving_network_name = serving_network_name;
+    udm_ue_local_var->ausf_instance_id = ausf_instance_id;
+    udm_ue_local_var->amf_instance_id = amf_instance_id;
+    udm_ue_local_var->dereg_callback_uri = dereg_callback_uri;
+    udm_ue_local_var->data_change_callback_uri = data_change_callback_uri;
     // udm_ue_local_var->k = k;
-    // udm_ue_local_var->opc = opc;
+    if(opc){
+        int i;
+        for (i = 0; i < OGS_KEY_LEN; i++)
+        {
+        udm_ue_local_var->opc[i] = opc[i];
+        }
+    }
+    
     // udm_ue_local_var->amf = amf;
     // udm_ue_local_var->rand = rand;
     // udm_ue_local_var->sqn = sqn;
@@ -105,21 +112,72 @@ cJSON *OpenAPI_udm_ue_convertToJSON(OpenAPI_udm_ue_t *udm_ue)
 
     item = cJSON_CreateObject();
 
-    if (udm_ue->suci) {
-    if (cJSON_AddStringToObject(item, "suci", udm_ue->suci) == NULL) {
-        ogs_error("OpenAPI_udm_ue_convertToJSON() failed [suci]");
-        goto end;
+    if (udm_ue->ctx_id) {
+	if (cJSON_AddStringToObject(item, "ctx_id", udm_ue->ctx_id) == NULL) {
+	    ogs_error("OpenAPI_udm_ue_convertToJSON() failed [ctx_id]");
+	    goto end;
+	}
     }
+
+    if (udm_ue->suci) {
+	if (cJSON_AddStringToObject(item, "suci", udm_ue->suci) == NULL) {
+	    ogs_error("OpenAPI_udm_ue_convertToJSON() failed [suci]");
+	    goto end;
+	}
     }
 
     if (udm_ue->supi) {
-    if (cJSON_AddStringToObject(item, "supi", udm_ue->supi) == NULL) {
-        ogs_error("OpenAPI_udm_ue_convertToJSON() failed [supi]");
-        goto end;
-    }
+	if (cJSON_AddStringToObject(item, "supi", udm_ue->supi) == NULL) {
+	    ogs_error("OpenAPI_udm_ue_convertToJSON() failed [supi]");
+	    goto end;
+	}
     }
 
+    if (udm_ue->serving_network_name) {
+	if (cJSON_AddStringToObject(item, "serving_network_name", udm_ue->serving_network_name) == NULL) {
+	    ogs_error("OpenAPI_udm_ue_convertToJSON() failed [serving_network_name]");
+	    goto end;
+	}
+    }
 
+    if (udm_ue->ausf_instance_id) {
+	if (cJSON_AddStringToObject(item, "ausf_instance_id", udm_ue->ausf_instance_id) == NULL) {
+	    ogs_error("OpenAPI_udm_ue_convertToJSON() failed [ausf_instance_id]");
+	    goto end;
+	}
+    }
+
+    if (udm_ue->amf_instance_id) {
+	if (cJSON_AddStringToObject(item, "amf_instance_id", udm_ue->amf_instance_id) == NULL) {
+	    ogs_error("OpenAPI_udm_ue_convertToJSON() failed [amf_instance_id]");
+	    goto end;
+	}
+    }
+
+    if (udm_ue->dereg_callback_uri) {
+	if (cJSON_AddStringToObject(item, "dereg_callback_uri", udm_ue->dereg_callback_uri) == NULL) {
+	    ogs_error("OpenAPI_udm_ue_convertToJSON() failed [dereg_callback_uri]");
+	    goto end;
+	}
+    }
+
+    if (udm_ue->data_change_callback_uri) {
+	if (cJSON_AddStringToObject(item, "data_change_callback_uri", udm_ue->data_change_callback_uri) == NULL) {
+	    ogs_error("OpenAPI_udm_ue_convertToJSON() failed [data_change_callback_uri]");
+	    goto end;
+	}
+    }
+
+    if (udm_ue->opc) {
+    char opc_string[2*OGS_RAND_LEN];
+    ogs_hex_to_ascii(udm_ue->opc, sizeof(udm_ue->opc),
+                    opc_string, sizeof(opc_string));
+	if (cJSON_AddStringToObject(item, "opc", opc_string) == NULL) {
+	    ogs_error("OpenAPI_udm_ue_convertToJSON() failed [opc]");
+	    goto end;
+	}
+    }
+    
 
     // if (!udm_ue->nf_instance_id) {
     //     ogs_error("OpenAPI_udm_ue_convertToJSON() failed [nf_instance_id]");
@@ -208,24 +266,85 @@ OpenAPI_udm_ue_t *OpenAPI_udm_ue_parseFromJSON(cJSON *udm_ueJSON)
 //     cJSON *nf_set_id = NULL;
 //     cJSON *reset_ids = NULL;
 //     OpenAPI_list_t *reset_idsList = NULL;
+    cJSON *ctx_id = NULL;
     cJSON *suci = NULL;
     cJSON *supi = NULL;
+    cJSON *serving_network_name = NULL;
+    cJSON *ausf_instance_id = NULL;
+    cJSON *amf_instance_id = NULL;
+    cJSON *dereg_callback_uri = NULL;
+    cJSON *data_change_callback_uri = NULL;
+    cJSON *opc = NULL;
+    uint8_t opcVariable[OGS_KEY_LEN];
+    
+
+    ctx_id = cJSON_GetObjectItemCaseSensitive(udm_ueJSON, "ctx_id");
+    if (ctx_id) {
+    if (!cJSON_IsString(ctx_id) && !cJSON_IsNull(ctx_id)) {
+	ogs_error("OpenAPI_udm_ue_parseFromJSON failed [ctx_id]");
+	goto end;
+    }}
 
     suci = cJSON_GetObjectItemCaseSensitive(udm_ueJSON, "suci");
     if (suci) {
     if (!cJSON_IsString(suci) && !cJSON_IsNull(suci)) {
-        ogs_error("OpenAPI_am_influ_data_parseFromJSON() failed [suci]");
-        goto end;
-    }
-    }
+	ogs_error("OpenAPI_udm_ue_parseFromJSON failed [suci]");
+	goto end;
+    }}
 
     supi = cJSON_GetObjectItemCaseSensitive(udm_ueJSON, "supi");
     if (supi) {
     if (!cJSON_IsString(supi) && !cJSON_IsNull(supi)) {
-        ogs_error("OpenAPI_am_influ_data_parseFromJSON() failed [supi]");
-        goto end;
+	ogs_error("OpenAPI_udm_ue_parseFromJSON failed [supi]");
+	goto end;
+    }}
+
+    serving_network_name = cJSON_GetObjectItemCaseSensitive(udm_ueJSON, "serving_network_name");
+    if (serving_network_name) {
+    if (!cJSON_IsString(serving_network_name) && !cJSON_IsNull(serving_network_name)) {
+	ogs_error("OpenAPI_udm_ue_parseFromJSON failed [serving_network_name]");
+	goto end;
+    }}
+
+    ausf_instance_id = cJSON_GetObjectItemCaseSensitive(udm_ueJSON, "ausf_instance_id");
+    if (ausf_instance_id) {
+    if (!cJSON_IsString(ausf_instance_id) && !cJSON_IsNull(ausf_instance_id)) {
+	ogs_error("OpenAPI_udm_ue_parseFromJSON failed [ausf_instance_id]");
+	goto end;
+    }}
+
+    amf_instance_id = cJSON_GetObjectItemCaseSensitive(udm_ueJSON, "amf_instance_id");
+    if (amf_instance_id) {
+    if (!cJSON_IsString(amf_instance_id) && !cJSON_IsNull(amf_instance_id)) {
+	ogs_error("OpenAPI_udm_ue_parseFromJSON failed [amf_instance_id]");
+	goto end;
+    }}
+
+    dereg_callback_uri = cJSON_GetObjectItemCaseSensitive(udm_ueJSON, "dereg_callback_uri");
+    if (dereg_callback_uri) {
+    if (!cJSON_IsString(dereg_callback_uri) && !cJSON_IsNull(dereg_callback_uri)) {
+	ogs_error("OpenAPI_udm_ue_parseFromJSON failed [dereg_callback_uri]");
+	goto end;
+    }}
+
+    data_change_callback_uri = cJSON_GetObjectItemCaseSensitive(udm_ueJSON, "data_change_callback_uri");
+    if (data_change_callback_uri) {
+    if (!cJSON_IsString(data_change_callback_uri) && !cJSON_IsNull(data_change_callback_uri)) {
+	ogs_error("OpenAPI_udm_ue_parseFromJSON failed [data_change_callback_uri]");
+	goto end;
+    }}
+
+    opc = cJSON_GetObjectItemCaseSensitive(udm_ueJSON, "opc");
+    if (opc) {
+    if (!cJSON_IsString(opc) && !cJSON_IsNull(opc)) {
+	ogs_error("OpenAPI_udm_ue_parseFromJSON failed [opc]");
+	goto end;
     }
+    ogs_ascii_to_hex(opc->valuestring,strlen(opc->valuestring),
+                    opcVariable, sizeof(opcVariable));
     }
+
+
 //     nf_instance_id = cJSON_GetObjectItemCaseSensitive(udm_ueJSON, "nfInstanceId");
 //     if (!nf_instance_id) {
 //         ogs_error("OpenAPI_udm_ue_parseFromJSON() failed [nf_instance_id]");
@@ -313,11 +432,18 @@ OpenAPI_udm_ue_t *OpenAPI_udm_ue_parseFromJSON(cJSON *udm_ueJSON)
 //             OpenAPI_list_add(reset_idsList, ogs_strdup(reset_ids_local->valuestring));
 //         }
 //     }
-
+    
     udm_ue_local_var = OpenAPI_udm_ue_create (
-//         ogs_strdup(nf_instance_id->valuestring),
-        suci? suci->valuestring : NULL,
-        supi? supi->valuestring : NULL
+        ctx_id && !cJSON_IsNull(ctx_id) ? ogs_strdup(ctx_id->valuestring) : NULL,
+        suci && !cJSON_IsNull(suci) ? ogs_strdup(suci->valuestring) : NULL,
+        supi && !cJSON_IsNull(supi) ? ogs_strdup(supi->valuestring) : NULL,
+        serving_network_name && !cJSON_IsNull(serving_network_name) ? ogs_strdup(serving_network_name->valuestring) : NULL,
+        ausf_instance_id && !cJSON_IsNull(ausf_instance_id) ? ogs_strdup(ausf_instance_id->valuestring) : NULL,
+        amf_instance_id && !cJSON_IsNull(amf_instance_id) ? ogs_strdup(amf_instance_id->valuestring) : NULL,
+        dereg_callback_uri && !cJSON_IsNull(dereg_callback_uri) ? ogs_strdup(dereg_callback_uri->valuestring) : NULL,
+        data_change_callback_uri && !cJSON_IsNull(data_change_callback_uri) ? ogs_strdup(data_change_callback_uri->valuestring) : NULL,
+        opc ? opcVariable : NULL
+            
 //         success->valueint,
 //         ogs_strdup(time_stamp->valuestring),
 //         auth_typeVariable,

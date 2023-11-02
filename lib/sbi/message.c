@@ -634,7 +634,7 @@ ogs_sbi_response_t *ogs_sbi_build_response(
             return NULL;
         }
     }
-
+    ogs_com("message->http.location %s",message->http.location);
     if (message->http.location) {
         ogs_sbi_header_set(response->http.headers, "Location",
                 message->http.location);
@@ -656,7 +656,7 @@ int ogs_sbi_parse_request(
 
     ogs_assert(request);
     ogs_assert(message);
-
+    // ogs_com("ogs_sbi_parse_request %s", request->h.uri);
     rv = ogs_sbi_parse_header(message, &request->h);
     if (rv != OGS_OK) {
         ogs_error("ogs_sbi_parse_header() failed");
@@ -982,6 +982,7 @@ static char *build_json(ogs_sbi_message_t *message)
 {
     char *content = NULL;
     cJSON *item = NULL;
+    // ogs_tmp("build_json(ogs_sbi_message_t *message)");
 
     ogs_assert(message);
 
@@ -1195,6 +1196,11 @@ static char *build_json(ogs_sbi_message_t *message)
             message->udm_ue);
         ogs_assert(item);
     }
+    else if (message->ausf_ue) {
+        item = OpenAPI_ausf_ue_convertToJSON(
+            message->ausf_ue);
+        ogs_assert(item);
+    }
 
     if (item) {
         content = cJSON_Print(item);
@@ -1211,6 +1217,7 @@ static int parse_json(ogs_sbi_message_t *message,
 {
     int rv = OGS_OK;
     cJSON *item = NULL;
+    // ogs_tmp("parse_json(ogs_sbi_message_t *message)");
 
     ogs_assert(message);
 
@@ -2239,6 +2246,14 @@ static int parse_json(ogs_sbi_message_t *message,
         CASE(OGS_SBI_SERVICE_NAME_NUDM_REPORT)
             message->udm_ue = OpenAPI_udm_ue_parseFromJSON(item);
             if (!message->udm_ue) {
+                rv = OGS_ERROR;
+                ogs_error("JSON parse error");
+            }
+            break;
+        
+        CASE(OGS_SBI_SERVICE_NAME_NAUSF_REPORT)
+            message->ausf_ue = OpenAPI_ausf_ue_parseFromJSON(item);
+            if (!message->ausf_ue) {
                 rv = OGS_ERROR;
                 ogs_error("JSON parse error");
             }

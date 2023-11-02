@@ -22,7 +22,8 @@ libtdf_sources = files('''
     ntdf-handler.c
     
     nudm-build.c
-
+    nausf-build.c
+    
     sbi-path.c
     tdf-sm.c
 

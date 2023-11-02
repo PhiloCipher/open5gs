@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2022 by Sukchan Lee <acetcom@gmail.com>
+ * Copyright (C) 2019 by Sukchan Lee <acetcom@gmail.com>
  *
  * This file is part of Open5GS.
  *
@@ -17,33 +17,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TDF_EVENT_H
-#define TDF_EVENT_H
+#include "nausf-build.h"
 
-#include "ogs-proto.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+ogs_sbi_request_t *tdf_nausf_report_build_ue_info(
+        tdf_ue_t *tdf_ue, void *data)
+{
+    ogs_sbi_message_t message;
+    ogs_sbi_request_t *request = NULL;
 
-typedef struct udm_ue_s udm_ue_t;
-typedef struct pcf_ue_s pcf_ue_t;
-typedef struct ausf_ue_s ausf_ue_t;
+    ogs_assert(tdf_ue);
 
-typedef struct tdf_event_s {
-    ogs_event_t h;
-} tdf_event_t;
+    memset(&message, 0, sizeof(message));
+    message.h.method = (char *)OGS_SBI_HTTP_METHOD_GET;
+    message.h.service.name = (char *)OGS_SBI_SERVICE_NAME_NAUSF_REPORT;
+    message.h.api.version = (char *)OGS_SBI_API_V1;
+    message.h.resource.component[0] = tdf_ue->suti;
 
-OGS_STATIC_ASSERT(OGS_EVENT_SIZE >= sizeof(tdf_event_t));
+    request = ogs_sbi_build_request(&message);
+    ogs_expect(request);
 
-tdf_event_t *tdf_event_new(int id);
-
-const char *tdf_event_get_name(tdf_event_t *e);
-
-typedef struct tdf_ue_s tdf_ue_t;
-
-#ifdef __cplusplus
+    return request;
 }
-#endif
-
-#endif /* TDF_EVENT_H */

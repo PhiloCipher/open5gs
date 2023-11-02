@@ -19,6 +19,7 @@
 
 #include "sbi-path.h"
 #include "nnrf-handler.h"
+#include "ntdf-handler.h"
 
 void ausf_state_initial(ogs_fsm_t *s, ausf_event_t *e)
 {
@@ -52,6 +53,7 @@ void ausf_state_operational(ogs_fsm_t *s, ausf_event_t *e)
     ausf_sm_debug(e);
 
     ogs_assert(s);
+    ogs_ad("AUSF state %d: %s", e->h.id, ausf_event_get_name(e));
 
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:
@@ -86,6 +88,7 @@ void ausf_state_operational(ogs_fsm_t *s, ausf_event_t *e)
             ogs_sbi_message_free(&message);
             break;
         }
+        ogs_ad("AUSF OGS_EVENT_SBI_SERVER: %s", message.h.service.name);
 
         SWITCH(message.h.service.name)
         CASE(OGS_SBI_SERVICE_NAME_NNRF_NFM)
@@ -161,6 +164,23 @@ void ausf_state_operational(ogs_fsm_t *s, ausf_event_t *e)
                 ogs_error("[%s] State machine exception", ausf_ue->suci);
                 ausf_ue_remove(ausf_ue);
             }
+            break;
+        CASE(OGS_SBI_SERVICE_NAME_NAUSF_REPORT)
+
+            ausf_ue = ausf_ue_find_by_suci_or_supi(
+                    message.h.resource.component[0]);
+        
+            if (!ausf_ue) {
+                ogs_error("Not found %s [%s]", message.h.resource.component[0], message.h.method);
+                ogs_assert(true ==
+                    ogs_sbi_server_send_error(stream,
+                        OGS_SBI_HTTP_STATUS_NOT_FOUND,
+                        &message, "Not found", message.h.method));
+                break;
+            }
+
+            ausf_nausf_report_handle_ue_info(ausf_ue, stream, &message);
+
             break;
 
         DEFAULT
@@ -307,6 +327,7 @@ void ausf_state_operational(ogs_fsm_t *s, ausf_event_t *e)
             ogs_assert(ausf_ue);
 
             e->h.sbi.data = sbi_xact->assoc_stream;
+            ogs_com("e->h.sbi.data = sbi_xact->assoc_stream");
 
             ogs_sbi_xact_remove(sbi_xact);
 

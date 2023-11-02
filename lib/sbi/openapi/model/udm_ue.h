@@ -61,19 +61,19 @@ OpenAPI_udm_ue_t *OpenAPI_udm_ue_create(
     // OpenAPI_auth_event_t *auth_event,
     // OpenAPI_amf3_gpp_access_registration_t *amf_3gpp_access_registration,
 
-    // char *ctx_id,
+    char *ctx_id,
     char *suci,
-    char *supi
-    // char *serving_network_name,
+    char *supi,
+    char *serving_network_name,
 
-    // char *ausf_instance_id,
-    // char *amf_instance_id,
+    char *ausf_instance_id,
+    char *amf_instance_id,
 
-    // char *dereg_callback_uri,
-    // char *data_change_callback_uri,
+    char *dereg_callback_uri,
+    char *data_change_callback_uri,
 
     // uint8_t k[OGS_KEY_LEN],
-    // uint8_t opc[OGS_KEY_LEN],
+    uint8_t opc[OGS_KEY_LEN]
     // uint8_t amf[OGS_AMF_LEN],
     // uint8_t rand[OGS_RAND_LEN],
     // uint8_t sqn[OGS_SQN_LEN],

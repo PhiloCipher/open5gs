@@ -21,41 +21,30 @@
 #include "ntdf-handler.h"
 
 
-bool udm_nudm_report_handle_ue_info(
-    udm_ue_t *udm_ue, ogs_sbi_stream_t *stream, ogs_sbi_message_t *recvmsg)
+bool ausf_nausf_report_handle_ue_info(
+    ausf_ue_t *ausf_ue, ogs_sbi_stream_t *stream, ogs_sbi_message_t *recvmsg)
 {
     ogs_sbi_message_t sendmsg;
     ogs_sbi_response_t *response = NULL;
 
-    ogs_assert(udm_ue);
+    ogs_assert(ausf_ue);
     ogs_assert(stream);
     ogs_assert(recvmsg);
 
-    if (udm_ue->data_change_callback_uri) {
-        ogs_free(udm_ue->data_change_callback_uri);
-        udm_ue->data_change_callback_uri = NULL;
-    }
 
     memset(&sendmsg, 0, sizeof(sendmsg));
-    OpenAPI_udm_ue_t udm_ue_ie;
-    memset(&udm_ue_ie, 0, sizeof(udm_ue_ie));
+    OpenAPI_ausf_ue_t ausf_ue_ie;
+    memset(&ausf_ue_ie, 0, sizeof(ausf_ue_ie));
 
-    sendmsg.udm_ue = &udm_ue_ie;
+    sendmsg.ausf_ue = &ausf_ue_ie;
 
-    udm_ue_ie.ctx_id = udm_ue->ctx_id;
-    udm_ue_ie.suci = udm_ue->suci;
-    udm_ue_ie.supi = udm_ue->supi;
-    udm_ue_ie.serving_network_name = udm_ue->serving_network_name;
-    udm_ue_ie.ausf_instance_id = udm_ue->ausf_instance_id;
-    udm_ue_ie.amf_instance_id = udm_ue->amf_instance_id;
-    udm_ue_ie.dereg_callback_uri = udm_ue->dereg_callback_uri;
-    udm_ue_ie.data_change_callback_uri = udm_ue->data_change_callback_uri;
-    int i;
-    for (i = 0; i < sizeof(udm_ue->opc); i++)
-    {
-        udm_ue_ie.opc[i] = udm_ue->opc[i];
-    }
-    
+    ausf_ue_ie.ctx_id = ausf_ue->ctx_id;
+    ausf_ue_ie.suci = ausf_ue->suci;
+    ausf_ue_ie.supi = ausf_ue->supi;
+    ausf_ue_ie.serving_network_name = ausf_ue->serving_network_name;
+    ausf_ue_ie.auth_type = ausf_ue->auth_type;
+    ausf_ue_ie.auth_events_url = ausf_ue->auth_events_url;
+    ausf_ue_ie.auth_result = ausf_ue->auth_result;
 
     response = ogs_sbi_build_response(&sendmsg, OGS_SBI_HTTP_STATUS_OK);
     ogs_assert(response);

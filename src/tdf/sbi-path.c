@@ -22,7 +22,7 @@
 int tdf_sbi_open(void)
 {
     ogs_sbi_nf_instance_t *nf_instance = NULL;
-    ogs_sbi_nf_service_t *service = NULL;
+    // ogs_sbi_nf_service_t *service = NULL;
 
     /* Initialize SELF NF instance */
     nf_instance = ogs_sbi_self()->nf_instance;
@@ -32,19 +32,20 @@ int tdf_sbi_open(void)
     /* Build NF instance information. It will be transmitted to NRF. */
     ogs_sbi_nf_instance_build_default(nf_instance);
     ogs_sbi_nf_instance_add_allowed_nf_type(nf_instance, OpenAPI_nf_type_PCF);
-    ogs_sbi_nf_instance_add_allowed_nf_type(nf_instance, OpenAPI_nf_type_UDM);
+    // ogs_sbi_nf_instance_add_allowed_nf_type(nf_instance, OpenAPI_nf_type_UDM);
     ogs_sbi_nf_instance_add_allowed_nf_type(nf_instance, OpenAPI_nf_type_SCP);
+    //ogs_sbi_nf_instance_add_allowed_nf_type(nf_instance, OpenAPI_nf_type_AUSF);
 
-    /* Build NF service information. It will be transmitted to NRF. */
-    if (ogs_sbi_nf_service_is_available(OGS_SBI_SERVICE_NAME_NTDF_FIRST)) {
-        service = ogs_sbi_nf_service_build_default(
-                    nf_instance, OGS_SBI_SERVICE_NAME_NTDF_FIRST);
-        ogs_assert(service);
-        ogs_sbi_nf_service_add_version(
-                    service, OGS_SBI_API_V1, OGS_SBI_API_V1_0_0, NULL);
-        ogs_sbi_nf_service_add_allowed_nf_type(service, OpenAPI_nf_type_PCF);
-        ogs_sbi_nf_service_add_allowed_nf_type(service, OpenAPI_nf_type_UDM);
-    }
+    // /* Build NF service information. It will be transmitted to NRF. */
+    // if (ogs_sbi_nf_service_is_available(OGS_SBI_SERVICE_NAME_NTDF_FIRST)) {
+    //     service = ogs_sbi_nf_service_build_default(
+    //                 nf_instance, OGS_SBI_SERVICE_NAME_NTDF_FIRST);
+    //     ogs_assert(service);
+    //     ogs_sbi_nf_service_add_version(
+    //                 service, OGS_SBI_API_V1, OGS_SBI_API_V1_0_0, NULL);
+    //     ogs_sbi_nf_service_add_allowed_nf_type(service, OpenAPI_nf_type_PCF);
+    //     ogs_sbi_nf_service_add_allowed_nf_type(service, OpenAPI_nf_type_UDM);
+    // }
 
     /* Initialize NRF NF Instance */
     nf_instance = ogs_sbi_self()->nrf_instance;
@@ -71,7 +72,6 @@ int tdf_ue_sbi_discover_and_send(
         tdf_ue_t *amf_ue, int state, void *data)
 {
     ogs_ad("tdf_ue_sbi_discover_and_send service_type %d", service_type);
-    int r;
     int rv;
     ogs_sbi_xact_t *xact = NULL;
 
@@ -86,7 +86,7 @@ int tdf_ue_sbi_discover_and_send(
 
     xact->state = state;
     ogs_ad("ogs_sbi_discover_and_send");
-
+    
     rv = ogs_sbi_discover_and_send(xact);
     if (rv != OGS_OK) {
         ogs_error("amf_ue_sbi_discover_and_send() failed");
