@@ -35,6 +35,8 @@ static OGS_POOL(smf_pf_pool, smf_pf_t);
 static OGS_POOL(smf_sess_pool, smf_sess_t);
 static OGS_POOL(smf_n4_seid_pool, ogs_pool_id_t);
 
+static OGS_POOL(smf_ue_loc_pool, smf_ue_loc_t);
+
 static int context_initialized = 0;
 
 static int num_of_smf_sess = 0;
@@ -91,6 +93,8 @@ void smf_context_init(void)
     ogs_pool_init(&smf_n4_seid_pool, ogs_app()->pool.sess);
     ogs_pool_random_id_generate(&smf_n4_seid_pool);
 
+    ogs_pool_init(&smf_ue_loc_pool, ogs_app()->max.ue);
+
     self.supi_hash = ogs_hash_make();
     ogs_assert(self.supi_hash);
     self.imsi_hash = ogs_hash_make();
@@ -133,6 +137,8 @@ void smf_context_final(void)
 
     ogs_pool_final(&smf_sess_pool);
     ogs_pool_final(&smf_n4_seid_pool);
+
+    ogs_pool_final(&smf_ue_loc_pool);
 
     ogs_list_for_each_entry_safe(&self.sgw_s5c_list, next_gnode, gnode, node) {
         smf_gtp_node_t *smf_gnode = gnode->data_ptr;
@@ -1004,6 +1010,8 @@ static smf_ue_t *smf_ue_add(void)
 
     ogs_list_init(&smf_ue->sess_list);
 
+    ogs_list_init(&smf_ue->loc_list);
+
     ogs_list_add(&self.smf_ue_list, smf_ue);
 
     smf_metrics_inst_global_inc(SMF_METR_GLOB_GAUGE_UES_ACTIVE);
@@ -1011,6 +1019,38 @@ static smf_ue_t *smf_ue_add(void)
             ogs_list_count(&self.smf_ue_list));
     return smf_ue;
 }
+
+bool smf_ue_loc_add(smf_ue_t *smf_ue, OpenAPI_nr_location_t *NrLocation, int loc_id)
+{
+    ogs_assert(smf_ue);
+    ogs_assert(NrLocation);
+
+    smf_ue_loc_t *smf_ue_loc = NULL; 
+    ogs_pool_alloc(&smf_ue_loc_pool, &smf_ue_loc);
+    ogs_sbi_parse_nr_location(&smf_ue_loc->nr_tai, &smf_ue_loc->nr_cgi, NrLocation);
+    smf_ue_loc->lid = loc_id;
+    ogs_list_add(&smf_ue->loc_list, smf_ue_loc);
+    return true;
+
+}
+
+bool smf_ue_loc_update(smf_ue_t *smf_ue, OpenAPI_nr_location_t *NrLocation, int loc_id)
+{
+    ogs_assert(smf_ue);
+    ogs_assert(NrLocation);
+
+    smf_ue_loc_t * smf_ue_loc = NULL;
+    ogs_list_for_each(&smf_ue->loc_list, smf_ue_loc) {
+        if (smf_ue_loc->lid == loc_id)
+        {
+            ogs_sbi_parse_nr_location(&smf_ue_loc->nr_tai, &smf_ue_loc->nr_cgi, NrLocation);
+            return true;  
+        } 
+    }
+    return false;
+
+}
+
 
 smf_ue_t *smf_ue_add_by_supi(char *supi)
 {
@@ -1053,6 +1093,7 @@ void smf_ue_remove(smf_ue_t *smf_ue)
     ogs_list_remove(&self.smf_ue_list, smf_ue);
 
     smf_sess_remove_all(smf_ue);
+    smf_ue_loc_remove_all(smf_ue);
 
     if (smf_ue->supi) {
         ogs_hash_set(self.supi_hash, smf_ue->supi, strlen(smf_ue->supi), NULL);
@@ -1069,6 +1110,8 @@ void smf_ue_remove(smf_ue_t *smf_ue)
     ogs_info("[Removed] Number of SMF-UEs is now %d",
             ogs_list_count(&self.smf_ue_list));
 }
+
+
 
 void smf_ue_remove_all(void)
 {
@@ -1106,13 +1149,13 @@ static bool compare_ue_info(ogs_pfcp_node_t *node, smf_sess_t *sess)
         if (sess->gtp_rat_type == OGS_GTP2_RAT_TYPE_EUTRAN &&
                 node->e_cell_id[i] == sess->e_cgi.cell_id) return true;
 
-    for (i = 0; i < node->num_of_nr_cell_id; i++)
-        if (node->nr_cell_id[i] == sess->nr_cgi.cell_id) return true;
+    // for (i = 0; i < node->num_of_nr_cell_id; i++)
+    //     if (node->nr_cell_id[i] == sess->nr_cgi.cell_id) return true;
 
-    for (i = 0; i < node->num_of_tac; i++)
-        if ((sess->gtp_rat_type == OGS_GTP2_RAT_TYPE_EUTRAN &&
-                node->tac[i] == sess->e_tai.tac) ||
-            (node->tac[i] == sess->nr_tai.tac.v)) return true;
+    // for (i = 0; i < node->num_of_tac; i++)
+    //     if ((sess->gtp_rat_type == OGS_GTP2_RAT_TYPE_EUTRAN &&
+    //             node->tac[i] == sess->e_tai.tac) ||
+    //         (node->tac[i] == sess->nr_tai.tac.v)) return true;
 
     return false;
 }
@@ -1159,6 +1202,7 @@ static ogs_pfcp_node_t *selected_upf_node(
 
 void smf_sess_select_upf(smf_sess_t *sess)
 {
+    ogs_ad("smf_sess_select_upf");
     char buf[OGS_ADDRSTRLEN];
 
     ogs_assert(sess);
@@ -1782,6 +1826,25 @@ void smf_sess_remove_all(smf_ue_t *smf_ue)
 
     ogs_list_for_each_safe(&smf_ue->sess_list, next, sess)
         smf_sess_remove(sess);
+}
+
+void smf_ue_loc_remove(smf_ue_loc_t *smf_ue_loc)
+{
+    ogs_assert(smf_ue_loc);
+
+    ogs_pool_free(&smf_ue_loc_pool, smf_ue_loc);
+
+    ogs_free(smf_ue_loc);
+}
+
+void smf_ue_loc_remove_all(smf_ue_t *smf_ue)
+{
+    smf_ue_loc_t *smf_ue_loc = NULL, *next = NULL;;
+
+    ogs_assert(smf_ue);
+
+    ogs_list_for_each_safe(&smf_ue->loc_list, next, smf_ue_loc)
+        smf_ue_loc_remove(smf_ue_loc);
 }
 
 smf_sess_t *smf_sess_find_by_teid(uint32_t teid)

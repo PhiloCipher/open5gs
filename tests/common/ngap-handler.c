@@ -67,6 +67,7 @@ void testngap_handle_ng_setup_response(
 void testngap_handle_downlink_nas_transport(
         test_ue_t *test_ue, ogs_ngap_message_t *message)
 {
+    ogs_ad("testngap_handle_downlink_nas_transport");
     int i;
     char buf[OGS_ADDRSTRLEN];
 

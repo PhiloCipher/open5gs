@@ -81,6 +81,7 @@ void upf_pfcp_state_will_associate(ogs_fsm_t *s, upf_event_t *e)
 
     node = e->pfcp_node;
     ogs_assert(node);
+    ogs_ad("PFCP state %d: %s", e->id, upf_event_get_name(e));
 
     switch (e->id) {
     case OGS_FSM_ENTRY_SIG:

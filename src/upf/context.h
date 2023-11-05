@@ -117,7 +117,7 @@ typedef struct upf_sess_s {
     ogs_ipsubnet_t   *ipv4_framed_routes;
     ogs_ipsubnet_t   *ipv6_framed_routes;
 
-    char            *gx_sid;            /* Gx Session ID */
+    char            *gx_sid;            /* Gx Session ID */ //For connecting to 4G PCRF
     ogs_pfcp_node_t *pfcp_node;
 
     /* Accounting: */

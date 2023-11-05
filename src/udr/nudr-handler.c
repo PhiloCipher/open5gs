@@ -44,8 +44,8 @@ bool udr_nudr_dr_handle_subscription_authentication(
 
     ogs_assert(stream);
     ogs_assert(recvmsg);
-
     supi = recvmsg->h.resource.component[1];
+    ogs_ad("udr_nudr_dr_handle_subscription_authentication supi: %s", supi);
     if (!supi) {
         ogs_error("No SUPI");
         ogs_assert(true ==
@@ -72,6 +72,7 @@ bool udr_nudr_dr_handle_subscription_authentication(
         return false;
     }
 
+    ogs_ad("udr_nudr_dr_handle_subscription_authentication: %s", recvmsg->h.resource.component[3]);
     SWITCH(recvmsg->h.resource.component[3])
     CASE(OGS_SBI_RESOURCE_NAME_AUTHENTICATION_SUBSCRIPTION)
         SWITCH(recvmsg->h.method)
@@ -110,6 +111,8 @@ bool udr_nudr_dr_handle_subscription_authentication(
             ogs_assert(AuthenticationSubscription.authentication_method);
             sendmsg.AuthenticationSubscription =
                 &AuthenticationSubscription;
+            ogs_ad("AuthenticationSubscription enc_permanent_key: %s authentication_management_field:%s opc_string: %s sqn_string: %s", 
+            k_string, amf_string, opc_string, sqn_string);
 
             response = ogs_sbi_build_response(
                     &sendmsg, OGS_SBI_HTTP_STATUS_OK);

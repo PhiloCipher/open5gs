@@ -31,6 +31,9 @@ void testgmm_recv(test_ue_t *test_ue, ogs_pkbuf_t *pkbuf)
     ogs_assert(rv == OGS_OK);
 
     test_ue->gmm_message_type = message.gmm.h.message_type;
+
+    ogs_ad("testgmm_recv: %d", message.gmm.h.message_type);
+
     switch (message.gmm.h.message_type) {
     case OGS_NAS_5GS_REGISTRATION_ACCEPT:
         testgmm_handle_registration_accept(test_ue,

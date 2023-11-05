@@ -434,7 +434,8 @@ static connection_t *connection_add(
                 ogs_debug("%s", request->http.content);
         }
     }
-
+    // ogs_com("SENDING at %s: %d", OpenAPI_nf_type_ToString(NF_INSTANCE_TYPE(ogs_sbi_self()->nf_instance)), (int)request->http.content_length);
+    // ogs_com("Content Start:%sContent Stop",request->http.content);
     curl_easy_setopt(conn->easy, CURLOPT_HTTPHEADER, conn->header_list);
 
 #if 1 /* Use HTTP2 */
@@ -654,6 +655,7 @@ bool ogs_sbi_client_send_request(
         ogs_assert(request->h.uri);
     }
     ogs_debug("[%s] %s", request->h.method, request->h.uri);
+    ogs_com("[%s] %s", request->h.method, request->h.uri);
 
     conn = connection_add(client, client_cb, request, data);
     if (!conn) {

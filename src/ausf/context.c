@@ -120,6 +120,7 @@ int ausf_context_parse_config(void)
 
 ausf_ue_t *ausf_ue_add(char *suci)
 {
+    ogs_ad("ausf_ue_add");
     ausf_event_t e;
     ausf_ue_t *ausf_ue = NULL;
 

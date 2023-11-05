@@ -54,6 +54,7 @@ int ogs_dbi_auth_info(char *supi, ogs_dbi_auth_info_t *auth_info)
 
     if (!mongoc_cursor_next(cursor, &document)) {
         ogs_info("[%s] Cannot find IMSI in DB", supi);
+        ogs_ad("[%s] Cannot find IMSI in DB", supi);
 
         rv = OGS_ERROR;
         goto out;

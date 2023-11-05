@@ -180,6 +180,7 @@ void smf_pfcp_state_associated(ogs_fsm_t *s, smf_event_t *e)
     ogs_assert(node);
     addr = node->sa_list;
     ogs_assert(addr);
+    ogs_ad("PFCP state %d: %s", e->h.id, smf_event_get_name(e));
 
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:
@@ -221,6 +222,7 @@ void smf_pfcp_state_associated(ogs_fsm_t *s, smf_event_t *e)
         }
         if (sess)
             e->sess = sess;
+        ogs_ad("SMF_EVT_N4_MESSAGE: %d", message->h.type);
 
         switch (message->h.type) {
         case OGS_PFCP_HEARTBEAT_REQUEST_TYPE:

@@ -373,8 +373,8 @@ int ngap_handle_path_switch_request_transfer(
     smf_ue_t *smf_ue = NULL;
     int rv, i;
 
-    uint32_t gnb_n3_teid;
-    ogs_ip_t gnb_n3_ip;
+    uint32_t gnb_n3_teid;//important!
+    ogs_ip_t gnb_n3_ip;//important!
 
     bool far_update = false;
 

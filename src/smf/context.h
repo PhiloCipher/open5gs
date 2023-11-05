@@ -132,7 +132,21 @@ typedef struct smf_ue_s {
     char  imeisv_bcd[OGS_MAX_IMEISV_BCD_LEN+1];
 
     ogs_list_t sess_list;
+
+    ogs_list_t loc_list;
+
 } smf_ue_t;
+
+typedef struct smf_ue_loc_s {
+    ogs_lnode_t lnode;
+
+    /* NR Location */
+    int lid;
+    ogs_5gs_tai_t   nr_tai;
+    ogs_nr_cgi_t    nr_cgi;
+    ogs_time_t      ue_location_timestamp;
+
+} smf_ue_loc_t;
 
 #define SMF_SESS_CLEAR(__sESS) \
     do { \
@@ -289,10 +303,10 @@ typedef struct smf_sess_s {
     ogs_eps_tai_t   e_tai;
     ogs_e_cgi_t     e_cgi;
 
-    /* NR Location */
-    ogs_5gs_tai_t   nr_tai;
-    ogs_nr_cgi_t    nr_cgi;
-    ogs_time_t      ue_location_timestamp;
+    // /* NR Location */
+    // ogs_5gs_tai_t   nr_tai;
+    // ogs_nr_cgi_t    nr_cgi;
+    // ogs_time_t      ue_location_timestamp;
 
     /* PCF ID */
     char            *pcf_id;
@@ -455,6 +469,9 @@ void smf_sess_set_paging_n1n2message_location(
 void smf_sess_remove(smf_sess_t *sess);
 void smf_sess_remove_all(smf_ue_t *smf_ue);
 
+void smf_ue_loc_remove(smf_ue_loc_t *smf_ue_loc);
+void smf_ue_loc_remove_all(smf_ue_t *smf_ue);
+
 smf_sess_t *smf_sess_find(uint32_t index);
 smf_sess_t *smf_sess_find_by_teid(uint32_t teid);
 smf_sess_t *smf_sess_find_by_seid(uint64_t seid);
@@ -528,6 +545,10 @@ int smf_maximum_integrity_protected_data_rate_uplink_value2enum(
 int smf_maximum_integrity_protected_data_rate_downlink_value2enum(
         const char *value);
 int get_sess_load(void);
+
+bool smf_ue_loc_add(smf_ue_t *smf_ue, OpenAPI_nr_location_t *NrLocation, int loc_id);
+bool smf_ue_loc_update(smf_ue_t *smf_ue, OpenAPI_nr_location_t *NrLocation, int loc_id);
+
 
 #ifdef __cplusplus
 }

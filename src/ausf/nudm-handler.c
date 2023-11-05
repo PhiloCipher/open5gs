@@ -152,6 +152,7 @@ bool ausf_nudm_ueau_handle_get(ausf_ue_t *ausf_ue,
                 ausf_ue->supi, strlen(ausf_ue->supi), NULL);
         ogs_free(ausf_ue->supi);
     }
+    ogs_ad("Setting SUPI from AuthenticationInfoResult");
     ausf_ue->supi = ogs_strdup(AuthenticationInfoResult->supi);
     ogs_assert(ausf_ue->supi);
     ogs_hash_set(ausf_self()->supi_hash,
@@ -223,6 +224,9 @@ bool ausf_nudm_ueau_handle_get(ausf_ue_t *ausf_ue,
     response = ogs_sbi_build_response(&sendmsg,
         OGS_SBI_HTTP_STATUS_CREATED);
     ogs_assert(response);
+    ogs_ad("sending SUPI to AMF");
+    ogs_com("message->http.location %s",sendmsg.http.location);
+    ogs_com("ogs_sbi_server_send_response content: %s",  response->http.content);
     ogs_assert(true == ogs_sbi_server_send_response(stream, response));
 
     OpenAPI_list_free(UeAuthenticationCtx._links);

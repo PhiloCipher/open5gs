@@ -36,6 +36,7 @@ int amf_sbi_open(void)
     ogs_sbi_nf_instance_build_default(nf_instance);
     ogs_sbi_nf_instance_add_allowed_nf_type(nf_instance, OpenAPI_nf_type_SMF);
     ogs_sbi_nf_instance_add_allowed_nf_type(nf_instance, OpenAPI_nf_type_SCP);
+    ogs_sbi_nf_instance_add_allowed_nf_type(nf_instance, OpenAPI_nf_type_TDF);
 
     /* Build NF service information. It will be transmitted to NRF. */
     if (ogs_sbi_nf_service_is_available(OGS_SBI_SERVICE_NAME_NAMF_COMM)) {
@@ -92,6 +93,7 @@ int amf_ue_sbi_discover_and_send(
         ogs_sbi_request_t *(*build)(amf_ue_t *amf_ue, void *data),
         amf_ue_t *amf_ue, int state, void *data)
 {
+    ogs_ad("amf_ue_sbi_discover_and_send service_type %d", service_type);
     int r;
     int rv;
     ogs_sbi_xact_t *xact = NULL;
@@ -113,6 +115,7 @@ int amf_ue_sbi_discover_and_send(
     }
 
     xact->state = state;
+    ogs_ad("ogs_sbi_discover_and_send");
 
     rv = ogs_sbi_discover_and_send(xact);
     if (rv != OGS_OK) {

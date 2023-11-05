@@ -65,6 +65,7 @@ void ausf_ue_state_operational(ogs_fsm_t *s, ausf_event_t *e)
 
     ausf_ue = e->ausf_ue;
     ogs_assert(ausf_ue);
+    ogs_ad("AUSF UE state %d", e->h.id);
 
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:
@@ -164,6 +165,7 @@ void ausf_ue_state_operational(ogs_fsm_t *s, ausf_event_t *e)
                         NULL, "HTTP response error", ausf_ue->suci));
                 break;
             }
+            ogs_ad("OGS_SBI_SERVICE_NAME_NUDM_UEAU: %s", message->h.method);
 
             SWITCH(message->h.method)
             CASE(OGS_SBI_HTTP_METHOD_PUT)

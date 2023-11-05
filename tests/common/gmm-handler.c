@@ -45,6 +45,8 @@ void testgmm_handle_registration_accept(test_ue_t *test_ue,
         memcpy(&test_ue->nas_5gs_guti.amf_id,
                 &mobile_identity_guti->amf_id, sizeof(ogs_amf_id_t));
         test_ue->nas_5gs_guti.m_tmsi = be32toh(mobile_identity_guti->m_tmsi);
+        ogs_ad("testgmm_handle_registration_accept: new GUTI: %d",test_ue->nas_5gs_guti.m_tmsi);
+
     }
 
     test_ue->pdu_session_status = 0;
@@ -150,6 +152,9 @@ void testgmm_handle_authentication_request(test_ue_t *test_ue,
 
     memcpy(test_ue->rand, authentication_parameter_rand->rand, OGS_RAND_LEN);
     memcpy(test_ue->autn, authentication_parameter_autn->autn, OGS_AUTN_LEN);
+    ogs_ad("testgmm_handle_authentication_request ksi: %d rand:%u autn: %u", 
+            test_ue->nas.ksi , *test_ue->rand, *test_ue->autn);
+
 }
 
 void testgmm_handle_security_mode_command(test_ue_t *test_ue,
@@ -200,6 +205,8 @@ void testgmm_handle_configuration_update_command(test_ue_t *test_ue,
         memcpy(&test_ue->nas_5gs_guti.amf_id,
                 &mobile_identity_guti->amf_id, sizeof(ogs_amf_id_t));
         test_ue->nas_5gs_guti.m_tmsi = be32toh(mobile_identity_guti->m_tmsi);
+        ogs_ad("testgmm_handle_configuration_update_command: new GUTI: %d",test_ue->nas_5gs_guti.m_tmsi);
+
     }
 }
 

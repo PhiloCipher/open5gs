@@ -67,6 +67,7 @@ typedef struct OpenAPI_sm_context_create_data_s {
     OpenAPI_access_type_e additional_an_type;
     OpenAPI_rat_type_e rat_type;
     OpenAPI_presence_state_e presence_in_ladn;
+    int loc_id;
     struct OpenAPI_user_location_s *ue_location;
     char *ue_time_zone;
     struct OpenAPI_user_location_s *add_ue_location;

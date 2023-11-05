@@ -72,6 +72,14 @@ void ngap_recv_upcall(short when, ogs_socket_t fd, void *data)
     sock = data;
     ogs_assert(sock);
 
+    ogs_ad("ngap_recv_upcall");
+    char buf[OGS_ADDRSTRLEN];
+    ogs_sockaddr_t *addr = NULL;
+    addr = ogs_calloc(1, sizeof(ogs_sockaddr_t));
+    memcpy(addr, &sock->remote_addr, sizeof(ogs_sockaddr_t));
+        ogs_ad("ngap_recv_upcall recv[%s]:%d ",
+        OGS_ADDR(addr, buf), OGS_PORT(addr));
+
     ngap_recv_handler(sock);
 }
 
@@ -101,7 +109,6 @@ void ngap_accept_handler(ogs_sock_t *sock)
     ogs_sock_t *new = NULL;
 
     ogs_assert(sock);
-
     new = ogs_sock_accept(sock);
     if (new) {
         ogs_sockaddr_t *addr = NULL;
@@ -112,7 +119,8 @@ void ngap_accept_handler(ogs_sock_t *sock)
 
         ogs_info("gNB-N2 accepted[%s]:%d in ng-path module",
             OGS_ADDR(addr, buf), OGS_PORT(addr));
-
+        ogs_ad("gNB-N2 accepted[%s]:%d in ng-path module",
+            OGS_ADDR(addr, buf), OGS_PORT(addr));
         ngap_event_push(AMF_EVENT_NGAP_LO_ACCEPT,
                 new, addr, NULL, 0, 0);
     } else {
@@ -121,7 +129,8 @@ void ngap_accept_handler(ogs_sock_t *sock)
 }
 
 void ngap_recv_handler(ogs_sock_t *sock)
-{
+{        ogs_ad("ngap_recv_handler");
+
     ogs_pkbuf_t *pkbuf;
     int size;
     ogs_sockaddr_t *addr = NULL;
@@ -134,6 +143,7 @@ void ngap_recv_handler(ogs_sock_t *sock)
     pkbuf = ogs_pkbuf_alloc(NULL, OGS_MAX_SDU_LEN);
     ogs_assert(pkbuf);
     ogs_pkbuf_put(pkbuf, OGS_MAX_SDU_LEN);
+    ogs_ad("ogs_sctp_recvmsg");
     size = ogs_sctp_recvmsg(
             sock, pkbuf->data, pkbuf->len, &from, &sinfo, &flags);
     if (size < 0 || size >= OGS_MAX_SDU_LEN) {
@@ -163,7 +173,7 @@ void ngap_recv_handler(ogs_sock_t *sock)
                 addr = ogs_calloc(1, sizeof(ogs_sockaddr_t));
                 ogs_assert(addr);
                 memcpy(addr, &from, sizeof(ogs_sockaddr_t));
-
+                ogs_ad("AMF_EVENT_NGAP_LO_SCTP_COMM_UP");
                 ngap_event_push(AMF_EVENT_NGAP_LO_SCTP_COMM_UP,
                         sock, addr, NULL,
                         not->sn_assoc_change.sac_inbound_streams,
@@ -234,7 +244,7 @@ void ngap_recv_handler(ogs_sock_t *sock)
         addr = ogs_calloc(1, sizeof(ogs_sockaddr_t));
         ogs_assert(addr);
         memcpy(addr, &from, sizeof(ogs_sockaddr_t));
-
+        ogs_ad("ngap_recv_handler: AMF_EVENT_NGAP_MESSAGE");
         ngap_event_push(AMF_EVENT_NGAP_MESSAGE, sock, addr, pkbuf, 0, 0);
         return;
     } else {

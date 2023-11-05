@@ -296,22 +296,22 @@ ogs_sbi_request_t *smf_npcf_smpolicycontrol_build_delete(
             OpenAPI_list_add(ranNasRelCauseList, ranNasRelCause);
         }
 
-        if (param->ue_location) {
-            ueLocation.nr_location = ogs_sbi_build_nr_location(
-                    &sess->nr_tai, &sess->nr_cgi);
-            if (!ueLocation.nr_location) {
-                ogs_error("ueLocation.nr_location");
-                goto end;
-            }
-            ueLocation.nr_location->ue_location_timestamp =
-                ogs_sbi_gmtime_string(sess->ue_location_timestamp);
-            if (!ueLocation.nr_location->ue_location_timestamp) {
-                ogs_error("ueLocation.nr_location->ue_location_timestamp");
-                goto end;
-            }
+        // if (param->ue_location) {
+        //     ueLocation.nr_location = ogs_sbi_build_nr_location(
+        //             &sess->nr_tai, &sess->nr_cgi);
+        //     if (!ueLocation.nr_location) {
+        //         ogs_error("ueLocation.nr_location");
+        //         goto end;
+        //     }
+        //     ueLocation.nr_location->ue_location_timestamp =
+        //         ogs_sbi_gmtime_string(sess->ue_location_timestamp);
+        //     if (!ueLocation.nr_location->ue_location_timestamp) {
+        //         ogs_error("ueLocation.nr_location->ue_location_timestamp");
+        //         goto end;
+        //     }
 
-            SmPolicyDeleteData.user_location_info = &ueLocation;
-        }
+        //     SmPolicyDeleteData.user_location_info = &ueLocation;
+        // }
         if (param->ue_timezone) {
             SmPolicyDeleteData.ue_time_zone =
                 ogs_sbi_timezone_string(ogs_timezone());

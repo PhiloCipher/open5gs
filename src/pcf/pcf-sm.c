@@ -58,6 +58,7 @@ void pcf_state_operational(ogs_fsm_t *s, pcf_event_t *e)
     pcf_sm_debug(e);
 
     ogs_assert(s);
+    ogs_ad("PCF state: %d", e->h.id);
 
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:

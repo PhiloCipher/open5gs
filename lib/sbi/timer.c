@@ -33,6 +33,7 @@ static void timer_send_event(int timer_id, void *data)
     case OGS_TIMER_SUBSCRIPTION_VALIDITY:
     case OGS_TIMER_SUBSCRIPTION_PATCH:
     case OGS_TIMER_SBI_CLIENT_WAIT:
+    // ogs_ad("timeeeeer%d",timer_id);
         e = ogs_event_new(OGS_EVENT_SBI_TIMER);
         ogs_assert(e);
         e->timer_id = timer_id;

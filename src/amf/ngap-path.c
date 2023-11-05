@@ -49,6 +49,7 @@ void ngap_close(void)
 int ngap_send_to_gnb(amf_gnb_t *gnb, ogs_pkbuf_t *pkbuf, uint16_t stream_no)
 {
     char buf[OGS_ADDRSTRLEN];
+    ogs_ad("ngap_send_to_gnb IP[%s] RAN_ID[%d]",OGS_ADDR(gnb->sctp.addr, buf), gnb->gnb_id);
 
     ogs_assert(pkbuf);
 
@@ -174,6 +175,7 @@ int ngap_send_to_nas(ran_ue_t *ran_ue,
     ogs_assert(sh);
 
     memset(&security_header_type, 0, sizeof(ogs_nas_security_header_type_t));
+    ogs_ad("OGS_NAS_SECURITY_HEADER: %d",sh->security_header_type);
     switch(sh->security_header_type) {
     case OGS_NAS_SECURITY_HEADER_PLAIN_NAS_MESSAGE:
         break;
@@ -464,7 +466,8 @@ int ngap_send_paging(amf_ue_t *amf_ue)
     /* Start T3513 */
     ogs_timer_start(amf_ue->t3513.timer, 
             amf_timer_cfg(AMF_TIMER_T3513)->duration);
-
+    ogs_timer_start(amf_ue->t_ad.timer, amf_timer_cfg(AMF_TIMER_T_AD)->duration);
+    ogs_ad("timer t_ad started!");
     return OGS_OK;
 }
 

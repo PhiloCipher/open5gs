@@ -48,6 +48,7 @@ const char *nrf_timer_get_name(int timer_id)
 
 static void timer_send_event(int timer_id, void *data)
 {
+    ogs_ad("timer");
     int rv;
     nrf_event_t *e = NULL;
     ogs_assert(data);

@@ -342,6 +342,7 @@ ogs_pkbuf_t *gmm_build_identity_request(amf_ue_t *amf_ue)
 
 ogs_pkbuf_t *gmm_build_authentication_request(amf_ue_t *amf_ue)
 {
+    ogs_ad("gmm_build_authentication_request");
     ogs_nas_5gs_message_t message;
     ogs_nas_5gs_authentication_request_t *authentication_request =
         &message.gmm.authentication_request;

@@ -50,6 +50,7 @@ void nrf_state_operational(ogs_fsm_t *s, nrf_event_t *e)
     nrf_sm_debug(e);
 
     ogs_assert(s);
+    ogs_ad("NRF state: %d", e->h.id);
 
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:
@@ -84,14 +85,16 @@ void nrf_state_operational(ogs_fsm_t *s, nrf_event_t *e)
             ogs_sbi_message_free(&message);
             break;
         }
-
         SWITCH(message.h.service.name)
         CASE(OGS_SBI_SERVICE_NAME_NNRF_NFM)
+        ogs_ad("OGS_SBI_SERVICE_NAME_NNRF_NFM: %s", message.h.resource.component[0]);
 
             SWITCH(message.h.resource.component[0])
             CASE(OGS_SBI_RESOURCE_NAME_NF_INSTANCES)
                 SWITCH(message.h.method)
-                CASE(OGS_SBI_HTTP_METHOD_GET)
+                CASE(OGS_SBI_HTTP_METHOD_GET)        
+
+
                     if (message.h.resource.component[1]) {
                         nrf_nnrf_handle_nf_profile_retrieval(stream, &message);
                     } else {
@@ -100,8 +103,10 @@ void nrf_state_operational(ogs_fsm_t *s, nrf_event_t *e)
                     break;
 
                 DEFAULT
+
                     nf_instance = ogs_sbi_nf_instance_find(
                             message.h.resource.component[1]);
+
                     if (!nf_instance) {
                         SWITCH(message.h.method)
                         CASE(OGS_SBI_HTTP_METHOD_PUT)
@@ -123,7 +128,6 @@ void nrf_state_operational(ogs_fsm_t *s, nrf_event_t *e)
                             ogs_assert(nf_instance);
                             ogs_sbi_nf_instance_set_id(nf_instance,
                                     message.h.resource.component[1]);
-
                             nrf_nf_fsm_init(nf_instance);
                             break;
                         DEFAULT
@@ -142,9 +146,13 @@ void nrf_state_operational(ogs_fsm_t *s, nrf_event_t *e)
                         ogs_assert(OGS_FSM_STATE(&nf_instance->sm));
 
                         e->h.sbi.message = &message;
+                        ogs_ad("ogs_fsm_dispatch: %s", message.h.resource.component[1]);
+
                         ogs_fsm_dispatch(&nf_instance->sm, e);
+
                         if (OGS_FSM_CHECK(&nf_instance->sm,
                                     nrf_nf_state_de_registered)) {
+
                             nrf_nf_fsm_fini(nf_instance);
                             ogs_sbi_nf_instance_remove(nf_instance);
                         } else if (OGS_FSM_CHECK(&nf_instance->sm,

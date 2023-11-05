@@ -1,0 +1,32 @@
+{
+    "files.associations": {
+        "nudm-build.h": "c",
+        "sbi-path.h": "c",
+        "context.h": "c",
+        "namf-build.h": "c",
+        "nlmf-build.h": "c",
+        "udm_ue.h": "c",
+        "ogs-crypt.h": "c",
+        "ogs-app.h": "c",
+        "binary.h": "c",
+        "ogs-sbi.h": "c",
+        "list.h": "c",
+        "amf3_gpp_access_registration.h": "c",
+        "rat_type.h": "c",
+        "stdio.h": "c",
+        "ue_authentication_ctx.h": "c",
+        "links.h": "c",
+        "nnrf-handler.h": "c",
+        "nudm-handler.h": "c",
+        "ntdf-handler.h": "c",
+        "nausf-build.h": "c",
+        "patch_item.h": "c",
+        "modification_notification.h": "c",
+        "termination_notification.h": "c",
+        "sm_policy_notification.h": "c",
+        "ogs-dbi.h": "c",
+        "subscription.h": "c",
+        "ogs-mongoc.h": "c",
+        "algorithm": "c"
+    }
+}

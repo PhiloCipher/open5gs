@@ -1104,6 +1104,7 @@ bool ogs_sbi_nf_service_is_allowed_nf_type(
     }
 
     for (i = 0; i < nf_service->num_of_allowed_nf_type; i++) {
+        ogs_tmp("ogs_sbi_nf_service_is_allowed_nf_type %s == %s",OpenAPI_nf_type_ToString(nf_service->allowed_nf_type[i] ),OpenAPI_nf_type_ToString(allowed_nf_type) );
         if (nf_service->allowed_nf_type[i] == allowed_nf_type)
             return true;
     }
@@ -1557,6 +1558,8 @@ bool ogs_sbi_discovery_option_is_matched(
 
         ogs_list_for_each(&nf_instance->nf_service_list, nf_service) {
             for (i = 0; i < discovery_option->num_of_service_names; i++) {
+             ogs_tmp("ogs_sbi_discovery_option_is_matched %s, %s == %s",OpenAPI_nf_type_ToString(requester_nf_type),nf_service->name, discovery_option->service_names[i]);
+
                 if (nf_service->name &&
                     discovery_option->service_names[i] &&
                     strcmp(nf_service->name,
@@ -1564,6 +1567,7 @@ bool ogs_sbi_discovery_option_is_matched(
                     if (ogs_sbi_nf_service_is_allowed_nf_type(
                             nf_service, requester_nf_type) == true) {
                         exist = true;
+
                         break;
                     }
                 }

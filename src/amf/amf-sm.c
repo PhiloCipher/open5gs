@@ -32,8 +32,8 @@ void amf_state_initial(ogs_fsm_t *s, amf_event_t *e)
     amf_sm_debug(e);
 
     ogs_assert(s);
-
     OGS_FSM_TRAN(s, &amf_state_operational);
+
 }
 
 void amf_state_final(ogs_fsm_t *s, amf_event_t *e)
@@ -78,6 +78,7 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
     amf_sm_debug(e);
 
     ogs_assert(s);
+    ogs_ad("AMF state %d: %s", e->h.id, amf_event_get_name(e));
 
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:
@@ -89,6 +90,8 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
     case OGS_EVENT_SBI_SERVER:
         sbi_request = e->h.sbi.request;
         ogs_assert(sbi_request);
+        ogs_com("AMF OGS_EVENT_SBI_SERVER h.resource.component[0]: %s  h.resource.component[1]: %s  Content: %s", sbi_request->h.resource.component[0], sbi_request->h.resource.component[1], sbi_request->http.content);
+
         stream = e->h.sbi.data;
         ogs_assert(stream);
 
@@ -102,6 +105,7 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
                     NULL, "cannot parse HTTP sbi_message", NULL));
             break;
         }
+        ogs_ad("OGS_EVENT_SBI_SERVER: %s", sbi_message.h.service.name);
 
         SWITCH(sbi_message.h.service.name)
         CASE(OGS_SBI_SERVICE_NAME_NUDM_SDM)
@@ -232,7 +236,36 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
                         sbi_message.h.resource.component[1]));
             END
             break;
+        // CASE(OGS_SBI_SERVICE_NAME_ANONYMOUS)
+        //     SWITCH(sbi_message.h.resource.component[1])
+        //     CASE(OGS_SBI_RESOURCE_NAME_SM_CONTEXT_STATUS)
+        //         amf_namf_callback_handle_sm_context_status(
+        //                 stream, &sbi_message);
+        //         break;
 
+        //     CASE(OGS_SBI_RESOURCE_NAME_DEREG_NOTIFY)
+        //         amf_namf_callback_handle_dereg_notify(stream, &sbi_message);
+        //         break;
+
+        //     CASE(OGS_SBI_RESOURCE_NAME_SDMSUBSCRIPTION_NOTIFY)
+        //         amf_namf_callback_handle_sdm_data_change_notify(
+        //                 stream, &sbi_message);
+        //         break;
+
+        //     CASE(OGS_SBI_RESOURCE_NAME_AM_POLICY_NOTIFY)
+        //         ogs_assert(true == ogs_sbi_send_http_status_no_content(stream));
+        //         break;
+
+        //     DEFAULT
+        //         ogs_error("Invalid resource name [%s]",
+        //                 sbi_message.h.resource.component[1]);
+        //         ogs_assert(true ==
+        //             ogs_sbi_server_send_error(stream,
+        //                 OGS_SBI_HTTP_STATUS_BAD_REQUEST, &sbi_message,
+        //                 "Invalid resource name",
+        //                 sbi_message.h.resource.component[1]));
+        //     END
+        //     break;
         DEFAULT
             ogs_error("Invalid API name [%s]", sbi_message.h.service.name);
             ogs_assert(true ==
@@ -244,6 +277,7 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
         /* In lib/sbi/server.c, notify_completed() releases 'request' buffer. */
         ogs_sbi_message_free(&sbi_message);
         break;
+
 
     case OGS_EVENT_SBI_CLIENT:
         ogs_assert(e);
@@ -257,7 +291,7 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
             ogs_sbi_response_free(sbi_response);
             break;
         }
-
+        ogs_ad("OGS_EVENT_SBI_CLIENT: %s",sbi_message.h.service.name);
         SWITCH(sbi_message.h.service.name)
         CASE(OGS_SBI_SERVICE_NAME_NUDM_SDM)
         CASE(OGS_SBI_SERVICE_NAME_NNSSF_NSSELECTION)
@@ -277,6 +311,7 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
 
         SWITCH(sbi_message.h.service.name)
         CASE(OGS_SBI_SERVICE_NAME_NNRF_NFM)
+            ogs_ad("OGS_SBI_SERVICE_NAME_NNRF_NFM: %s",sbi_message.h.resource.component[0]);
 
             SWITCH(sbi_message.h.resource.component[0])
             CASE(OGS_SBI_RESOURCE_NAME_NF_INSTANCES)
@@ -404,7 +439,7 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
             e->amf_ue = amf_ue;
             e->h.sbi.message = &sbi_message;;
             e->h.sbi.state = state;
-
+            ogs_ad("ogs_fsm_dispatch OGS_SBI_SERVICE_NAME_NPCF_AM_POLICY_CONTROL");
             ogs_fsm_dispatch(&amf_ue->sm, e);
             break;
 
@@ -819,6 +854,7 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
         if (rc == OGS_OK) {
             e->gnb = gnb;
             e->ngap.message = &ngap_message;
+            ogs_ad("ngap state");
             ogs_fsm_dispatch(&gnb->sm, e);
         } else {
             ogs_error("Cannot decode NGAP message");
@@ -879,6 +915,7 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
         if (!amf_ue) {
             amf_ue = amf_ue_find_by_message(&nas_message);
             if (!amf_ue) {
+                ogs_ad("the AMF_UE Context is not found");
                 amf_ue = amf_ue_add(ran_ue);
                 if (amf_ue == NULL) {
                     r = ngap_send_ran_ue_context_release_command(
@@ -892,6 +929,8 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
                     break;
                 }
             } else {
+                ogs_ad("the AMF_UE Context is found");
+
                 /* Here, if the AMF_UE Context is found,
                  * the integrity check is not performed
                  * For example, REGISTRATION_REQUEST,
@@ -936,6 +975,7 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
                  * Newly associated NG(ran_ue_t) context holding timer
                  * is stopped. */
                 ogs_debug("[%s] Start NG Holding Timer", amf_ue->suci);
+                ogs_ad("[%s] Start NG Holding Timer", amf_ue->suci);
                 ogs_debug("[%s]    RAN_UE_NGAP_ID[%d] AMF_UE_NGAP_ID[%lld]",
                         amf_ue->suci, amf_ue->ran_ue->ran_ue_ngap_id,
                         (long long)amf_ue->ran_ue->amf_ue_ngap_id);
@@ -969,6 +1009,7 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
 
         e->amf_ue = amf_ue;
         e->nas.message = &nas_message;
+            ogs_ad("ogs_fsm_dispatch AMF_EVENT_5GMM_MESSAGE");
 
         ogs_fsm_dispatch(&amf_ue->sm, e);
 
@@ -983,6 +1024,7 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
         }
 
         ogs_assert(OGS_FSM_STATE(&amf_ue->sm));
+            ogs_ad("ogs_fsm_dispatch AMF_EVENT_5GMM_TIMER");
 
         ogs_fsm_dispatch(&amf_ue->sm, e);
         break;

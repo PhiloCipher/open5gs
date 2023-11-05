@@ -574,7 +574,8 @@ static bool server_send_rspmem_persistent(
     ogs_assert(sock);
     fd = sock->fd;
     ogs_assert(fd != INVALID_SOCKET); /* Check if session is removed */
-
+    // char buf[OGS_ADDRSTRLEN];
+    // ogs_com("Sending response to socket IP= %s PORT=  %d fd: %d", OGS_ADDR(&sock->remote_addr, buf), OGS_PORT(&sock->remote_addr), fd);
     nvlen = 3; /* :status && server && date */
 
     for (hi = ogs_hash_first(response->http.headers);
@@ -887,6 +888,8 @@ static void recv_handler(short when, ogs_socket_t fd, void *data)
     ogs_assert(fd != INVALID_SOCKET);
     addr = sbi_sess->addr;
     ogs_assert(addr);
+    // char mybuf[OGS_ADDRSTRLEN];
+    // ogs_com("recv_handler socket IP= %s PORT=  %d fd: %d", OGS_ADDR(addr, mybuf), OGS_PORT(addr), fd);
 
     pkbuf = ogs_pkbuf_alloc(NULL, OGS_MAX_SDU_LEN);
     ogs_assert(pkbuf);
@@ -1106,6 +1109,8 @@ static int on_frame_recv(nghttp2_session *session,
                 ogs_log_message(level, 0, "%s", request->http.content);
             }
 
+            // ogs_com("RECEIVED at %s: %d ", OpenAPI_nf_type_ToString(NF_INSTANCE_TYPE(ogs_sbi_self()->nf_instance)), (int)request->http.content_length);
+            // ogs_com("Content Start:%sContent Stop",request->http.content);
             if (stream->memory_overflow == true) {
                 ogs_error("[DROP] Overflow");
                 break;

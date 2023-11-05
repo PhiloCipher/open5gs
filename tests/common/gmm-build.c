@@ -86,6 +86,9 @@ ogs_pkbuf_t *testgmm_build_registration_request(
             &mobile_identity_guti;
 
     } else {
+        char *suci = ogs_nas_5gs_suci_from_mobile_identity(&(test_ue->mobile_identity));
+        ogs_ad("No GUIT, SUCI is %s",suci); // make full talloc report on 'core' (total     63 bytes in   3 blocks) if not free
+        ogs_free(suci);
         registration_request->mobile_identity.length =
             test_ue->mobile_identity.length;
         registration_request->mobile_identity.buffer =

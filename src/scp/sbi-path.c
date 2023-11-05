@@ -50,6 +50,7 @@ int scp_sbi_open(void)
     nrf_client = NF_INSTANCE_CLIENT(ogs_sbi_self()->nrf_instance);
 
     if (nrf_client) {
+        ogs_ad("scp_sbi_open: Initialize NRF NF Instance");
 
         /* Initialize NRF NF Instance */
         if (nrf_instance)
@@ -213,6 +214,7 @@ static int request_handler(ogs_sbi_request_t *request, void *data)
         } else {
         }
     }
+    // ogs_com("request_handler target_nf_type: %s  requester_nf_type: %s", OpenAPI_nf_type_ToString(target_nf_type), OpenAPI_nf_type_ToString(requester_nf_type));
 
     /* Check if Discovery Parameter and Option */
     discovery_presence = false;
@@ -345,7 +347,6 @@ static int request_handler(ogs_sbi_request_t *request, void *data)
             ogs_free(scp_request.h.uri);
             ogs_sbi_discovery_option_free(discovery_option);
             scp_assoc_remove(assoc);
-
             return OGS_ERROR;
         }
 
@@ -512,6 +513,7 @@ static int request_handler(ogs_sbi_request_t *request, void *data)
 
     e->h.sbi.request = request;
     e->h.sbi.data = data;
+    ogs_ad("sbi request_handler ogs_queue_push e->h.sbi.request and e->h.sbi.data ");
 
     rv = ogs_queue_push(ogs_app()->queue, e);
     if (rv != OGS_OK) {
@@ -569,6 +571,7 @@ static int response_handler(
 static int discover_handler(
         int status, ogs_sbi_response_t *response, void *data)
 {
+
     int rv;
     char *strerror = NULL;
     ogs_sbi_message_t message;
@@ -594,6 +597,7 @@ static int discover_handler(
     ogs_assert(service_type);
     requester_nf_type = assoc->requester_nf_type;
     ogs_assert(requester_nf_type);
+        ogs_tmp("discover_handler %ld",request->http.content_length);
 
     if (status != OGS_OK) {
 

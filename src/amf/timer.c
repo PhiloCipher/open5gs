@@ -47,6 +47,10 @@ static amf_timer_cfg_t g_amf_timer_cfg[MAX_NUM_OF_AMF_TIMER] = {
 
     [AMF_TIMER_NG_HOLDING] =
         { .have = true, .duration = ogs_time_from_sec(30) },
+
+    [AMF_TIMER_T_AD] =
+        { .have = true, .max_count = 5, .duration = ogs_time_from_sec(6) },
+
 };
 
 static void gmm_timer_event_send(
@@ -198,4 +202,10 @@ void amf_timer_mobile_reachable_expire(void *data)
 void amf_timer_implicit_deregistration_expire(void *data)
 {
     gmm_timer_event_send(AMF_TIMER_IMPLICIT_DEREGISTRATION, data);
+}
+
+void amf_timer_t_ad_expire(void *data)
+{
+    ogs_ad("ad timer expired!");
+    gmm_timer_event_send(AMF_TIMER_T_AD, data);
 }

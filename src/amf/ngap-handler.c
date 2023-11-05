@@ -337,6 +337,7 @@ void ngap_handle_ng_setup_request(amf_gnb_t *gnb, ogs_ngap_message_t *message)
     amf_gnb_set_gnb_id(gnb, gnb_id);
 
     gnb->state.ng_setup_success = true;
+    ogs_ad("ngap_send_ng_setup_response IP[%s] RAN_ID[%d]",OGS_ADDR(gnb->sctp.addr, buf), gnb->gnb_id);
     r = ngap_send_ng_setup_response(gnb);
     ogs_expect(r == OGS_OK);
     ogs_assert(r != OGS_ERROR);
@@ -397,6 +398,8 @@ void ngap_handle_initial_ue_message(amf_gnb_t *gnb, ogs_ngap_message_t *message)
 
     ogs_debug("    IP[%s] RAN_ID[%d]",
             OGS_ADDR(gnb->sctp.addr, buf), gnb->gnb_id);
+    ogs_ad("    IP[%s] RAN_ID[%d]",
+            OGS_ADDR(gnb->sctp.addr, buf), gnb->gnb_id);
 
     if (!RAN_UE_NGAP_ID) {
         ogs_error("No RAN_UE_NGAP_ID");
@@ -409,6 +412,8 @@ void ngap_handle_initial_ue_message(amf_gnb_t *gnb, ogs_ngap_message_t *message)
 
     ran_ue = ran_ue_find_by_ran_ue_ngap_id(gnb, *RAN_UE_NGAP_ID);
     if (!ran_ue) {
+            ogs_ad("ran_ue not found! Has to call to ran_ue_add(): %lu", *RAN_UE_NGAP_ID);
+
         ran_ue = ran_ue_add(gnb, *RAN_UE_NGAP_ID);
         if (ran_ue == NULL) {
             r = ngap_send_error_indication(gnb, NULL, NULL,
@@ -454,6 +459,11 @@ void ngap_handle_initial_ue_message(amf_gnb_t *gnb, ogs_ngap_message_t *message)
                         AMF_UE_HAVE_SUCI(amf_ue) ? amf_ue->suci : "Unknown ID",
                         ogs_amf_id_hexdump(&amf_ue->current.guti.amf_id),
                         amf_ue->current.guti.m_tmsi);
+
+                        ogs_ad("[%s]    5G-S_TMSI[AMF_ID:0x%x,M_TMSI:0x%x]",
+                        AMF_UE_HAVE_SUCI(amf_ue) ? amf_ue->suci : "Unknown ID",
+                        ogs_amf_id_hexdump(&amf_ue->current.guti.amf_id),
+                        amf_ue->current.guti.m_tmsi);
                 /* If NAS(amf_ue_t) has already been associated with
                  * older NG(ran_ue_t) context */
                 if (CM_CONNECTED(amf_ue)) {
@@ -476,6 +486,7 @@ void ngap_handle_initial_ue_message(amf_gnb_t *gnb, ogs_ngap_message_t *message)
                     ogs_expect(r == OGS_OK);
                     ogs_assert(r != OGS_ERROR);
                 }
+
                 amf_ue_associate_ran_ue(amf_ue, ran_ue);
 
                 /*
@@ -530,14 +541,24 @@ void ngap_handle_initial_ue_message(amf_gnb_t *gnb, ogs_ngap_message_t *message)
     ogs_ngap_ASN_to_5gs_tai(
             &UserLocationInformationNR->tAI, &ran_ue->saved.nr_tai);
 
+    ogs_ad("save UserLocationInformationNR from message to ran_ue");
+    amf_ran_ue_location_setter(ran_ue, &ran_ue->saved.nr_tai, &ran_ue->saved.nr_cgi, (ogs_time_t)NULL);
+
+
     ogs_info("    RAN_UE_NGAP_ID[%d] AMF_UE_NGAP_ID[%lld] "
             "TAC[%d] CellID[0x%llx]",
         ran_ue->ran_ue_ngap_id, (long long)ran_ue->amf_ue_ngap_id,
         ran_ue->saved.nr_tai.tac.v, (long long)ran_ue->saved.nr_cgi.cell_id);
 
+    ogs_ad("    RAN_UE_NGAP_ID[%d] AMF_UE_NGAP_ID[%lld] "
+                "TAC[%d] CellID[0x%llx]",
+            ran_ue->ran_ue_ngap_id, (long long)ran_ue->amf_ue_ngap_id,
+            ran_ue->saved.nr_tai.tac.v, (long long)ran_ue->saved.nr_cgi.cell_id);
+            
     if (UEContextRequest) {
         if (*UEContextRequest == NGAP_UEContextRequest_requested) {
             ran_ue->ue_context_requested = true;
+            ogs_ad("NGAP_UEContextRequest_requested");
         }
     }
 
@@ -681,12 +702,14 @@ void ngap_handle_uplink_nas_transport(
             &UserLocationInformationNR->nR_CGI, &ran_ue->saved.nr_cgi);
     ogs_ngap_ASN_to_5gs_tai(
             &UserLocationInformationNR->tAI, &ran_ue->saved.nr_tai);
+    ogs_ad("save UserLocationInformationNR from message to ran_ue");
 
     ogs_debug("    RAN_UE_NGAP_ID[%d] AMF_UE_NGAP_ID[%lld] "
             "TAC[%d] CellID[0x%llx]",
         ran_ue->ran_ue_ngap_id, (long long)ran_ue->amf_ue_ngap_id,
         ran_ue->saved.nr_tai.tac.v, (long long)ran_ue->saved.nr_cgi.cell_id);
 
+    ogs_ad("Copy NR-TAI/NR-CGI from ran_ue to amf_ue");
     /* Copy NR-TAI/NR-CGI from ran_ue */
     memcpy(&amf_ue->nr_tai, &ran_ue->saved.nr_tai, sizeof(ogs_5gs_tai_t));
     memcpy(&amf_ue->nr_cgi, &ran_ue->saved.nr_cgi, sizeof(ogs_nr_cgi_t));
@@ -799,6 +822,7 @@ void ngap_handle_ue_radio_capability_info_indication(
 void ngap_handle_initial_context_setup_response(
         amf_gnb_t *gnb, ogs_ngap_message_t *message)
 {
+    //look for making pdu session
     char buf[OGS_ADDRSTRLEN];
     int i, r;
 
@@ -956,6 +980,8 @@ void ngap_handle_initial_context_setup_response(
         }
 
         ogs_debug("    SUPI[%s] PSI[%d] OLD ACTIVATED[0x%x]",
+                amf_ue->supi, sess->psi, ran_ue->psimask.activated);
+                ogs_ad("    SUPI[%s] PSI[%d] OLD ACTIVATED[0x%x]",
                 amf_ue->supi, sess->psi, ran_ue->psimask.activated);
         ran_ue->psimask.activated |= ((1 << sess->psi));
         ogs_debug("    NEW ACTIVATED[0x%x]", ran_ue->psimask.activated);
@@ -2771,7 +2797,9 @@ void ngap_handle_path_switch_request(
             &UserLocationInformationNR->nR_CGI, &ran_ue->saved.nr_cgi);
     ogs_ngap_ASN_to_5gs_tai(
             &UserLocationInformationNR->tAI, &ran_ue->saved.nr_tai);
+    ogs_ad("save UserLocationInformationNR from message to ran_ue");
 
+    ogs_ad("Copy NR-TAI/NR-CGI from ran_ue to amf_ue");
     /* Copy Stream-No/TAI/ECGI from ran_ue */
     amf_ue->gnb_ostream_id = ran_ue->gnb_ostream_id;
     memcpy(&amf_ue->nr_tai, &ran_ue->saved.nr_tai, sizeof(ogs_5gs_tai_t));
@@ -2935,6 +2963,7 @@ void ngap_handle_handover_required(
     ogs_assert(HandoverRequired);
 
     ogs_info("HandoverRequired");
+    ogs_ad("HandoverRequired");
 
     for (i = 0; i < HandoverRequired->protocolIEs.list.count; i++) {
         ie = HandoverRequired->protocolIEs.list.array[i];
@@ -2968,7 +2997,8 @@ void ngap_handle_handover_required(
 
     ogs_debug("    IP[%s] RAN_ID[%d]",
             OGS_ADDR(gnb->sctp.addr, buf), gnb->gnb_id);
-
+    ogs_ad("    IP[%s] RAN_ID[%d]",
+            OGS_ADDR(gnb->sctp.addr, buf), gnb->gnb_id);
     if (!AMF_UE_NGAP_ID) {
         ogs_error("No AMF_UE_NGAP_ID");
         r = ngap_send_error_indication(gnb, (uint32_t *)RAN_UE_NGAP_ID, NULL,
@@ -3003,7 +3033,8 @@ void ngap_handle_handover_required(
 
     ogs_debug("    Source : RAN_UE_NGAP_ID[%d] AMF_UE_NGAP_ID[%lld] ",
         source_ue->ran_ue_ngap_id, (long long)source_ue->amf_ue_ngap_id);
-
+    ogs_ad("    Source : RAN_UE_NGAP_ID[%d] AMF_UE_NGAP_ID[%lld] ",
+        source_ue->ran_ue_ngap_id, (long long)source_ue->amf_ue_ngap_id);
     amf_ue = source_ue->amf_ue;
     if (!amf_ue) {
         ogs_error("Cannot find AMF-UE Context [%lld]",
@@ -4006,10 +4037,14 @@ void ngap_handle_handover_notification(
         target_ue->saved.nr_tai.tac.v,
         (long long)target_ue->saved.nr_cgi.cell_id);
 
+    ogs_ad("Copy Stream-No/TAI/ECGI from ran_ue to amf_ue");
     /* Copy Stream-No/TAI/ECGI from ran_ue */
     amf_ue->gnb_ostream_id = target_ue->gnb_ostream_id;
     memcpy(&amf_ue->nr_tai, &target_ue->saved.nr_tai, sizeof(ogs_5gs_tai_t));
     memcpy(&amf_ue->nr_cgi, &target_ue->saved.nr_cgi, sizeof(ogs_nr_cgi_t));
+    
+    amf_ran_ue_location_setter(target_ue, &target_ue->saved.nr_tai, &target_ue->saved.nr_cgi, (ogs_time_t)NULL);
+    amf_ue_loc_associate(amf_ue, target_ue->amf_loc);
 
     r = ngap_send_ran_ue_context_release_command(source_ue,
             NGAP_Cause_PR_radioNetwork,

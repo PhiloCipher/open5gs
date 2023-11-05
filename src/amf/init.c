@@ -115,8 +115,9 @@ static void amf_main(void *data)
     ogs_fsm_init(&amf_sm, amf_state_initial, amf_state_final, 0);
 
     for ( ;; ) {
+        // ogs_ad("ogs_pollset_poll: waiting for events");
         ogs_pollset_poll(ogs_app()->pollset,
-                ogs_timer_mgr_next(ogs_app()->timer_mgr));
+                ogs_timer_mgr_next(ogs_app()->timer_mgr)); // wait here
 
         /*
          * After ogs_pollset_poll(), ogs_timer_mgr_expire() must be called.
@@ -144,6 +145,7 @@ static void amf_main(void *data)
                 break;
 
             ogs_assert(e);
+            // ogs_ad("ogs_fsm_dispatch");
             ogs_fsm_dispatch(&amf_sm, e);
             ogs_event_free(e);
         }

@@ -34,6 +34,7 @@ typedef struct amf_gnb_s amf_gnb_t;
 typedef struct ran_ue_s ran_ue_t;
 typedef struct amf_ue_s amf_ue_t;
 typedef struct amf_sess_s amf_sess_t;
+typedef struct amf_loc_s amf_loc_t;
 typedef struct amf_bearer_s amf_bearer_t;
 
 typedef enum {

@@ -48,6 +48,7 @@ void udm_ue_state_operational(ogs_fsm_t *s, udm_event_t *e)
 
     udm_ue = e->udm_ue;
     ogs_assert(udm_ue);
+    ogs_ad("UDM UE state %d", e->h.id);
 
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:
@@ -61,11 +62,14 @@ void udm_ue_state_operational(ogs_fsm_t *s, udm_event_t *e)
         ogs_assert(message);
         stream = e->h.sbi.data;
         ogs_assert(stream);
+        ogs_ad("UDM UE OGS_EVENT_SBI_SERVER: %s", message->h.service.name);
 
         SWITCH(message->h.service.name)
         CASE(OGS_SBI_SERVICE_NAME_NUDM_UEAU)
             SWITCH(message->h.method)
             CASE(OGS_SBI_HTTP_METHOD_POST)
+                ogs_ad("UDM UE OGS_SBI_HTTP_METHOD_POST: %s", message->h.resource.component[1]);
+
                 SWITCH(message->h.resource.component[1])
                 CASE(OGS_SBI_RESOURCE_NAME_SECURITY_INFORMATION)
                     udm_nudm_ueau_handle_get(udm_ue, stream, message);
@@ -236,6 +240,7 @@ void udm_ue_state_operational(ogs_fsm_t *s, udm_event_t *e)
 
     case OGS_EVENT_SBI_CLIENT:
         message = e->h.sbi.message;
+        // ogs_com("OGS_EVENT_SBI_CLIENT Target NF: %s  Requester NF: %s", OpenAPI_nf_type_ToString(message->param.target_nf_type), OpenAPI_nf_type_ToString(message->param.requester_nf_type));
         ogs_assert(message);
 
         udm_ue = e->udm_ue;
@@ -247,6 +252,7 @@ void udm_ue_state_operational(ogs_fsm_t *s, udm_event_t *e)
         CASE(OGS_SBI_SERVICE_NAME_NUDR_DR)
             SWITCH(message->h.resource.component[0])
             CASE(OGS_SBI_RESOURCE_NAME_SUBSCRIPTION_DATA)
+                ogs_ad("OGS_SBI_RESOURCE_NAME_SUBSCRIPTION_DATA: %s", message->h.resource.component[2]);
                 SWITCH(message->h.resource.component[2])
                 CASE(OGS_SBI_RESOURCE_NAME_AUTHENTICATION_DATA)
                     udm_nudr_dr_handle_subscription_authentication(

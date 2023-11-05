@@ -28,6 +28,9 @@
 #endif
 
 #include "ogs-core.h"
+#include <stdio.h>
+#include <stdarg.h>
+#include <pthread.h>
 
 #define TA_NOR              "\033[0m"       /* all off */
 
@@ -461,16 +464,19 @@ void ogs_log_vprintf(ogs_log_level_e level, int id,
     }
 }
 
+static pthread_mutex_t log_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 void ogs_log_printf(ogs_log_level_e level, int id,
     ogs_err_t err, const char *file, int line, const char *func,
     int content_only, const char *format, ...)
 {
     va_list args;
-
+    pthread_mutex_lock(&log_mutex);
     va_start(args, format);
     ogs_log_vprintf(level, id,
             err, file, line, func, content_only, format, args);
     va_end(args);
+    pthread_mutex_unlock(&log_mutex);
 }
 
 void ogs_log_hexdump_func(ogs_log_level_e level, int id,

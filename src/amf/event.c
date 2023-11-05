@@ -99,7 +99,7 @@ void amf_sctp_event_push(int id,
     e->ngap.addr = addr;
     e->ngap.max_num_of_istreams = max_num_of_istreams;
     e->ngap.max_num_of_ostreams = max_num_of_ostreams;
-
+    ogs_ad("amf_sctp_event_push");
     rv = ogs_queue_push(ogs_app()->queue, e);
     if (rv != OGS_OK) {
         ogs_error("ogs_queue_push() failed:%d", (int)rv);

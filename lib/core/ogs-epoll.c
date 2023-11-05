@@ -250,6 +250,7 @@ static int epoll_process(ogs_pollset_t *pollset, ogs_time_t timeout)
 
         map = ogs_hash_get(context->map_hash, &fd, sizeof(fd));
         if (!map) continue;
+        // ogs_ad("epoll_process");
 
         if (map->read && map->write && map->read == map->write) {
             map->read->handler(when, map->read->fd, map->read->data);

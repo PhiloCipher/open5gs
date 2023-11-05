@@ -56,6 +56,7 @@ void ngap_state_operational(ogs_fsm_t *s, amf_event_t *e)
 
     gnb = e->gnb;
     ogs_assert(gnb);
+    ogs_ad("AMF ngap state: %d", e->h.id);
 
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:
@@ -72,17 +73,18 @@ void ngap_state_operational(ogs_fsm_t *s, amf_event_t *e)
                     NGAP_ProcedureCode_id_NGSetup)) {
             break;
         }
-
+        
         switch (pdu->present) {
         case NGAP_NGAP_PDU_PR_initiatingMessage:
             initiatingMessage = pdu->choice.initiatingMessage;
             ogs_assert(initiatingMessage);
-
+        ogs_ad("ngap ProcedureCode:    %ld",initiatingMessage->procedureCode);
             switch (initiatingMessage->procedureCode) {
             case NGAP_ProcedureCode_id_NGSetup:
                 ngap_handle_ng_setup_request(gnb, pdu);
                 break;
             case NGAP_ProcedureCode_id_InitialUEMessage:
+                ogs_ad("amf_ue_init in NGAP_ProcedureCode_id_InitialUEMessage");
                 ngap_handle_initial_ue_message(gnb, pdu);
                 break;
             case NGAP_ProcedureCode_id_UplinkNASTransport:

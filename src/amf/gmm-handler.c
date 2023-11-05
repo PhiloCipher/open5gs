@@ -137,6 +137,7 @@ ogs_nas_5gmm_cause_t gmm_handle_registration_request(amf_ue_t *amf_ue,
     case OGS_NAS_5GS_MOBILE_IDENTITY_SUCI:
         mobile_identity_suci =
             (ogs_nas_5gs_mobile_identity_suci_t *)mobile_identity->buffer;
+        ogs_ad("Mobile identity type: SUCI %s",ogs_nas_5gs_suci_from_mobile_identity((mobile_identity)));
 
         if (mobile_identity_suci->protection_scheme_id !=
                 OGS_PROTECTION_SCHEME_NULL &&
@@ -152,6 +153,7 @@ ogs_nas_5gmm_cause_t gmm_handle_registration_request(amf_ue_t *amf_ue,
         ogs_info("[%s]    SUCI", amf_ue->suci);
         break;
     case OGS_NAS_5GS_MOBILE_IDENTITY_GUTI:
+        ogs_ad("Mobile identity type: GUTI");
         mobile_identity_guti =
             (ogs_nas_5gs_mobile_identity_guti_t *)mobile_identity->buffer;
         if (!mobile_identity_guti) {
@@ -224,6 +226,14 @@ ogs_nas_5gmm_cause_t gmm_handle_registration_request(amf_ue_t *amf_ue,
     ogs_debug("    NEW TSC[UE:%d,AMF:%d] KSI[UE:%d,AMF:%d]",
             amf_ue->nas.ue.tsc, amf_ue->nas.amf.tsc,
             amf_ue->nas.ue.ksi, amf_ue->nas.amf.ksi);
+    
+    
+    ogs_ad("    OLD TSC[UE:%d,AMF:%d] KSI[UE:%d,AMF:%d]",
+        amf_ue->nas.ue.tsc, amf_ue->nas.amf.tsc,
+        amf_ue->nas.ue.ksi, amf_ue->nas.amf.ksi);
+    ogs_ad("    NEW TSC[UE:%d,AMF:%d] KSI[UE:%d,AMF:%d]",
+        amf_ue->nas.ue.tsc, amf_ue->nas.amf.tsc,
+        amf_ue->nas.ue.ksi, amf_ue->nas.amf.ksi);
     /*
      * REGISTRATION_REQUEST
      * SERVICE_REQUEST
@@ -278,11 +288,28 @@ ogs_nas_5gmm_cause_t gmm_handle_registration_request(amf_ue_t *amf_ue,
             ogs_plmn_id_hexdump(&ran_ue->saved.nr_cgi.plmn_id),
             (long long)ran_ue->saved.nr_cgi.cell_id);
 
+    ogs_ad("amf_ue    OLD TAI[PLMN_ID:%06x,TAC:%d]",
+            ogs_plmn_id_hexdump(&amf_ue->nr_tai.plmn_id), amf_ue->nr_tai.tac.v);
+    ogs_ad("amf_ue    OLD NR_CGI[PLMN_ID:%06x,CELL_ID:0x%llx]",
+            ogs_plmn_id_hexdump(&amf_ue->nr_cgi.plmn_id),
+            (long long)amf_ue->nr_cgi.cell_id);
+    ogs_ad("ran_ue->saved    TAI[PLMN_ID:%06x,TAC:%d]",
+            ogs_plmn_id_hexdump(&ran_ue->saved.nr_tai.plmn_id),
+            ran_ue->saved.nr_tai.tac.v);
+    ogs_ad("ran_ue->saved    NR_CGI[PLMN_ID:%06x,CELL_ID:0x%llx]",
+            ogs_plmn_id_hexdump(&ran_ue->saved.nr_cgi.plmn_id),
+            (long long)ran_ue->saved.nr_cgi.cell_id);
+
+    ogs_ad("Copy Stream-No/NR-TAI/NR-CGI from ran_ue to amf_ue");
     /* Copy Stream-No/NR-TAI/NR-CGI from ran_ue */
     amf_ue->gnb_ostream_id = ran_ue->gnb_ostream_id;
     memcpy(&amf_ue->nr_tai, &ran_ue->saved.nr_tai, sizeof(ogs_5gs_tai_t));
     memcpy(&amf_ue->nr_cgi, &ran_ue->saved.nr_cgi, sizeof(ogs_nr_cgi_t));
     amf_ue->ue_location_timestamp = ogs_time_now();
+
+    amf_ran_ue_location_setter(ran_ue, &ran_ue->saved.nr_tai, &ran_ue->saved.nr_cgi, (ogs_time_t)NULL);
+    amf_ue_loc_associate(amf_ue, ran_ue->amf_loc);
+
 
     /* Check PLMN-ID access control */
     gmm_cause = gmm_cause_from_access_control(&amf_ue->nr_tai.plmn_id);
@@ -614,7 +641,8 @@ ogs_nas_5gmm_cause_t gmm_handle_service_request(amf_ue_t *amf_ue,
     ogs_debug("    NR_CGI[PLMN_ID:%06x,CELL_ID:0x%llx]",
             ogs_plmn_id_hexdump(&ran_ue->saved.nr_cgi.plmn_id),
             (long long)ran_ue->saved.nr_cgi.cell_id);
-
+            
+    ogs_ad("Copy Stream-No/NR-TAI/NR-CGI from ran_ue to amf_ue");
     /* Copy Stream-No/NR-TAI/NR-CGI from ran_ue */
     amf_ue->gnb_ostream_id = ran_ue->gnb_ostream_id;
     memcpy(&amf_ue->nr_tai, &ran_ue->saved.nr_tai, sizeof(ogs_5gs_tai_t));
@@ -753,6 +781,8 @@ ogs_nas_5gmm_cause_t gmm_handle_service_update(amf_ue_t *amf_ue,
 int gmm_handle_deregistration_request(amf_ue_t *amf_ue,
         ogs_nas_5gs_deregistration_request_from_ue_t *deregistration_request)
 {
+                ogs_ad("gmm_handle_deregistration_request inside");
+
     int r, state, xact_count = 0;
     ogs_nas_de_registration_type_t *de_registration_type = NULL;
 
