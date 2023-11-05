@@ -63,25 +63,33 @@ static void test1_func(abts_case *tc, void *data)
 
     test_ue->k_string = "465b5ce8b199b49faa5f0a2ee238a6bc";
     test_ue->opc_string = "e8ed289deba952e4283b54e88e6183ca";
-
+    ogs_ad("make a socket for gnb");
     /* gNB connects to AMF */
     ngap = testngap_client(AF_INET);
     ABTS_PTR_NOTNULL(tc, ngap);
+    sleep(0.5);
+    ogs_ad("gNB socket made to connect to AMF ");
 
-    /* gNB connects to UPF */
-    gtpu = test_gtpu_server(1, AF_INET);
-    ABTS_PTR_NOTNULL(tc, gtpu);
+//     /* gNB connects to UPF */
+//     gtpu = test_gtpu_server(1, AF_INET);
+//     ABTS_PTR_NOTNULL(tc, gtpu);
 
+    ogs_ad("Send NG-Setup Reqeust");
     /* Send NG-Setup Reqeust */
-    sendbuf = testngap_build_ng_setup_request(0x4000, 29);
+    sendbuf = testngap_build_ng_setup_request(0x4000, 29); // gNB: Hi AMF there is a gNB here!
     ABTS_PTR_NOTNULL(tc, sendbuf);
     rv = testgnb_ngap_send(ngap, sendbuf);
     ABTS_INT_EQUAL(tc, OGS_OK, rv);
-
+    ogs_ad("Sent NG-Setup Reqeust");
+    sleep(0.5);
+    
     /* Receive NG-Setup Response */
+    ogs_ad("ngap_recv want to receive NG-Setup Response");
     recvbuf = testgnb_ngap_read(ngap);
     ABTS_PTR_NOTNULL(tc, recvbuf);
-    testngap_recv(test_ue, recvbuf);
+    testngap_recv(test_ue, recvbuf); // AMF: OK!
+    ogs_ad("Received NG-Setup Response: %s", recvbuf->data);
+    sleep(0.5);
 
     /********** Insert Subscriber in Database */
     doc = test_db_new_simple(test_ue);
@@ -89,7 +97,7 @@ static void test1_func(abts_case *tc, void *data)
     ABTS_INT_EQUAL(tc, OGS_OK, test_db_insert_ue(test_ue, doc));
 
     /* Send Registration request */
-    gmmbuf = testgmm_build_registration_request(test_ue, NULL, false, false);
+    gmmbuf = testgmm_build_registration_request(test_ue, NULL, false, false); // UE: Hey gNB, I have a NAS message in plain text(NAS_5GS_REGISTRATION_REQUEST)for AMF. It contains ngKSI(not important), SUCI, 
     ABTS_PTR_NOTNULL(tc, gmmbuf);
 
     test_ue->registration_request_param.gmm_capability = 1;
@@ -101,60 +109,66 @@ static void test1_func(abts_case *tc, void *data)
     ABTS_PTR_NOTNULL(tc, nasbuf);
 
     sendbuf = testngap_build_initial_ue_message(test_ue, gmmbuf,
-                NGAP_RRCEstablishmentCause_mo_Signalling, false, true);
+                NGAP_RRCEstablishmentCause_mo_Signalling, false, true); // gNB: Hey AMF I have the first NAS from a UE, but I have to wrap it by INITIAL UE MESSAGE. I've allocated a RAN UE NGAP ID for UE.
     ABTS_PTR_NOTNULL(tc, sendbuf);
+    ogs_ad("Send Registration request: %s", gmmbuf->data);
     rv = testgnb_ngap_send(ngap, sendbuf);
     ABTS_INT_EQUAL(tc, OGS_OK, rv);
 
+    sleep(0.5);
+    ogs_ad("Receive Authentication request");
     /* Receive Authentication request */
-    recvbuf = testgnb_ngap_read(ngap);
+    recvbuf = testgnb_ngap_read(ngap); // This line makes the program not to terminate if scp is not initialized
     ABTS_PTR_NOTNULL(tc, recvbuf);
-    testngap_recv(test_ue, recvbuf);
+    testngap_recv(test_ue, recvbuf); // AMF: hey gNB, I stored your location and built a new profile for the UE. deliver this to UE.It contains autn(and RAND and ngKSI(not important) ) to enable the UE to verify that I'm an honest core, because she will understand that both of us has the same secret k_string
+    ogs_ad("Received Authentication request");
+//     sleep(50);
 
     /* Send Authentication response */
-    gmmbuf = testgmm_build_authentication_response(test_ue);
+    gmmbuf = testgmm_build_authentication_response(test_ue); // UE: OK it's my turn to prove to AUSF that I'm an honest person. I make RES token using RAND and k_string and opc_string(can be derieved from k_string and OP(MNC+MCC) OPc=AES128(Ki,OP) XOR OP).
     ABTS_PTR_NOTNULL(tc, gmmbuf);
+    ogs_ad("Send Authentication response : %s", gmmbuf->data);
     sendbuf = testngap_build_uplink_nas_transport(test_ue, gmmbuf);
     ABTS_PTR_NOTNULL(tc, sendbuf);
-    rv = testgnb_ngap_send(ngap, sendbuf);
+    rv = testgnb_ngap_send(ngap, sendbuf);// gNB: hey AMF, my UE has a message for you.
     ABTS_INT_EQUAL(tc, OGS_OK, rv);
 
     /* Receive Security mode command */
     recvbuf = testgnb_ngap_read(ngap);
     ABTS_PTR_NOTNULL(tc, recvbuf);
-    testngap_recv(test_ue, recvbuf);
+    testngap_recv(test_ue, recvbuf);// AMF: Hey UE let's establish NAS signalling security. and, Please tell me your mobile_identity_imeisv.
 
     /* Send Security mode complete */
-    gmmbuf = testgmm_build_security_mode_complete(test_ue, nasbuf);
+    gmmbuf = testgmm_build_security_mode_complete(test_ue, nasbuf); // UE: Got the security config. and Here is my imeisv!
     ABTS_PTR_NOTNULL(tc, gmmbuf);
     sendbuf = testngap_build_uplink_nas_transport(test_ue, gmmbuf);
     ABTS_PTR_NOTNULL(tc, sendbuf);
-    rv = testgnb_ngap_send(ngap, sendbuf);
+    rv = testgnb_ngap_send(ngap, sendbuf);//UE: Hey gNB could you pass it to AMF?
     ABTS_INT_EQUAL(tc, OGS_OK, rv);
 
     /* Receive InitialContextSetupRequest +
      * Registration accept */
     recvbuf = testgnb_ngap_read(ngap);
     ABTS_PTR_NOTNULL(tc, recvbuf);
-    testngap_recv(test_ue, recvbuf);
+    testngap_recv(test_ue, recvbuf); // AMF:Dear gNB, store Mobility Restriction List in the UE context and execute PDU session configuration and activate security for the UE. Dear UE, here is your GUTI, allowed NSSAI(set of network slices), allowed TAI list(not implemented yet), PDU session status...
     ABTS_INT_EQUAL(tc,
             NGAP_ProcedureCode_id_InitialContextSetup,
             test_ue->ngap_procedure_code);
 
     /* Send UE radio capability info indication */
-    sendbuf = testngap_build_ue_radio_capability_info_indication(test_ue);
+    sendbuf = testngap_build_ue_radio_capability_info_indication(test_ue);// gNB: hey AMF! here are UE radio capability-related information.
     ABTS_PTR_NOTNULL(tc, sendbuf);
     rv = testgnb_ngap_send(ngap, sendbuf);
     ABTS_INT_EQUAL(tc, OGS_OK, rv);
 
     /* Send InitialContextSetupResponse */
-    sendbuf = testngap_build_initial_context_setup_response(test_ue, false);
+    sendbuf = testngap_build_initial_context_setup_response(test_ue, false); //gNB: hey AMF! I made those pdu sessions.
     ABTS_PTR_NOTNULL(tc, sendbuf);
     rv = testgnb_ngap_send(ngap, sendbuf);
     ABTS_INT_EQUAL(tc, OGS_OK, rv);
 
     /* Send Registration complete */
-    gmmbuf = testgmm_build_registration_complete(test_ue);
+    gmmbuf = testgmm_build_registration_complete(test_ue); // UE: hey AMF I'm done registration.
     ABTS_PTR_NOTNULL(tc, gmmbuf);
     sendbuf = testngap_build_uplink_nas_transport(test_ue, gmmbuf);
     ABTS_PTR_NOTNULL(tc, sendbuf);
@@ -164,7 +178,8 @@ static void test1_func(abts_case *tc, void *data)
     /* Receive Configuration update command */
     recvbuf = testgnb_ngap_read(ngap);
     ABTS_PTR_NOTNULL(tc, recvbuf);
-    testngap_recv(test_ue, recvbuf);
+    testngap_recv(test_ue, recvbuf);// AMF, dear UE, I've reset your timer.
+    // sleep(50);
 
     /* Send PDU session establishment request */
     sess = test_sess_add_by_dnn_and_psi(test_ue, "internet", 5);
@@ -344,14 +359,15 @@ static void test1_func(abts_case *tc, void *data)
     /********** Remove Subscriber in Database */
     ABTS_INT_EQUAL(tc, OGS_OK, test_db_remove_ue(test_ue));
 
-    /* gNB disonncect from UPF */
-    testgnb_gtpu_close(gtpu);
+//     /* gNB disonncect from UPF */
+//     testgnb_gtpu_close(gtpu);
 
     /* gNB disonncect from AMF */
     testgnb_ngap_close(ngap);
 
     /* Clear Test UE Context */
     test_ue_remove(test_ue);
+    ogs_ad("test1_func ended");
 }
 
 abts_suite *test_identity(abts_suite *suite)

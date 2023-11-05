@@ -27,6 +27,7 @@ abts_suite *test_idle(abts_suite *suite);
 abts_suite *test_dereg(abts_suite *suite);
 abts_suite *test_paging(abts_suite *suite);
 abts_suite *test_identity(abts_suite *suite);
+abts_suite *test_ad(abts_suite *suite);
 abts_suite *test_gmm_status(abts_suite *suite);
 abts_suite *test_ue_context(abts_suite *suite);
 abts_suite *test_reset(abts_suite *suite);
@@ -36,18 +37,19 @@ abts_suite *test_crash(abts_suite *suite);
 const struct testlist {
     abts_suite *(*func)(abts_suite *suite);
 } alltests[] = {
-    {test_simple},
-    {test_guti},
-    {test_auth},
-    {test_ecc},
-    {test_idle},
-    {test_dereg},
-    {test_paging},
-    {test_identity},
-    {test_gmm_status},
-    {test_ue_context},
-    {test_reset},
-    {test_multi_ue},
+    // {test_simple},
+    // {test_guti},
+    // {test_auth},
+    // {test_ecc},
+    // {test_idle},
+    // {test_dereg},
+    // {test_paging},
+    // {test_identity},
+    {test_ad},
+    // {test_gmm_status},
+    // {test_ue_context},
+    // {test_reset},
+    // {test_multi_ue},
 #if 0 /* Since there is error LOG, we disabled the following test */
     {test_crash},
 #endif

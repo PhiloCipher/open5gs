@@ -25,6 +25,7 @@ test5gc_registration_sources = files('''
     dereg-test.c
     paging-test.c
     identity-test.c
+    ad-test.c
     gmm-status-test.c
     ue-context-test.c
     reset-test.c
