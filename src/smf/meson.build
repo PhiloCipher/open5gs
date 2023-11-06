@@ -106,6 +106,7 @@ libsmf_sources = files('''
     ngap-handler.c
     ngap-path.c
     metrics.c
+    ntdf-handler.c
 '''.split())
 
 libsmf = static_library('smf',

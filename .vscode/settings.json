@@ -27,6 +27,12 @@
         "ogs-dbi.h": "c",
         "subscription.h": "c",
         "ogs-mongoc.h": "c",
-        "algorithm": "c"
+        "algorithm": "c",
+        "nsmf-build.h": "c",
+        "npcf-handler.h": "c",
+        "gtp-path.h": "c",
+        "ogs-core.h": "c",
+        "ogs-pfcp.h": "c",
+        "smf_ue.h": "c"
     }
 }

@@ -1201,6 +1201,11 @@ static char *build_json(ogs_sbi_message_t *message)
             message->ausf_ue);
         ogs_assert(item);
     }
+    else if (message->smf_ue) {
+        item = OpenAPI_smf_ue_convertToJSON(
+            message->smf_ue);
+        ogs_assert(item);
+    }
 
     if (item) {
         content = cJSON_Print(item);
@@ -2254,6 +2259,14 @@ static int parse_json(ogs_sbi_message_t *message,
         CASE(OGS_SBI_SERVICE_NAME_NAUSF_REPORT)
             message->ausf_ue = OpenAPI_ausf_ue_parseFromJSON(item);
             if (!message->ausf_ue) {
+                rv = OGS_ERROR;
+                ogs_error("JSON parse error");
+            }
+            break;
+
+        CASE(OGS_SBI_SERVICE_NAME_NSMF_REPORT)
+            message->smf_ue = OpenAPI_smf_ue_parseFromJSON(item);
+            if (!message->smf_ue) {
                 rv = OGS_ERROR;
                 ogs_error("JSON parse error");
             }

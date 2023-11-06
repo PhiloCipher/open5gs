@@ -81,6 +81,8 @@
 #include "model/ue_authentication_ctx.h"
 #include "model/udm_ue.h"
 #include "model/ausf_ue.h"
+#include "model/smf_ue.h"
+#include "model/smf_sess.h"
 
 #include "custom/links.h"
 

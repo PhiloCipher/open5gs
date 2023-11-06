@@ -20,6 +20,7 @@
 #include "sbi-path.h"
 #include "nudm-build.h"
 #include "nausf-build.h"
+#include "nsmf-build.h"
 
 static tdf_context_t self;
 
@@ -29,6 +30,7 @@ static int context_initialized = 0;
 static OGS_POOL(tdf_ue_pool, tdf_ue_t);    
 static OGS_POOL(ausf_ue_pool, ausf_ue_t);    
 static OGS_POOL(udm_ue_pool, udm_ue_t);    
+static OGS_POOL(smf_ue_pool, smf_ue_t);    
 
 void tdf_context_init(void)
 {
@@ -42,6 +44,7 @@ void tdf_context_init(void)
     ogs_pool_init(&tdf_ue_pool, ogs_app()->max.ue);
     ogs_pool_init(&ausf_ue_pool, ogs_app()->max.ue);
     ogs_pool_init(&udm_ue_pool, ogs_app()->max.ue);
+    ogs_pool_init(&smf_ue_pool, ogs_app()->max.ue);
 
     ogs_list_init(&self.tdf_ue_list);
     self.suti_hash = ogs_hash_make();
@@ -177,6 +180,11 @@ void func(char* suti){
     tdf_nausf_report_build_ue_info,
     tdf_ue, 0, NULL);
 
+    tdf_ue_sbi_discover_and_send(
+    OGS_SBI_SERVICE_TYPE_NSMF_REPORT,
+    NULL,
+    tdf_nsmf_report_build_ue_info,
+    tdf_ue, 0, NULL);
 }
 
 
@@ -212,6 +220,30 @@ ausf_ue_t *ausf_ue_add()
     return ausf_ue;
 }
 
+static smf_ue_t *smf_ue_add(void)
+{
+    smf_ue_t *smf_ue = NULL;
+
+    ogs_pool_alloc(&smf_ue_pool, &smf_ue);
+    if (!smf_ue) {
+        ogs_error("Maximum number of smf_ue[%lld] reached",
+                    (long long)ogs_app()->max.ue);
+        return NULL;
+    }
+    memset(smf_ue, 0, sizeof *smf_ue);
+
+    ogs_list_init(&smf_ue->sess_list);
+
+    ogs_list_init(&smf_ue->loc_list);
+
+    // ogs_list_add(&self.smf_ue_list, smf_ue);
+
+    // smf_metrics_inst_global_inc(SMF_METR_GLOB_GAUGE_UES_ACTIVE);
+    // ogs_info("[Added] Number of SMF-UEs is now %d",
+    //         ogs_list_count(&self.smf_ue_list));
+    return smf_ue;
+}
+
 udm_ue_t *udm_ue_add()
 {
     udm_ue_t *udm_ue = NULL;
@@ -237,6 +269,7 @@ tdf_ue_t *tdf_ue_add(char *suti)
     memset(tdf_ue, 0, sizeof *tdf_ue);
     tdf_ue->ausf_ue= ausf_ue_add();
     tdf_ue->udm_ue= udm_ue_add();
+    tdf_ue->smf_ue= smf_ue_add();
 
     // tdf_ue->ctx_id = ogs_msprintf("%d",
     //         (int)ogs_pool_index(&tdf_ue_pool, tdf_ue));

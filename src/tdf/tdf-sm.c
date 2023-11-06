@@ -324,6 +324,20 @@ void tdf_state_operational(ogs_fsm_t *s, tdf_event_t *e)
             // func("imsi-999700000021309");
             break;
 
+        CASE(OGS_SBI_SERVICE_NAME_NSMF_REPORT)
+            tdf_ue_t* tdf_ue = tdf_ue_find_by_suti(
+                        message.h.resource.component[0]);
+
+            if (!tdf_ue) {
+                tdf_ue = tdf_ue_add(message.h.resource.component[0]);
+                ogs_assert(tdf_ue);
+                }
+            tdf_ue->smf_ue->supi = message.smf_ue->supi;
+
+            ogs_tmp("supi is %s", tdf_ue->smf_ue->supi);
+            ogs_sbi_xact_remove(e->h.sbi.data);
+            break;
+
         DEFAULT
             ogs_error("Invalid API name [%s]", message.h.service.name);
             ogs_assert_if_reached();

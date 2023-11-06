@@ -91,6 +91,7 @@ typedef enum {
     OGS_SBI_SERVICE_NAME_NLMF_LOC,
     OGS_SBI_SERVICE_TYPE_NUDM_REPORT,
     OGS_SBI_SERVICE_TYPE_NAUSF_REPORT,
+    OGS_SBI_SERVICE_TYPE_NSMF_REPORT,
 
     OGS_SBI_MAX_NUM_OF_SERVICE_TYPE,
 } ogs_sbi_service_type_e;
@@ -166,6 +167,7 @@ typedef enum {
 #define OGS_SBI_SERVICE_NAME_NLMF_LOC "nlmf-loc"
 #define OGS_SBI_SERVICE_NAME_NUDM_REPORT "nudm-report"
 #define OGS_SBI_SERVICE_NAME_NAUSF_REPORT "nausf-report"
+#define OGS_SBI_SERVICE_NAME_NSMF_REPORT "nsmf-report"
 
 OpenAPI_nf_type_e ogs_sbi_service_type_to_nf_type(
         ogs_sbi_service_type_e service_type);

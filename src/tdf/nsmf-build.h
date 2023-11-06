@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2022 by Sukchan Lee <acetcom@gmail.com>
+ * Copyright (C) 2019,2020 by Sukchan Lee <acetcom@gmail.com>
  *
  * This file is part of Open5GS.
  *
@@ -17,34 +17,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TDF_EVENT_H
-#define TDF_EVENT_H
+#ifndef TDF_NSMF_BUILD_H
+#define TDF_NSMF_BUILD_H
 
-#include "ogs-proto.h"
+#include "context.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct udm_ue_s udm_ue_t;
-typedef struct pcf_ue_s pcf_ue_t;
-typedef struct ausf_ue_s ausf_ue_t;
-typedef struct smf_ue_s smf_ue_t;
-
-typedef struct tdf_event_s {
-    ogs_event_t h;
-} tdf_event_t;
-
-OGS_STATIC_ASSERT(OGS_EVENT_SIZE >= sizeof(tdf_event_t));
-
-tdf_event_t *tdf_event_new(int id);
-
-const char *tdf_event_get_name(tdf_event_t *e);
-
-typedef struct tdf_ue_s tdf_ue_t;
+ogs_sbi_request_t *tdf_nsmf_report_build_ue_info(
+        tdf_ue_t *tdf_ue, void *data);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* TDF_EVENT_H */
+#endif /* TDF_NAUSF_BUILD_H */

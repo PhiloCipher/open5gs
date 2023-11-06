@@ -514,6 +514,7 @@ typedef struct ogs_sbi_message_s {
     // OpenAPI_input_data_t *InputData;
     OpenAPI_udm_ue_t *udm_ue;
     OpenAPI_ausf_ue_t *ausf_ue;
+    OpenAPI_smf_ue_t *smf_ue;
 
     ogs_sbi_links_t *links;
 

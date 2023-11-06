@@ -29,6 +29,7 @@
 #include "nnrf-handler.h"
 #include "namf-handler.h"
 #include "npcf-handler.h"
+#include "ntdf-handler.h"
 
 void smf_state_initial(ogs_fsm_t *s, smf_event_t *e)
 {
@@ -625,6 +626,24 @@ void smf_state_operational(ogs_fsm_t *s, smf_event_t *e)
                         sbi_message.h.resource.component[0]));
             END
             break;
+      
+        CASE(OGS_SBI_SERVICE_NAME_NSMF_REPORT)
+
+            smf_ue = smf_ue_find_by_supi(
+                    sbi_message.h.resource.component[0]);
+        
+            if (!smf_ue) {
+                ogs_error("Not found %s [%s]", sbi_message.h.resource.component[0], sbi_message.h.method);
+                ogs_assert(true ==
+                    ogs_sbi_server_send_error(stream,
+                        OGS_SBI_HTTP_STATUS_NOT_FOUND,
+                        &sbi_message, "Not found", sbi_message.h.method));
+                break;
+            }
+
+            smf_nsmf_report_handle_ue_info(smf_ue, stream, &sbi_message);
+         
+            break;
 
         DEFAULT
             ogs_error("Invalid API name [%s]", sbi_message.h.service.name);
@@ -801,6 +820,7 @@ void smf_state_operational(ogs_fsm_t *s, smf_event_t *e)
 
             ogs_fsm_dispatch(&sess->sm, e);
             break;
+
 
         DEFAULT
             ogs_error("Invalid service name [%s]", sbi_message.h.service.name);

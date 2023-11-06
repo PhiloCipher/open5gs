@@ -108,6 +108,33 @@ struct pcf_ue_s {
     ogs_list_t sess_list;
 };
 
+typedef struct smf_ue_s {
+    ogs_lnode_t lnode;
+
+    /* SUPI */
+    char *supi;
+
+    /* IMSI */
+    uint8_t imsi[OGS_MAX_IMSI_LEN];
+    int imsi_len;
+    char imsi_bcd[OGS_MAX_IMSI_BCD_LEN+1];
+
+    /* MSISDN */
+    uint8_t msisdn[OGS_MAX_MSISDN_LEN];
+    int msisdn_len;
+    char msisdn_bcd[OGS_MAX_MSISDN_BCD_LEN+1];
+
+    /* IMEI */
+    uint8_t imeisv[OGS_MAX_IMEISV_LEN];
+    int imeisv_len;
+    char  imeisv_bcd[OGS_MAX_IMEISV_BCD_LEN+1];
+
+    ogs_list_t sess_list;
+
+    ogs_list_t loc_list;
+
+} smf_ue_t;
+
 struct ausf_ue_s {
     ogs_sbi_object_t sbi;
     ogs_fsm_t sm;
@@ -134,6 +161,7 @@ struct tdf_ue_s {
     udm_ue_t *udm_ue;
     pcf_ue_t *pcf_ue;
     ausf_ue_t *ausf_ue;
+    smf_ue_t *smf_ue;
 };
 
 ogs_sbi_request_t *tdf_npcf_am_policy_control_build_delete(tdf_ue_t *tdf_ue, void *data);
