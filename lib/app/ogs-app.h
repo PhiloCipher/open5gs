@@ -100,6 +100,9 @@ void amf_terminate(void);
 int scp_initialize(void);
 void scp_terminate(void);
 
+int lmf_initialize(void);
+void lmf_terminate(void);
+
 #ifdef __cplusplus
 }
 #endif

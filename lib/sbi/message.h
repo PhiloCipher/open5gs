@@ -143,7 +143,7 @@ extern "C" {
 
 #define OGS_SBI_RESOURCE_NAME_PCF_BINDINGS          "pcfBindings"
 
-#define OGS_SBI_RESOURCE_NAME_DETERMINE_LOCATION          "determine-location"
+#define OGS_SBI_RESOURCE_NAME_DETERMINE_LOCATION    "determine-location"
 
 #define OGS_SBI_PATCH_PATH_NF_STATUS                "/nfStatus"
 #define OGS_SBI_PATCH_PATH_LOAD                     "/load"
