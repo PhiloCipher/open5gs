@@ -17,21 +17,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "sbi-path.h"
-#include "nlmf-handler.h"
+#ifndef TDF_NLMF_BUILD_H
+#define TDF_NLMF_BUILD_H
 
+#include "context.h"
 
-bool lmf_nlmf_loc_handle_determine_location(
-        ogs_sbi_stream_t *stream, ogs_sbi_message_t *recvmsg)
-{
-    ogs_sbi_message_t sendmsg;
-    ogs_sbi_response_t *response = NULL;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-    ogs_assert(stream);
-    ogs_assert(recvmsg);
-    ogs_tmp("determine loc");
+ogs_sbi_request_t *tdf_nlmf_loc_build_determine_location(
+        tdf_ue_t *tdf_ue, void *data);
 
-    
-
-    return false;
+#ifdef __cplusplus
 }
+#endif
+
+#endif /* TDF_NAUSF_BUILD_H */

@@ -22,7 +22,7 @@
 int lmf_sbi_open(void)
 {
     ogs_sbi_nf_instance_t *nf_instance = NULL;
-    // ogs_sbi_nf_service_t *service = NULL;
+    ogs_sbi_nf_service_t *service = NULL;
 
     /* Initialize SELF NF instance */
     nf_instance = ogs_sbi_self()->nf_instance;
@@ -34,18 +34,17 @@ int lmf_sbi_open(void)
     ogs_sbi_nf_instance_add_allowed_nf_type(nf_instance, OpenAPI_nf_type_PCF);
     // ogs_sbi_nf_instance_add_allowed_nf_type(nf_instance, OpenAPI_nf_type_UDM);
     ogs_sbi_nf_instance_add_allowed_nf_type(nf_instance, OpenAPI_nf_type_SCP);
-    //ogs_sbi_nf_instance_add_allowed_nf_type(nf_instance, OpenAPI_nf_type_AUSF);
+    ogs_sbi_nf_instance_add_allowed_nf_type(nf_instance, OpenAPI_nf_type_TDF);
 
-    // /* Build NF service information. It will be transmitted to NRF. */
-    // if (ogs_sbi_nf_service_is_available(OGS_SBI_SERVICE_NAME_NTDF_FIRST)) {
-    //     service = ogs_sbi_nf_service_build_default(
-    //                 nf_instance, OGS_SBI_SERVICE_NAME_NTDF_FIRST);
-    //     ogs_assert(service);
-    //     ogs_sbi_nf_service_add_version(
-    //                 service, OGS_SBI_API_V1, OGS_SBI_API_V1_0_0, NULL);
-    //     ogs_sbi_nf_service_add_allowed_nf_type(service, OpenAPI_nf_type_PCF);
-    //     ogs_sbi_nf_service_add_allowed_nf_type(service, OpenAPI_nf_type_UDM);
-    // }
+    /* Build NF service information. It will be transmitted to NRF. */
+    if (ogs_sbi_nf_service_is_available(OGS_SBI_SERVICE_NAME_NLMF_LOC)) {
+        service = ogs_sbi_nf_service_build_default(
+                    nf_instance, OGS_SBI_SERVICE_NAME_NLMF_LOC);
+        ogs_assert(service);
+        ogs_sbi_nf_service_add_version(
+                    service, OGS_SBI_API_V1, OGS_SBI_API_V1_0_0, NULL);
+        ogs_sbi_nf_service_add_allowed_nf_type(service, OpenAPI_nf_type_TDF);
+    }
 
     /* Initialize NRF NF Instance */
     nf_instance = ogs_sbi_self()->nrf_instance;

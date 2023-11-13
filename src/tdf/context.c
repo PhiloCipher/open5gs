@@ -185,6 +185,12 @@ void func(char* suti){
     NULL,
     tdf_nsmf_report_build_ue_info,
     tdf_ue, 0, NULL);
+
+    tdf_ue_sbi_discover_and_send(
+    OGS_SBI_SERVICE_TYPE_NLMF_LOC,
+    NULL,
+    tdf_nlmf_location_build_determine_location,
+    tdf_ue, 0, NULL);
 }
 
 

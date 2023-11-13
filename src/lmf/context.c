@@ -189,9 +189,9 @@ lmf_ue_t *lmf_ue_add(char *suti)
     //         (int)ogs_pool_index(&lmf_ue_pool, lmf_ue));
     // ogs_assert(lmf_ue->ctx_id);
 
-    lmf_ue->suti = ogs_strdup(suti);
-    ogs_assert(lmf_ue->suti);
-    ogs_hash_set(self.suti_hash, lmf_ue->suti, strlen(lmf_ue->suti), lmf_ue);
+    // lmf_ue->suti = ogs_strdup(suti);
+    // ogs_assert(lmf_ue->suti);
+    // ogs_hash_set(self.suti_hash, lmf_ue->suti, strlen(lmf_ue->suti), lmf_ue);
 
     ogs_list_add(&self.lmf_ue_list, lmf_ue);
 

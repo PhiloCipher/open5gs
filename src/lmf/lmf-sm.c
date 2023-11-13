@@ -55,9 +55,8 @@ void lmf_state_operational(ogs_fsm_t *s, lmf_event_t *e)
 
     switch (e->h.id) {
     case OGS_FSM_ENTRY_SIG:
-        ogs_msleep(3000);
         func("imsi-999700000021309");
-        lmf_event();
+        // lmf_event();
         //ogs_sbi_message_t message2;
         //ogs_sbi_request_t *request2 = NULL;
         // ogs_sbi_server_handler(request2, data);
@@ -85,7 +84,7 @@ void lmf_state_operational(ogs_fsm_t *s, lmf_event_t *e)
             break;
         }
 
-        if (strcmp(message.h.api.version, OGS_SBI_API_V2) != 0) {
+        if (strcmp(message.h.api.version, OGS_SBI_API_V1) != 0) {
             ogs_error("Not supported version [%s]", message.h.api.version);
             ogs_assert(true ==
                 ogs_sbi_server_send_error(
