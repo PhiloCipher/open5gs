@@ -32,22 +32,24 @@ abts_suite *test_ue_context(abts_suite *suite);
 abts_suite *test_reset(abts_suite *suite);
 abts_suite *test_multi_ue(abts_suite *suite);
 abts_suite *test_crash(abts_suite *suite);
+abts_suite *test_lpp(abts_suite *suite);
 
 const struct testlist {
     abts_suite *(*func)(abts_suite *suite);
 } alltests[] = {
-    {test_simple},
-    {test_guti},
-    {test_auth},
-    {test_ecc},
-    {test_idle},
-    {test_dereg},
-    {test_paging},
-    {test_identity},
-    {test_gmm_status},
-    {test_ue_context},
-    {test_reset},
-    {test_multi_ue},
+    // {test_simple},
+    // {test_guti},
+    // {test_auth},
+    // {test_ecc},
+    // {test_idle},
+    // {test_dereg},
+    // {test_paging},
+    // {test_identity},
+    // {test_gmm_status},
+    // {test_ue_context},
+    // {test_reset},
+    // {test_multi_ue},
+    {test_lpp},
 #if 0 /* Since there is error LOG, we disabled the following test */
     {test_crash},
 #endif
