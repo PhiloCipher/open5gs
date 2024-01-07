@@ -34,6 +34,10 @@ extern "C" {
 
 #define ogs_fatal(...) ogs_log_message(OGS_LOG_FATAL, 0, __VA_ARGS__)
 #define ogs_error(...) ogs_log_message(OGS_LOG_ERROR, 0, __VA_ARGS__)
+#define ogs_level0(...) ogs_log_message(OGS_LOG_LEVEL0, 0, __VA_ARGS__)
+#define ogs_level1(...) ogs_log_message(OGS_LOG_LEVEL1, 0, __VA_ARGS__)
+#define ogs_level2(...) ogs_log_message(OGS_LOG_LEVEL2, 0, __VA_ARGS__)
+#define ogs_level3(...) ogs_log_message(OGS_LOG_LEVEL3, 0, __VA_ARGS__)
 #define ogs_warn(...) ogs_log_message(OGS_LOG_WARN, 0, __VA_ARGS__)
 #define ogs_info(...) ogs_log_message(OGS_LOG_INFO, 0, __VA_ARGS__)
 #define ogs_debug(...) ogs_log_message(OGS_LOG_DEBUG, 0, __VA_ARGS__)
@@ -56,6 +60,10 @@ typedef enum {
     OGS_LOG_NONE,
     OGS_LOG_FATAL,
     OGS_LOG_ERROR,
+    OGS_LOG_LEVEL0,
+    OGS_LOG_LEVEL1,
+    OGS_LOG_LEVEL2,
+    OGS_LOG_LEVEL3,
     OGS_LOG_WARN,
     OGS_LOG_INFO,
     OGS_LOG_DEBUG,
