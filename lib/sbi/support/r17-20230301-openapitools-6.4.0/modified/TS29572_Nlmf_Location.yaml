@@ -54,18 +54,18 @@ paths:
                   Content-Id:
                     schema:
                       type: string
-              binaryDataLppMessageExt1:
-                contentType:  application/vnd.3gpp.lpp
-                headers:
-                  Content-Id:
-                    schema:
-                      type: string
-              binaryDataLppMessageExt2:
-                contentType:  application/vnd.3gpp.lpp
-                headers:
-                  Content-Id:
-                    schema:
-                      type: string
+           #   binaryDataLppMessageExt1:
+           #     contentType:  application/vnd.3gpp.lpp
+           #     headers:
+           #       Content-Id:
+           #         schema:
+           #           type: string
+           #   binaryDataLppMessageExt2:
+           #     contentType:  application/vnd.3gpp.lpp
+           #     headers:
+           #       Content-Id:
+           #         schema:
+           #           type: string
         required: true
       responses:
         '200':
@@ -1314,9 +1314,9 @@ components:
 # ENUMS
 #
     ExternalClientType:
-      description: Indicates types of External Clients.
-      anyOf:
-        - type: string
+      # description: Indicates types of External Clients.
+      # anyOf:
+      #   - type: string
           enum:
             - EMERGENCY_SERVICES
             - VALUE_ADDED_SERVICES
@@ -1326,12 +1326,12 @@ components:
             - PLMN_OPERATOR_OM
             - PLMN_OPERATOR_ANONYMOUS_STATISTICS
             - PLMN_OPERATOR_TARGET_MS_SERVICE_SUPPORT
-        - type: string
+        # - type: string
 
     SupportedGADShapes:
-      description: Indicates supported GAD shapes.
-      anyOf:
-        - type: string
+      # description: Indicates supported GAD shapes.
+      # anyOf:
+      #   - type: string
           enum:
             - POINT
             - POINT_UNCERTAINTY_CIRCLE
@@ -1342,22 +1342,22 @@ components:
             - ELLIPSOID_ARC
             - LOCAL_2D_POINT_UNCERTAINTY_ELLIPSE
             - LOCAL_3D_POINT_UNCERTAINTY_ELLIPSOID
-        - type: string
+        # - type: string
 
     ResponseTime:
-      description: Indicates acceptable delay of location request.
-      anyOf:
-        - type: string
+      # description: Indicates acceptable delay of location request.
+      # anyOf:
+      #   - type: string
           enum:
             - LOW_DELAY
             - DELAY_TOLERANT
             - NO_DELAY
-        - type: string
+        # - type: string
 
     PositioningMethod:
-      description: Indicates supported positioning methods.
-      anyOf:
-        - type: string
+      # description: Indicates supported positioning methods.
+      # anyOf:
+      #   - type: string
           enum:
             - CELLID
             - ECID
@@ -1374,22 +1374,22 @@ components:
             - UL_TDOA
             - UL_AOA
             - NETWORK_SPECIFIC
-        - type: string
+        # - type: string
 
     PositioningMode:
-      description: Indicates supported modes used for positioning method.
-      anyOf:
-        - type: string
+      # description: Indicates supported modes used for positioning method.
+      # anyOf:
+      #   - type: string
           enum:
             - UE_BASED
             - UE_ASSISTED
             - CONVENTIONAL
-        - type: string
+        # - type: string
 
     GnssId:
-      description: Global Navigation Satellite System (GNSS) ID.
-      anyOf:
-        - type: string
+      # description: Global Navigation Satellite System (GNSS) ID.
+      # anyOf:
+      #   - type: string
           enum:
             - GPS
             - GALILEO
@@ -1399,58 +1399,58 @@ components:
             - GLONASS
             - BDS
             - NAVIC
-        - type: string
+        # - type: string
 
     Usage:
-      description: Indicates usage made of the location measurement.
-      anyOf:
-        - type: string
+      # description: Indicates usage made of the location measurement.
+      # anyOf:
+      #   - type: string
           enum:
             - UNSUCCESS
             - SUCCESS_RESULTS_NOT_USED
             - SUCCESS_RESULTS_USED_TO_VERIFY_LOCATION
             - SUCCESS_RESULTS_USED_TO_GENERATE_LOCATION
             - SUCCESS_METHOD_NOT_DETERMINED
-        - type: string
+        # - type: string
 
     LcsPriority:
-      description: Indicates priority of the LCS client.
-      anyOf:
-        - type: string
+      # description: Indicates priority of the LCS client.
+      # anyOf:
+      #   - type: string
           enum:
             - HIGHEST_PRIORITY
             - NORMAL_PRIORITY
-        - type: string
+        # - type: string
 
     VelocityRequested:
-      description: Indicates velocity requirement.
-      anyOf:
-        - type: string
+      # description: Indicates velocity requirement.
+      # anyOf:
+      #   - type: string
           enum:
             - VELOCITY_IS_NOT_REQUESTED
             - VELOCITY_IS_REQUESTED
-        - type: string
+        # - type: string
 
     AccuracyFulfilmentIndicator:
-      description: Indicates fulfilment of requested accuracy.
-      anyOf:
-        - type: string
+      # description: Indicates fulfilment of requested accuracy.
+      # anyOf:
+      #   - type: string
           enum:
             - REQUESTED_ACCURACY_FULFILLED
             - REQUESTED_ACCURACY_NOT_FULFILLED
-        - type: string
+        # - type: string
 
     VerticalDirection:
-      description: Indicates direction of vertical speed.
-      type: string
+      # description: Indicates direction of vertical speed.
+      # type: string
       enum:
         - UPWARD
         - DOWNWARD
 
     LdrType:
-      description: Indicates LDR types.
-      anyOf:
-        - type: string
+      # description: Indicates LDR types.
+      # anyOf:
+      #   - type: string
           enum:
             - UE_AVAILABLE
             - PERIODIC
@@ -1458,32 +1458,32 @@ components:
             - LEAVING_FROM_AREA
             - BEING_INSIDE_AREA
             - MOTION
-        - type: string
+        # - type: string
 
     ReportingAreaType:
-      description: Indicates type of event reporting area.
-      anyOf:
-        - type: string
+      # description: Indicates type of event reporting area.
+      # anyOf:
+      #   - type: string
           enum:
             - EPS_TRACKING_AREA_IDENTITY
             - E-UTRAN_CELL_GLOBAL_IDENTIFICATION
             - 5GS_TRACKING_AREA_IDENTITY
             - NR_CELL_GLOBAL_IDENTITY
-        - type: string
+        # - type: string
 
     OccurrenceInfo:
-      description: Specifies occurrence of event reporting.
-      anyOf:
-        - type: string
+      # description: Specifies occurrence of event reporting.
+      # anyOf:
+      #   - type: string
           enum:
             - ONE_TIME_EVENT
             - MULTIPLE_TIME_EVENT
-        - type: string
+        # - type: string
 
     ReportingAccessType:
-      description: Specifies access types of event reporting.
-      anyOf:
-        - type: string
+      # description: Specifies access types of event reporting.
+      # anyOf:
+      #   - type: string
           enum:
             - NR
             - EUTRA_CONNECTED_TO_5GC
@@ -1492,20 +1492,20 @@ components:
             - NR_MEO
             - NR_GEO
             - NR_OTHER_SAT
-        - type: string
+        # - type: string
 
     EventClass:
-      description: Specifies event classes.
-      anyOf:
-        - type: string
+      # description: Specifies event classes.
+      # anyOf:
+      #   - type: string
           enum:
             - SUPPLEMENTARY_SERVICES
-        - type: string
+        # - type: string
 
     ReportedEventType:
-      description: Specifies type of event reporting.
-      anyOf:
-        - type: string
+      # description: Specifies type of event reporting.
+      # anyOf:
+      #   - type: string
           enum:
             - PERIODIC_EVENT
             - ENTERING_AREA_EVENT
@@ -1514,33 +1514,33 @@ components:
             - MOTION_EVENT
             - MAXIMUM_INTERVAL_EXPIRATION_EVENT
             - LOCATION_CANCELLATION_EVENT
-        - type: string
+        # - type: string
 
     TerminationCause:
-      description: Specifies causes of event reporting termination.
-      anyOf:
-        - type: string
+      # description: Specifies causes of event reporting termination.
+      # anyOf:
+      #   - type: string
           enum:
             - TERMINATION_BY_UE
             - TERMINATION_BY_NETWORK
             - NORMAL_TERMINATION
-        - type: string
+        # - type: string
 
     LcsQosClass:
-      description: Specifies LCS QoS class.
-      anyOf:
-        - type: string
+      # description: Specifies LCS QoS class.
+      # anyOf:
+      #   - type: string
           enum:
             - BEST_EFFORT
             - ASSURED
             - MULTIPLE_QOS
-        - type: string
+        # - type: string
 
     UeLocationServiceInd:
-      description: Specifies location service types requested by UE.
-      anyOf:
-        - type: string
+      # description: Specifies location service types requested by UE.
+      # anyOf:
+      #   - type: string
           enum:
             - LOCATION_ESTIMATE
             - LOCATION_ASSISTANCE_DATA
-        - type: string
+        # - type: string
