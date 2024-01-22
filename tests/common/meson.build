@@ -49,6 +49,7 @@ libtestcommon_sources = files('''
     nas-security.c
 
     sgsap-build.c
+    
 '''.split())
 
 libtestcommon_inc = include_directories('.')
@@ -65,6 +66,7 @@ libtestcommon = static_library('testcomon',
                     libgtp_dep,
                     libs1ap_dep,
                     libngap_dep,
+                    liblpp_dep,
                     libnas_eps_dep,
                     libnas_5gs_dep,
                     libdiameter_rx_dep,
@@ -85,6 +87,7 @@ libtestcommon_dep = declare_dependency(
                     libgtp_dep,
                     libs1ap_dep,
                     libngap_dep,
+                    liblpp_dep,
                     libnas_eps_dep,
                     libnas_5gs_dep,
                     libdiameter_rx_dep,

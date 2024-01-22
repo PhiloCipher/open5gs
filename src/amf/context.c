@@ -50,6 +50,7 @@ void amf_context_init(void)
 
     ogs_log_install_domain(&__ogs_sctp_domain, "sctp", ogs_core()->log.level);
     ogs_log_install_domain(&__ogs_ngap_domain, "ngap", ogs_core()->log.level);
+    ogs_log_install_domain(&__ogs_lpp_domain, "lpp", ogs_core()->log.level);
     ogs_log_install_domain(&__ogs_nas_domain, "nas", ogs_core()->log.level);
     ogs_log_install_domain(&__amf_log_domain, "amf", ogs_core()->log.level);
     ogs_log_install_domain(&__gmm_log_domain, "gmm", ogs_core()->log.level);

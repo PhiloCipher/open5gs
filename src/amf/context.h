@@ -25,6 +25,7 @@
 #include "ogs-sctp.h"
 #include "ogs-ngap.h"
 #include "ogs-nas-5gs.h"
+#include "ogs-lpp.h"
 
 #include "amf-sm.h"
 #include "timer.h"
