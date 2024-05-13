@@ -1094,3 +1094,18 @@ libasn1c_ngap_dep = declare_dependency(
     link_with : libasn1c_ngap,
     include_directories : libasn1c_ngap_inc,
     dependencies : [libasn1c_common_dep, libasn1c_util_dep])
+
+
+    
+libasn1c_ngap_sgx = static_library('ogsasn1c-ngap_sgx',
+    sources : libasn1c_ngap_sources,
+   # version : libogslib_version,
+    c_args : libasn1c_common_cc_flags,
+    include_directories : libasn1c_ngap_inc,
+    dependencies : [libasn1c_common_dep_sgx, libasn1c_util_dep_sgx],
+    install : true)
+
+libasn1c_ngap_dep_sgx = declare_dependency(
+    link_with : libasn1c_ngap_sgx,
+    include_directories : libasn1c_ngap_inc,
+    dependencies : [libasn1c_common_dep_sgx, libasn1c_util_dep_sgx])

@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "ogs-app.h": "c",
+        "inet.h": "c",
+        "ogs-ngap.h": "c",
+        "sbi-path.h": "c",
+        "nudr-build.h": "c",
+        "context.h": "c",
+        "tgf-sm.h": "c"
+    }
+}

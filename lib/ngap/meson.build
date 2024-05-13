@@ -36,3 +36,23 @@ libngap_dep = declare_dependency(
     link_with : libngap,
     include_directories : [libngap_inc, libinc],
     dependencies : libasn1c_ngap_dep)
+
+
+libngap_sources2 = files('''
+    message.c
+'''.split())
+
+    
+libngap_sgx = static_library('ogsngap2',
+    sources : libngap_sources,
+   # version : libogslib_version,
+    c_args : '-DOGS_NGAP_COMPILATION',
+    include_directories : [libngap_inc, libinc],
+    dependencies : libasn1c_ngap_dep_sgx,
+    install_rpath : libdir,
+    install : true)
+
+libngap_dep_sgx = declare_dependency(
+    link_with : libngap_sgx,
+    include_directories : [libngap_inc, libinc],
+    dependencies : libasn1c_ngap_dep_sgx)

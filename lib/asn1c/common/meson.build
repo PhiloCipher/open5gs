@@ -168,3 +168,18 @@ libasn1c_common_dep = declare_dependency(
     link_with : libasn1c_common,
     include_directories : libasn1c_common_inc,
     dependencies : libcore_dep)
+
+
+    
+libasn1c_common_sgx = static_library('ogsasn1c-common_sgx',
+    sources : libasn1c_common_sources,
+   # version : libogslib_version,
+    c_args : libasn1c_common_cc_flags,
+    include_directories : libasn1c_common_inc,
+    dependencies : libcore_dep_sgx,
+    install : true)
+
+libasn1c_common_dep_sgx = declare_dependency(
+    link_with : libasn1c_common_sgx,
+    include_directories : libasn1c_common_inc,
+    dependencies : libcore_dep_sgx)
