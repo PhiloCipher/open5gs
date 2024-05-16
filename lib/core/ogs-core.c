@@ -41,7 +41,9 @@ void ogs_core_initialize(void)
     ogs_mem_init();
     ogs_log_init();
     ogs_pkbuf_init();
+#ifndef SGXLIBCORE
     ogs_socket_init();
+#endif
     ogs_tlv_init();
 
     ogs_log_install_domain(&__ogs_mem_domain, "mem", ogs_core()->log.level);
@@ -55,7 +57,9 @@ void ogs_core_initialize(void)
 void ogs_core_terminate(void)
 {
     ogs_tlv_final();
+#ifndef SGXLIBCORE
     ogs_socket_final();
+#endif
     ogs_pkbuf_final();
     ogs_log_final();
     ogs_mem_final();

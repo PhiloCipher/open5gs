@@ -55,6 +55,9 @@
 
 #if HAVE_CTYPE_H
 #include <ctype.h>
+#ifdef SGXLIBCORE
+#define __ctype_b_loc(x) ((short **)0)
+#endif
 #endif
 
 #include "ogs-core.h"
@@ -146,7 +149,7 @@ char *ogs_cpystrn(char *dst, const char *src, size_t dst_size)
 /*****************************************
  * Memory Pool - Use talloc library
  *****************************************/
-
+#ifndef SGXLIBCORE
 char *ogs_talloc_strdup(const void *t, const char *p)
 {
     char *ptr = NULL;
@@ -221,7 +224,7 @@ char *ogs_talloc_asprintf_append(char *s, const char *fmt, ...)
 
     return s;
 }
-
+#endif
 
 /*****************************************
  * Memory Pool - Use pkbuf library

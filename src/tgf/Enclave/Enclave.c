@@ -28,7 +28,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-
+#define SGX
 
 #ifndef SGX
 #define SGX
@@ -117,6 +117,7 @@
 // # endif
 // int a = be32toh(2);
 #include <stdbool.h>
+#include <stdint.h>
 // #include <sys/socket.h>
 // #define __U32_TYPE		unsigned int
 // #define __U32_TYPE __socklen_t;
@@ -138,7 +139,7 @@ struct sockaddr_storage{};
 typedef __ssize_t ssize_t;
 typedef __time_t time_t;
 // #include "../lib/sgx/include/tlibc/stdlib.h"
-// #include "ogs-ngap.h"
+#include "ogs-ngap.h"
 
 
 
@@ -156,10 +157,13 @@ int printf(const char* fmt, ...)
 
 int mymytest(char* str, size_t len)
 {
+    // ogs_ngap_message_t a;
     // ogs_asn_decode(&asn_DEF_NGAP_NGAP_PDU,
     //         NULL, sizeof(ogs_ngap_message_t), NULL);
-    // ogs_ngap_decode(NULL,NULL);
-    malloc(5);
+    ogs_ngap_decode(NULL,NULL);
+    // ogs_asn_encode(NULL,NULL);
+    // ogs_asn_free(NULL, NULL);
+    // malloc(5);
     printf("AAA");
     str[1]= 'p';
     return 5;

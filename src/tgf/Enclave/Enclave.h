@@ -33,6 +33,8 @@
 #define _ENCLAVE_H_
 
 #include <assert.h>
+// #include "../../../../sgxsdk/include/tlibc/assert.h"
+
 #include <stdlib.h>
 
 #if defined(__cplusplus)

@@ -51,6 +51,6 @@ libasn1c_util_sgx = static_library('ogsasn1c-util_sgx',
     install : true)
 
 libasn1c_util_dep_sgx = declare_dependency(
-    link_with : libasn1c_util,
+    link_with : libasn1c_util_sgx,
     include_directories : libasn1c_util_inc,
     dependencies : libasn1c_common_dep_sgx)

@@ -137,7 +137,7 @@ Enclave_Link_Flags = Enclave_Security_Link_Flags + ['-Wl,--no-undefined', '-nost
 executable('enclave.so',
   sources: [gen_Enclave_t[1]] + Enclave_Cpp_Files + Enclave_C_Files,
   dependencies: [ declare_dependency(sources: gen_Enclave_t)
- # ,libngap_dep_sgx
+  ,libngap_dep_sgx
   ],
   link_args: Enclave_Link_Flags + SGX_COMMON_CFLAGS + SGX_COMMON_CXXFLAGS, # Add any libraries to link with here
   include_directories: Enclave_Include_Paths, # Make sure Meson finds the generated header

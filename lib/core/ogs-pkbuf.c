@@ -74,8 +74,9 @@ typedef struct ogs_pkbuf_pool_s {
     OGS_POOL(cluster_8192, ogs_cluster_8192_t);
     OGS_POOL(cluster_32768, ogs_cluster_32768_t);
     OGS_POOL(cluster_big, ogs_cluster_big_t);
-
+#ifndef SGXLIBCORE
     ogs_thread_mutex_t mutex;
+#endif
 } ogs_pkbuf_pool_t;
 
 static OGS_POOL(pkbuf_pool, ogs_pkbuf_pool_t);
@@ -152,9 +153,9 @@ ogs_pkbuf_pool_t *ogs_pkbuf_pool_create(ogs_pkbuf_config_t *config)
     ogs_pool_alloc(&pkbuf_pool, &pool);
     ogs_assert(pool);
     memset(pool, 0, sizeof *pool);
-
+#ifndef SGXLIBCORE
     ogs_thread_mutex_init(&pool->mutex);
-
+#endif
     tmp = config->cluster_128_pool + config->cluster_256_pool +
         config->cluster_512_pool + config->cluster_1024_pool +
         config->cluster_2048_pool + config->cluster_8192_pool +
@@ -210,9 +211,9 @@ void ogs_pkbuf_pool_destroy(ogs_pkbuf_pool_t *pool)
     ogs_pool_final(&pool->cluster_8192);
     ogs_pool_final(&pool->cluster_32768);
     ogs_pool_final(&pool->cluster_big);
-
+#ifndef SGXLIBCORE
     ogs_thread_mutex_destroy(&pool->mutex);
-
+#endif
     ogs_pool_free(&pkbuf_pool, pool);
 #endif
 }
@@ -247,20 +248,24 @@ ogs_pkbuf_t *ogs_pkbuf_alloc_debug(
     if (pool == NULL)
         pool = default_pool;
     ogs_assert(pool);
-
+#ifndef SGXLIBCORE
     ogs_thread_mutex_lock(&pool->mutex);
-
+#endif
     cluster = cluster_alloc(pool, size);
     if (!cluster) {
         ogs_error("ogs_pkbuf_alloc() failed [size=%d]", size);
+#ifndef SGXLIBCORE
         ogs_thread_mutex_unlock(&pool->mutex);
+#endif
         return NULL;
     }
 
     ogs_pool_alloc(&pool->pkbuf, &pkbuf);
     if (!pkbuf) {
         ogs_error("ogs_pkbuf_alloc() failed [size=%d]", size);
+#ifndef SGXLIBCORE
         ogs_thread_mutex_unlock(&pool->mutex);
+#endif
         return NULL;
     }
     memset(pkbuf, 0, sizeof(*pkbuf));
@@ -279,9 +284,9 @@ ogs_pkbuf_t *ogs_pkbuf_alloc_debug(
     pkbuf->file_line = file_line; /* For debug */
 
     pkbuf->pool = pool;
-
+#ifndef SGXLIBCORE
     ogs_thread_mutex_unlock(&pool->mutex);
-
+#endif
     return pkbuf;
 #endif
 }
@@ -297,9 +302,9 @@ void ogs_pkbuf_free(ogs_pkbuf_t *pkbuf)
 
     pool = pkbuf->pool;
     ogs_assert(pool);
-
+#ifndef SGXLIBCORE
     ogs_thread_mutex_lock(&pool->mutex);
-
+#endif
     cluster = pkbuf->cluster;
     ogs_assert(cluster);
 
@@ -309,8 +314,10 @@ void ogs_pkbuf_free(ogs_pkbuf_t *pkbuf)
         cluster_free(pool, pkbuf->cluster);
 
     ogs_pool_free(&pool->pkbuf, pkbuf);
-
+#ifndef SGXLIBCORE
     ogs_thread_mutex_unlock(&pool->mutex);
+#endif
+
 #endif
 }
 
@@ -352,21 +359,25 @@ ogs_pkbuf_t *ogs_pkbuf_copy_debug(ogs_pkbuf_t *pkbuf, const char *file_line)
 #else
     pool = pkbuf->pool;
     ogs_assert(pool);
-
+#ifndef SGXLIBCORE
     ogs_thread_mutex_lock(&pool->mutex);
-
+#endif
     ogs_pool_alloc(&pool->pkbuf, &newbuf);
     if (!newbuf) {
         ogs_error("ogs_pkbuf_copy() failed [size=%d]", size);
+#ifndef SGXLIBCORE
         ogs_thread_mutex_unlock(&pool->mutex);
+#endif
         return NULL;
     }
     ogs_assert(newbuf);
     memcpy(newbuf, pkbuf, sizeof *pkbuf);
 
     OGS_OBJECT_REF(newbuf->cluster);
-
+#ifndef SGXLIBCORE
     ogs_thread_mutex_unlock(&pool->mutex);
+#endif
+
 #endif
 
     return newbuf;

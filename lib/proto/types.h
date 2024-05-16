@@ -332,9 +332,11 @@ ED3(uint8_t ipv4:1;,
     uint8_t reserved:6;)
 } ogs_ip_t;
 
+#ifndef SGX
 int ogs_ip_to_sockaddr(ogs_ip_t *ip, uint16_t port, ogs_sockaddr_t **list);
 int ogs_sockaddr_to_ip(
         ogs_sockaddr_t *addr, ogs_sockaddr_t *addr6, ogs_ip_t *ip);
+#endif
 
 char *ogs_ipv4_to_string(uint32_t addr);
 char *ogs_ipv6addr_to_string(const uint8_t *addr6);
@@ -773,12 +775,15 @@ ED6(uint8_t     spare:1;,
     uint8_t     source_interface;
 } __attribute__ ((packed)) ogs_user_plane_ip_resource_info_t;
 
+#ifndef SGX
 int ogs_sockaddr_to_user_plane_ip_resource_info(
     ogs_sockaddr_t *addr, ogs_sockaddr_t *addr6,
     ogs_user_plane_ip_resource_info_t *info);
 int ogs_user_plane_ip_resource_info_to_sockaddr(
     ogs_user_plane_ip_resource_info_t *info,
     ogs_sockaddr_t **addr, ogs_sockaddr_t **addr6);
+#endif
+
 
 typedef struct ogs_slice_data_s {
     ogs_s_nssai_t s_nssai;

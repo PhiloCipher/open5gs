@@ -24,7 +24,23 @@
 
 #define OGS_CORE_INSIDE
 
-#define OGS_USE_TALLOC 1
+#ifdef SGX
+#include "core/ogs-macros.h"
+#include "core/ogs-list.h"
+#include "core/ogs-abort.h"
+#include "core/ogs-strings.h"
+#include "core/ogs-errno.h"
+#include "core/ogs-time.h"
+#include "core/ogs-log.h"
+#include "core/ogs-pkbuf.h"
+#include "core/ogs-memory.h"
+#include "core/ogs-tlv.h"
+#else
+
+#define OGS_USE_TALLOC 0
+
+
+
 
 #include "core/ogs-compat.h"
 #include "core/ogs-macros.h"
@@ -64,6 +80,9 @@
 #include "core/ogs-getopt.h"
 #include "core/ogs-file.h"
 
+
+#endif
+
 #undef OGS_CORE_INSIDE
 
 #ifdef __cplusplus
@@ -80,7 +99,12 @@ typedef struct {
     struct {
         int pool;
         int domain_pool;
+        #ifndef SGX
         ogs_log_level_e level;
+        #else
+        ogs_log_level_e level;
+        #endif
+        
     } log;
 
     struct {
@@ -94,8 +118,14 @@ typedef struct {
 
 } ogs_core_context_t;
 
+#ifndef SGX
 void ogs_core_initialize(void);
 void ogs_core_terminate(void);
+#else
+;
+#endif
+
+
 
 ogs_core_context_t *ogs_core(void);
 

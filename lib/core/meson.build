@@ -331,14 +331,29 @@ libcore_dep = declare_dependency(
 libcore_sources_sgx = files('''
     ogs-core.h
 
-
+    ogs-list.h
+    ogs-errno.h
+    ogs-strings.h
+    ogs-abort.h
+    ogs-errno.h
+    ogs-log.h
     ogs-pkbuf.h
+    ogs-memory.h
+    ogs-timer.h
+    ogs-tlv.h
+    
 
 
 
 
-
+    ogs-abort.c
+    ogs-errno.c
+    ogs-strings.c
+    ogs-time.c
+    ogs-log.c
     ogs-pkbuf.c
+    ogs-memory.c
+    ogs-tlv.c
 
 
     ogs-core.c
@@ -350,7 +365,7 @@ libcore_sources_sgx = files('''
 libcore_sgx = static_library('ogscore_sgx',
     sources : libcore_sources_sgx,
   #  version : libogslib_version,
-    c_args : '-DOGS_CORE_COMPILATION',
+    c_args : ['-DOGS_CORE_COMPILATION','-DSGXLIBCORE'],
     include_directories : [libcore_inc, libinc],
     dependencies : [ librt, libexecinfo, libsocket],
     install : true)

@@ -32,7 +32,7 @@ OGS_GNUC_NORETURN void ogs_abort(void)
     int nptrs;
     void *buffer[100];
     char **strings;
-
+#ifndef SGXLIBCORE
     nptrs = backtrace(buffer, OGS_ARRAY_SIZE(buffer));
     ogs_fatal("backtrace() returned %d addresses", nptrs);
 
@@ -43,7 +43,7 @@ OGS_GNUC_NORETURN void ogs_abort(void)
 
         free(strings);
     }
-
+#endif
     abort();
 #elif defined(_WIN32)
     DebugBreak();

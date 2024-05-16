@@ -111,7 +111,11 @@ extern "C" {
 #include <sys/endian.h>
 
 #elif defined(__linux__)
+#ifndef SGX
 #include <endian.h>
+#else
+#include <../../usr/include/endian.h>
+#endif
 
 #endif
 

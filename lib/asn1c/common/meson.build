@@ -174,7 +174,7 @@ libasn1c_common_dep = declare_dependency(
 libasn1c_common_sgx = static_library('ogsasn1c-common_sgx',
     sources : libasn1c_common_sources,
    # version : libogslib_version,
-    c_args : libasn1c_common_cc_flags,
+    c_args : ['-DSGXCOMMON'] + libasn1c_common_cc_flags,
     include_directories : libasn1c_common_inc,
     dependencies : libcore_dep_sgx,
     install : true)

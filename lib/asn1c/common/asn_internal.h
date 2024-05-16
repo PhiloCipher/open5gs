@@ -14,7 +14,16 @@
 #include "asn_application.h"	/* Application-visible API */
 
 #ifndef	__NO_ASSERT_H__		/* Include assert.h only for internal use. */
+#ifndef SGXCOMMON
 #include <assert.h>		/* for assert() macro */
+#else
+#include <stdbool.h>
+#define assert(x) ((void)0)
+#define rand(x) ((int)2)
+#define fputc(x,y) ((int)0)
+// #include <assert.h>	
+// #include "../../../../sgxsdk/include/tlibc/assert.h"
+#endif
 #endif
 
 #ifdef	__cplusplus
@@ -46,8 +55,11 @@ static ogs_inline void *ogs_asn_malloc(size_t size, const char *file_line)
 {
     void *ptr = ogs_malloc(size);
     if (!ptr) {
+#ifndef SGXCOMMON
         ogs_fatal("asn_malloc() failed in `%s`", file_line);
         ogs_assert_if_reached();
+#endif
+        
     }
 
     return ptr;
@@ -57,8 +69,11 @@ static ogs_inline void *ogs_asn_calloc(
 {
     void *ptr = ogs_calloc(nmemb, size);
     if (!ptr) {
+        
+#ifndef SGXCOMMON
         ogs_fatal("asn_calloc() failed in `%s`", file_line);
         ogs_assert_if_reached();
+#endif
     }
 
     return ptr;
@@ -68,8 +83,11 @@ static ogs_inline void *ogs_asn_realloc(
 {
     void *ptr = ogs_realloc(oldptr, size);
     if (!ptr) {
+#ifndef SGXCOMMON
         ogs_fatal("asn_realloc() failed in `%s`", file_line);
         ogs_assert_if_reached();
+#endif
+        
     }
 
     return ptr;

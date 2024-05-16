@@ -21,6 +21,7 @@
 
 #if HAVE_CTYPE_H
 #include <ctype.h>
+#define __ctype_b_loc(x) ((short **)0)
 #endif
 
 #if HAVE_STDARG_H
@@ -155,7 +156,7 @@ ogs_log_t *ogs_log_add_stderr(void)
     log = add_log(OGS_LOG_STDERR_TYPE);
     ogs_assert(log);
 
-    log->file.out = stderr;
+    // log->file.out = stderr;
     log->writer = file_writer;
 
 #if !defined(_WIN32)
@@ -170,17 +171,17 @@ ogs_log_t *ogs_log_add_file(const char *name)
     FILE *out = NULL;
     ogs_log_t *log = NULL;
 
-    out = fopen(name, "a");
-    if (!out) 
-        return NULL;
+    // out = fopen(name, "a");
+    // if (!out) 
+    //     return NULL;
     
-    log = add_log(OGS_LOG_FILE_TYPE);
-    ogs_assert(log);
+    // log = add_log(OGS_LOG_FILE_TYPE);
+    // ogs_assert(log);
 
-    log->file.name = name;
-    log->file.out = out;
+    // log->file.name = name;
+    // log->file.out = out;
 
-    log->writer = file_writer;
+    // log->writer = file_writer;
 
     return log;
 }
@@ -193,7 +194,7 @@ void ogs_log_remove(ogs_log_t *log)
 
     if (log->type == OGS_LOG_FILE_TYPE) {
         ogs_assert(log->file.out);
-        fclose(log->file.out);
+        // fclose(log->file.out);
         log->file.out = NULL;
     }
 
@@ -413,7 +414,7 @@ void ogs_log_vprintf(ogs_log_level_e level, int id,
     ogs_list_for_each(&log_list, log) {
         domain = ogs_pool_find(&domain_pool, id);
         if (!domain) {
-            fprintf(stderr, "No LogDomain[id:%d] in %s:%d", id, file, line);
+            // fprintf(stderr, "No LogDomain[id:%d] in %s:%d", id, file, line);
             ogs_assert_if_reached();
         }
         if (domain->level < level)
@@ -475,8 +476,8 @@ void ogs_log_vprintf(ogs_log_level_e level, int id,
             p = log_linefeed(p, last);
         }
 
-        fprintf(stderr, "%s", logstr);
-        fflush(stderr);
+        // fprintf(stderr, "%s", logstr);
+        // fflush(stderr);
     }
 }
 
@@ -552,9 +553,9 @@ static int file_cycle(ogs_log_t *log)
     ogs_assert(log->file.out);
     ogs_assert(log->file.name);
 
-    fclose(log->file.out);
-    log->file.out = fopen(log->file.name, "a");
-    ogs_assert(log->file.out);
+    // // fclose(log->file.out);
+    // log->file.out = fopen(log->file.name, "a");
+    // ogs_assert(log->file.out);
 
     return 0;
 }
@@ -566,8 +567,8 @@ static char *log_timestamp(char *buf, char *last,
     struct tm tm;
     char nowstr[32];
 
-    ogs_gettimeofday(&tv);
-    ogs_localtime(tv.tv_sec, &tm);
+    // ogs_gettimeofday(&tv); TGFF
+    // ogs_localtime(tv.tv_sec, &tm);
     strftime(nowstr, sizeof nowstr, "%m/%d %H:%M:%S", &tm);
 
     buf = ogs_slprintf(buf, last, "%s%s.%03d%s: ",
@@ -641,7 +642,7 @@ static char *log_linefeed(char *buf, char *last)
 static void file_writer(
         ogs_log_t *log, ogs_log_level_e level, const char *string)
 {
-    fprintf(log->file.out, "%s", string);
-    fflush(log->file.out);
+    // fprintf(log->file.out, "%s", string);
+    // fflush(log->file.out);
 }
 
