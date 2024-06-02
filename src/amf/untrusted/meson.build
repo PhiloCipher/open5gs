@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+subdir('sgx')
+
 libamf_sources = files('''
     metrics.h
 
@@ -86,9 +88,13 @@ amf_sources = files('''
 '''.split())
 
 executable('open5gs-amfd',
-    sources : amf_sources,
+    sources : amf_sources +['./sgx/App.c'],
     c_args : '-DDEFAULT_CONFIG_FILENAME="@0@/amf.yaml"'.format(open5gs_sysconfdir),
     include_directories : srcinc,
-    dependencies : libamf_dep,
+    dependencies : [libamf_dep ,libsgx_dep],
     install_rpath : libdir,
     install : true)
+    
+    
+
+

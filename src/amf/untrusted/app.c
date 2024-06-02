@@ -19,6 +19,7 @@
 
 #include "ogs-sctp.h"
 #include "ogs-app.h"
+#include "App.h"
 
 int app_initialize(const char *const argv[])
 {
@@ -31,6 +32,14 @@ int app_initialize(const char *const argv[])
         return rv;
     }
     ogs_info("AMF initialize...done");
+    
+    int global_eid = sgx_initialize();
+    // sgx_test();
+    if (global_eid == OGS_ERROR) {
+        ogs_error("Failed to initialize SGX");
+        return rv;
+    }
+    ogs_info("SGX initialize...done");
 
     return OGS_OK;
 }
@@ -40,4 +49,6 @@ void app_terminate(void)
     amf_terminate();
     ogs_sctp_final();
     ogs_info("AMF terminate...done");
+    sgx_terminate(global_eid);
+    ogs_info("SGX terminate...done");
 }
