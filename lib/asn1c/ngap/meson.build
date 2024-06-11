@@ -1094,3 +1094,24 @@ libasn1c_ngap_dep = declare_dependency(
     link_with : libasn1c_ngap,
     include_directories : libasn1c_ngap_inc,
     dependencies : [libasn1c_common_dep, libasn1c_util_dep])
+
+common_c_flags = ['-m64', '-O0', '-g', '-Wall', '-Wextra', '-Winit-self', '-Wpointer-arith', '-Wreturn-type', '-Waddress', '-Wsequence-point', '-Wformat-security', '-Wmissing-include-dirs', '-Wfloat-equal', '-Wundef', '-Wshadow', '-Wcast-align', '-Wcast-qual', '-Wconversion', '-Wredundant-decls', '-fPIC', '-Wno-attributes', '-DDEBUG', '-UNDEBUG', '-UEDEBUG']
+
+SGX_SDK = '/home/mahdi/Desktop/mysgx/sgxsdk'
+Enclave_Include_Paths = include_directories( '.', SGX_SDK + '/include', SGX_SDK + '/include/tlibc',SGX_SDK + '/include/libcxx')
+
+sgx_linker_flags = ['-L' + SGX_SDK + '/lib64', '-lsgx_uprotected_fs']
+
+libasn1c_ngap_sgx = static_library('ogsasn1c-ngap_sgx',
+    sources : libasn1c_ngap_sources,
+  #  version : libogslib_version,
+    c_args : cc.get_supported_arguments(common_c_flags) +libasn1c_common_cc_flags+ ['-DSGX'],
+    include_directories : [libasn1c_ngap_inc] + Enclave_Include_Paths,
+    dependencies : [libasn1c_common_dep_sgx],
+    install : true)
+
+libasn1c_ngap_dep_sgx = declare_dependency(
+    link_with : libasn1c_ngap_sgx,
+    include_directories : libasn1c_ngap_inc,
+    dependencies : [libasn1c_common_dep_sgx],
+    link_args: sgx_linker_flags)

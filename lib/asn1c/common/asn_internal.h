@@ -13,8 +13,14 @@
 
 #include "asn_application.h"	/* Application-visible API */
 
+#ifndef SGX
 #ifndef	__NO_ASSERT_H__		/* Include assert.h only for internal use. */
 #include <assert.h>		/* for assert() macro */
+#endif
+#else
+#include <assert.h>
+#define rand(x) ((int)2)
+// #define rand(x) (assert(0 == 1), 0)
 #endif
 
 #ifdef	__cplusplus
@@ -40,8 +46,15 @@ int get_asn1c_environment_version(void);	/* Run-time version */
 #define	REALLOC(oldptr, size)	realloc(oldptr, size)
 #define	FREEMEM(ptr)		free(ptr)
 #else
-#include "proto/ogs-proto.h"
 
+#ifdef SGX
+#include "../tlibc/stdlib.h"
+#define CALLOC(nmemb, size) calloc(nmemb, size)
+#define MALLOC(size) malloc(size)
+#define REALLOC(oldptr, size) realloc(oldptr, size)
+#define FREEMEM(ptr) free(ptr)
+#else
+#include "proto/ogs-proto.h"
 static ogs_inline void *ogs_asn_malloc(size_t size, const char *file_line)
 {
     void *ptr = ogs_malloc(size);
@@ -79,7 +92,7 @@ static ogs_inline void *ogs_asn_realloc(
 #define MALLOC(size) ogs_asn_malloc(size, OGS_FILE_LINE)
 #define REALLOC(oldptr, size) ogs_asn_realloc(oldptr, size, OGS_FILE_LINE)
 #define FREEMEM(ptr) ogs_free(ptr)
-
+#endif
 #endif
 
 #define	asn_debug_indent	0

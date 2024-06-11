@@ -32,7 +32,7 @@
 #ifndef _ENCLAVE_H_
 #define _ENCLAVE_H_
 
-#include <assert.h>
+#include <assert.h>  ///home/mahdi/Desktop/mysgx/sgxsdk/include/tlibc/assert.h
 // #include "../../../../sgxsdk/include/tlibc/assert.h"
 
 #include <stdlib.h>
@@ -41,7 +41,14 @@
 extern "C" {
 #endif
 
+#define SGX
+
+#include "ogs-ngap.h"
+
 int printf(const char* fmt, ...);
+int ogs_ngap_decode_sgx(NGAP_NGAP_PDU_t *message, const void *buffer,size_t size);
+int ogs_asn_decode_sgx(const asn_TYPE_descriptor_t *td,
+        void *struct_ptr, size_t struct_size, const void *buffer,size_t size);
 
 #if defined(__cplusplus)
 }

@@ -38,15 +38,17 @@ cxx = meson.get_compiler('cpp')
 
 # Assuming gen_enclave is your custom target generating Enclave_u.h
 gen_dependency = declare_dependency(sources: gen_enclave)
-sgx_linker_flags = ['-L' + SGX_SDK + '/lib64', '-lpthread', '-lsgx_urts_sim']
+sgx_linker_flags = ['-L' + SGX_SDK + '/lib64', '-lpthread', '-lsgx_urts_sim', '-lsgx_uprotected_fs']
 
 
+libsgx_uprotected_fs = SGX_SDK + '/lib64/libsgx_uprotected_fs.a'
 
 
 # Create a static library for all sources except App.c
 libsgx = static_library('ogssgx',
   sources: app_sources + edger8r_syntax_sources + trusted_library_sources,
   dependencies: [gen_dependency],
+      link_args: [libsgx_uprotected_fs],
   c_args: cc.get_supported_arguments(common_c_flags),
   cpp_args: cxx.get_supported_arguments(common_cpp_flags),
   include_directories: include_dirs,

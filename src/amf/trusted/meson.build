@@ -13,7 +13,7 @@ Enclave_C_Files = ['./Enclave.c']
 Enclave_Cpp_Files = ['./Edger8rSyntax/Arrays.cpp', './Edger8rSyntax/Functions.cpp', './Edger8rSyntax/Pointers.cpp', './Edger8rSyntax/Types.cpp', './TrustedLibrary/Libc.cpp', './TrustedLibrary/Libcxx.cpp', './TrustedLibrary/Thread.cpp']
 
 
-Enclave_Include_Paths = include_directories('../Include', '.', SGX_SDK + '/include', SGX_SDK + '/include/tlibc',SGX_SDK + '/include/libcxx',SGX_SDK + '/../../Projects/open5gs_sgx/lib/ngap',SGX_SDK + '/../../Projects/open5gs_sgx/lib',SGX_SDK + '/../../Projects/open5gs_sgx/builddir/lib',SGX_SDK + '/../../Projects/open5gs_sgx/lib/asn1c/ngap',SGX_SDK + '/../../Projects/open5gs_sgx/lib/asn1c/common',SGX_SDK + '/../../Projects/open5gs_sgx/lib/core')
+Enclave_Include_Paths = include_directories('../Include', '.', SGX_SDK + '/include', SGX_SDK + '/include/tlibc',SGX_SDK + '/include/libcxx','../../../lib/ngap','../../../lib', '../../../build/lib','../../../lib/asn1c/ngap','../../../lib/asn1c/common','../../../lib/core')
 
 Enclave_C_Flags = ['-nostdinc', '-fvisibility=hidden', '-fpie', '-ffunction-sections', '-fdata-sections']
 Enclave_Cpp_Flags = Enclave_C_Flags + ['-nostdinc++']
@@ -31,16 +31,20 @@ Enclave_Link_Flags = Enclave_Security_Link_Flags + ['-Wl,--no-undefined', '-nost
 	'-Wl,-Bstatic', '-Wl,-Bsymbolic', '-Wl,--no-undefined',
 	'-Wl,-pie','-eenclave_entry', '-Wl,--export-dynamic',
 	'-Wl,--defsym','__ImageBase=0' ,'-Wl,--gc-sections',
-	'-Wl,--version-script=../src/amf/trusted/Enclave.lds']
+	'-Wl,--version-script=../src/amf/trusted/Enclave.lds', '-fPIC']
 
+libsgx_tprotected_fs = SGX_SDK + '/lib64/libsgx_tprotected_fs.a'
+libsgx_pthread = SGX_SDK + '/lib64/libsgx_pthread.a'
+libtlibc = '/home/mahdi/Desktop/Projects/linux-sgx/sdk/tlibc/libtlibc.a'  
 
-                    
 executable('enclave.so',
   sources: [gen_Enclave_t[1]] + Enclave_Cpp_Files + Enclave_C_Files,
+  c_args : ['-DSGX'] ,
   dependencies: [ declare_dependency(sources: gen_Enclave_t)
-  #,libngap_dep_sgx
+ # ,libngap_dep_sgx
+ ,libasn1c_ngap_dep_sgx
   ],
-  link_args: Enclave_Link_Flags + SGX_COMMON_CFLAGS + SGX_COMMON_CXXFLAGS, # Add any libraries to link with here
+  link_args: Enclave_Link_Flags + SGX_COMMON_CFLAGS + SGX_COMMON_CXXFLAGS + [libsgx_tprotected_fs, libsgx_pthread, libtlibc], # Add any libraries to link with here
   include_directories: Enclave_Include_Paths, # Make sure Meson finds the generated header
   install: true
 )
@@ -53,6 +57,7 @@ Enclave_private_test = custom_target('Enclave_private_test',
 sgx_sign = custom_target('sgx_sign',
   depends: [Enclave_private_test],
   output: ['enclave.signed.so'],
-  command: ['sh', '-c', SGX_SDK+'/bin/x64/sgx_sign sign -key ./Enclave_private_test.pem -enclave ./src/amf/trusted/enclave.so -out ./enclave.signed.so -config ../src/amf/trusted/Enclave.config.xml'],
+  command: ['sh', '-c', SGX_SDK+'/bin/x64/sgx_sign sign -key ./Enclave_private_test.pem -enclave ./src/amf/trusted/enclave.so -out ../enclave.signed.so -config ../src/amf/trusted/Enclave.config.xml'],
   build_by_default: true
 )
+

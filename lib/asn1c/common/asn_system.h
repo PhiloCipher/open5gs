@@ -19,7 +19,7 @@
 #ifndef _BSD_SOURCE
 #define _BSD_SOURCE /* for snprintf() on some linux systems  */
 #endif
-
+#ifndef SGX
 #include <stdio.h>	/* For snprintf(3) */
 #include <stdlib.h>	/* For *alloc(3) */
 #include <string.h>	/* For memcpy(3) */
@@ -28,7 +28,19 @@
 #include <stdarg.h>	/* For va_start */
 #include <stddef.h>	/* for offsetof and ptrdiff_t */
 #include <inttypes.h>	/* for PRIdMAX */
-
+#else
+#include <../../../../sgxsdk/include/tlibc/stddef.h> /* for size_t */
+#include <../../../../sgxsdk/include/tlibc/sys/types.h> /* for ssize_t */
+#include <../../../../sgxsdk/include/tlibc/stdlib.h> /* for bsearch */
+#include <../../../../sgxsdk/include/tlibc/string.h> /* for memset */
+#include <../../../../sgxsdk/include/tlibc/sys/limits.h> /* for LONG_MIN */
+#include <../../../../sgxsdk/include/tlibc/stdio.h> /* for snprintf */
+#define FILE void
+#include <../../../../sgxsdk/include/sgx_tprotected_fs.h> /* for sgx_fwrite */
+#define fwrite sgx_fwrite
+#define fflush sgx_fflush
+#include <../../../../sgxsdk/include/tlibc/pthread.h> /* for pthread_create */
+#endif
 #ifdef	_WIN32
 
 #include <malloc.h>

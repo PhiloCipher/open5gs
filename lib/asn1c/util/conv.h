@@ -19,8 +19,9 @@
 
 #ifndef OGS_ASN_CONV_H
 #define OGS_ASN_CONV_H
-
+#ifndef SGX
 #include "ogs-core.h"
+#endif
 
 #include "asn_internal.h"
 #include "OCTET_STRING.h"

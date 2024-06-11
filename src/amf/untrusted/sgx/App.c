@@ -238,7 +238,11 @@ int sgx_test()
 {
     char ali[3] = {'o','s','q'};
     int retval;
+        // sgx_test_array(global_eid,&retval, ali, 3);
+    ogs_error("calling sgx_ngap_decode" );
     sgx_test_array(global_eid,&retval, ali, 3);
     ogs_error("The number is : %d %s.\n",retval,ali );
     return OGS_OK;
 }
+
+

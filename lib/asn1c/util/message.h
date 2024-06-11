@@ -19,9 +19,9 @@
 
 #ifndef OGS_ASN_MESSAGE_H
 #define OGS_ASN_MESSAGE_H
-
+#ifndef SGX
 #include "ogs-core.h"
-
+#endif
 #include "asn_internal.h"
 #include "constr_TYPE.h"
 

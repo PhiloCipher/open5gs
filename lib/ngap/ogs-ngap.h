@@ -19,8 +19,9 @@
 
 #ifndef OGS_NGAP_H
 #define OGS_NGAP_H
-
+#ifndef SGX
 #include "core/ogs-core.h"
+#endif
 
 #include "NGAP_ActivatedCellList.h"
 #include "NGAP_AdditionalDLUPTNLInformationForHOItem.h"
@@ -1089,7 +1090,7 @@
 #include "NGAP_XnTLAs.h"
 #include "NGAP_XnTNLConfigurationInfo.h"
 
-
+#ifndef SGX
 #include "asn1c/util/conv.h"
 #include "asn1c/util/message.h"
 
@@ -1100,7 +1101,7 @@
 #include "ngap/build.h"
 
 #undef OGS_NGAP_INSIDE
-
+#endif
 #ifdef __cplusplus
 extern "C" {
 #endif

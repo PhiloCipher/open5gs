@@ -28,12 +28,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-#define SGX
+
 
 #ifndef SGX
 #define SGX
 #endif
-
+#include "../tlibc/stdlib.h"
 
 
 // #ifndef OGS_CORE_H
@@ -60,10 +60,10 @@
 
 #include "Enclave.h"
 #include "Enclave_t.h" /* print_string */
-#include <stdarg.h>
-#include <stdio.h> /* vsnprintf */
+// #include <stdarg.h>
+// #include <stdio.h> /* vsnprintf */
 
-#include <string.h>
+// #include <string.h>
 // #include <arpa/inet.h>
 
 
@@ -118,17 +118,21 @@
 // int a = be32toh(2);
 #include <stdbool.h>
 #include <stdint.h>
+uint32_t a =0;
+
+#include <sys/types.h>	/* For size_t */
+
 // #include <sys/socket.h>
 // #define __U32_TYPE		unsigned int
 // #define __U32_TYPE __socklen_t;
 // typedef __socklen_t socklen_t;
 
 
-struct sockaddr_in6{};
-struct sockaddr_in{};
-struct sockaddr{};
-struct sockaddr_storage{};
-#define socklen_t   unsigned int
+// struct sockaddr_in6{};
+// struct sockaddr_in{};
+// struct sockaddr{};
+// struct sockaddr_storage{};
+// #define socklen_t   unsigned int
 
 
 // #include <sgx_tstdc.h>
@@ -139,8 +143,10 @@ struct sockaddr_storage{};
 typedef __ssize_t ssize_t;
 typedef __time_t time_t;
 // #include "../lib/sgx/include/tlibc/stdlib.h"
-// #include "ogs-ngap.h"
 
+#include "ogs-ngap.h"
+
+#include "../../../../sgxsdk/include/tlibc/string.h"
 // #include <string.h>
 
 // #include "ogs-nas-5gs.h"
@@ -148,21 +154,89 @@ typedef __time_t time_t;
 
 int printf(const char* fmt, ...)
 {
-    char buf[BUFSIZ] = { '\0' };
-    va_list ap;
-    va_start(ap, fmt);
-    vsnprintf(buf, BUFSIZ, fmt, ap);
-    va_end(ap);
-    ocall_print_string(buf);
-    return (int)strnlen(buf, BUFSIZ - 1) + 1;
-}
-
-
-int sgx_ngap_decode(char* str, size_t len)
-{
+    // char buf[BUFSIZ] = { '\0' };
+    // va_list ap;
+    // va_start(ap, fmt);
+    // vsnprintf(buf, BUFSIZ, fmt, ap);
+    // va_end(ap);
+    // ocall_print_string(buf);
+    // return (int)strnlen(buf, BUFSIZ - 1) + 1;
     return 0;
+}
+
+int ogs_asn_decode_sgx(const asn_TYPE_descriptor_t *td,
+        void *struct_ptr, size_t struct_size, const void *buffer,size_t size)
+{
+    asn_dec_rval_t dec_ret = {0};
+
+    // ogs_assert(td);
+    // ogs_assert(struct_ptr);
+    // ogs_assert(struct_size);
+    // ogs_assert(buffer);
+    // ogs_assert(size);
+    //int *a = malloc(10);
+    //memset(a, 0, 10);
+    // assert(0);
+    memset(struct_ptr, 0, struct_size);
+    dec_ret = aper_decode(NULL, td, (void **)&struct_ptr,
+           buffer, size, 0, 0);
+
+    if (dec_ret.code != RC_OK) {
+        // ogs_warn("Failed to decode ASN-PDU [code:%d,consumed:%d]",
+        //         dec_ret.code, (int)dec_ret.consumed);
+        // return OGS_ERROR;
+        return -1;
+    }
+
+    return 0;
+}
+
+
+
+int ogs_ngap_decode_sgx(NGAP_NGAP_PDU_t *message, const void *buffer,size_t size)
+{
+    int rv;
+    // ogs_assert(message);
+    // ogs_assert(buffer);
+    // ogs_assert(size);
+    // const asn_TYPE_descriptor_t a = asn_DEF_NGAP_NGAP_PDU;
+    rv = ogs_asn_decode_sgx(&asn_DEF_NGAP_NGAP_PDU,
+            message, sizeof(NGAP_NGAP_PDU_t), buffer, size);
+    // if (rv != OGS_OK) {
+    if (rv != 0) {
+        // ogs_warn("Failed to decode NGAP-PDU");
+        return rv;
+    }
+
+    // if (ogs_log_get_domain_level(OGS_LOG_DOMAIN) >= OGS_LOG_TRACE)
+    //     asn_fprint(stdout, &asn_DEF_NGAP_NGAP_PDU, message);
+
+    // return OGS_OK;
+    return 0;
+}
+
+
+// int sgx_ngap_decode(char* str, size_t len)
+// {
+//     const void *pkbuf_data;
+//     size_t pkbuf_size;
+//     NGAP_NGAP_PDU_t *message;
+//     int a = ogs_ngap_decode_sgx(message, pkbuf_data, pkbuf_size);
+//     return a;
+
+// }
+
+
+void *sgx_ngap_decode_ecall(const void *pkbuf_data, size_t pkbuf_size) 
+{
+    NGAP_NGAP_PDU_t *message = malloc(sizeof(NGAP_NGAP_PDU_t));
+    int a = ogs_ngap_decode_sgx(message, pkbuf_data, pkbuf_size);
+    void *b = message;
+    // ogs_ngap_free(message);
+    return b;
 
 }
+
 
 int sgx_test_array(char* str, size_t len)
 {

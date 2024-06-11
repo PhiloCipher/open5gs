@@ -25,22 +25,25 @@ int app_initialize(const char *const argv[])
 {
     int rv;
 
+
+
     ogs_sctp_init(ogs_app()->usrsctp.udp_port);
     rv = amf_initialize();
     if (rv != OGS_OK) {
         ogs_error("Failed to initialize AMF");
         return rv;
     }
-    ogs_info("AMF initialize...done");
-    
+    ogs_error("AMF initialize...done");
+
     int global_eid = sgx_initialize();
-    // sgx_test();
     if (global_eid == OGS_ERROR) {
         ogs_error("Failed to initialize SGX");
-        return rv;
+        return global_eid;
     }
-    ogs_info("SGX initialize...done");
-
+    ogs_error("SGX initialize...done");
+    
+    //ogs_msleep(13000);
+    //sgx_test();
     return OGS_OK;
 }
 

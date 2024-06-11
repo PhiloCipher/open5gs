@@ -26,6 +26,7 @@
 #include "nsmf-handler.h"
 #include "nnssf-handler.h"
 #include "nas-security.h"
+#include "sgx_api.h"
 
 void amf_state_initial(ogs_fsm_t *s, amf_event_t *e)
 {
@@ -831,7 +832,10 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
         ogs_assert(gnb);
         ogs_assert(OGS_FSM_STATE(&gnb->sm));
 
-        rc = ogs_ngap_decode(&ngap_message, pkbuf);
+        //rc = ogs_ngap_decode(&ngap_message, pkbuf);
+        // ogs_msleep(12000);
+        rc = sgx_ngap_decode(&ngap_message, pkbuf);
+        
         if (rc == OGS_OK) {
             e->gnb = gnb;
             e->ngap.message = &ngap_message;
@@ -845,7 +849,7 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
             ogs_assert(r != OGS_ERROR);
         }
 
-        ogs_ngap_free(&ngap_message);
+        //ogs_ngap_free(&ngap_message);
         ogs_pkbuf_free(pkbuf);
         break;
 

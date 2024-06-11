@@ -49,6 +49,8 @@ enclave {
     from "TrustedLibrary/Libc.edl" import *;
     from "TrustedLibrary/Libcxx.edl" import ecall_exception, ecall_map;
     from "TrustedLibrary/Thread.edl" import *;
+    
+    from "sgx_tprotected_fs.edl" import *;
 
     /* 
      * ocall_print_string - invokes OCALL to display string buffer inside the enclave.
@@ -58,13 +60,16 @@ enclave {
      
      trusted{
      
-     public int sgx_ngap_decode(
-            [in,out, size=len]char* str, size_t len
-        );
+     //public int sgx_ngap_decode(
+     //       [in,out, size=len]char* str, size_t len
+     //   );
     
     public int sgx_test_array(
             [in,out, size=len]char* str, size_t len
         );
+
+    public void * sgx_ngap_decode_ecall(
+        [in, size= pkbuf_size] const void *pkbuf_data, size_t pkbuf_size);
 
         
      };
@@ -72,6 +77,7 @@ enclave {
      
     untrusted {
         void ocall_print_string([in, string] const char *str);
+        
     };
 
 };

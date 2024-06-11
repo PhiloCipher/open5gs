@@ -34,3 +34,17 @@ libasn1c_util_dep = declare_dependency(
     link_with : libasn1c_util,
     include_directories : libasn1c_util_inc,
     dependencies : libasn1c_common_dep)
+
+
+#libasn1c_util_sgx = static_library('ogsasn1c-util_sgx',
+#    sources : libasn1c_util_sources,
+#   # version : libogslib_version,
+#    c_args : libasn1c_common_cc_flags + ['-DSGX'],
+#    include_directories : libasn1c_util_inc,
+#    dependencies : libasn1c_common_dep_sgx,
+#    install : false)
+
+#libasn1c_util_dep_sgx = declare_dependency(
+#    link_with : libasn1c_util_sgx,
+#    include_directories : libasn1c_util_inc,
+#    dependencies : libasn1c_common_dep_sgx)

@@ -35,7 +35,9 @@ asn_TYPE_outmost_tag(const asn_TYPE_descriptor_t *type_descriptor,
 int
 asn_fprint(FILE *stream, const asn_TYPE_descriptor_t *td,
            const void *struct_ptr) {
+#ifndef SGX
     if(!stream) stream = stdout;
+#endif
     if(!td || !struct_ptr) {
         errno = EINVAL;
         return -1;
@@ -50,8 +52,12 @@ asn_fprint(FILE *stream, const asn_TYPE_descriptor_t *td,
     if(_print2fp("\n", 1, stream)) {
         return -1;
     }
-
+#ifndef SGX
     return fflush(stream);
+#else
+    return sgx_fflush(stream);
+#endif
+    
 }
 
 /*
@@ -78,10 +84,10 @@ asn_copy(const asn_TYPE_descriptor_t *td,
 static int
 _print2fp(const void *buffer, size_t size, void *app_key) {
 	FILE *stream = (FILE *)app_key;
-
+#ifndef SGX
 	if(fwrite(buffer, 1, size, stream) != size)
 		return -1;
-
+#endif
 	return 0;
 }
 
@@ -94,7 +100,9 @@ void CC_PRINTFLIKE(1, 2) ASN_DEBUG_f(const char *fmt, ...);
 void ASN_DEBUG_f(const char *fmt, ...) {
 	va_list ap;
 	va_start(ap, fmt);
+#ifndef SGX
 	vfprintf(stderr, fmt, ap);
 	fprintf(stderr, "\n");
+#endif
 	va_end(ap);
 }

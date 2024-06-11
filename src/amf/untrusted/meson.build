@@ -66,12 +66,13 @@ libamf_sources = files('''
 '''.split())
 
 libamf = static_library('amf',
-    sources : libamf_sources,
+    sources : libamf_sources +['./sgx/App.c', 'sgx_api.c'],
     dependencies : [libmetrics_dep,
                     libsctp_dep,
                     libngap_dep,
                     libnas_5gs_dep,
-                    libsbi_dep],
+                    libsbi_dep,
+                    libsgx_dep],
     install : false)
 
 libamf_dep = declare_dependency(
@@ -80,7 +81,8 @@ libamf_dep = declare_dependency(
                     libsctp_dep,
                     libngap_dep,
                     libnas_5gs_dep,
-                    libsbi_dep])
+                    libsbi_dep,
+                    libsgx_dep])
 
 amf_sources = files('''
     app.c
@@ -88,10 +90,10 @@ amf_sources = files('''
 '''.split())
 
 executable('open5gs-amfd',
-    sources : amf_sources +['./sgx/App.c'],
+    sources : amf_sources ,
     c_args : '-DDEFAULT_CONFIG_FILENAME="@0@/amf.yaml"'.format(open5gs_sysconfdir),
     include_directories : srcinc,
-    dependencies : [libamf_dep ,libsgx_dep],
+    dependencies : [libamf_dep],
     install_rpath : libdir,
     install : true)
     
