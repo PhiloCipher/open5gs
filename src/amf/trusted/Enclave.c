@@ -152,17 +152,6 @@ typedef __time_t time_t;
 // #include "ogs-nas-5gs.h"
 
 
-int printf(const char* fmt, ...)
-{
-    // char buf[BUFSIZ] = { '\0' };
-    // va_list ap;
-    // va_start(ap, fmt);
-    // vsnprintf(buf, BUFSIZ, fmt, ap);
-    // va_end(ap);
-    // ocall_print_string(buf);
-    // return (int)strnlen(buf, BUFSIZ - 1) + 1;
-    return 0;
-}
 
 int ogs_asn_decode_sgx(const asn_TYPE_descriptor_t *td,
         void *struct_ptr, size_t struct_size, const void *buffer,size_t size)
@@ -231,6 +220,7 @@ void *sgx_ngap_decode_ecall(const void *pkbuf_data, size_t pkbuf_size)
 {
     NGAP_NGAP_PDU_t *message = malloc(sizeof(NGAP_NGAP_PDU_t));
     int a = ogs_ngap_decode_sgx(message, pkbuf_data, pkbuf_size);
+    printf("ogs_ngap_decode_sgx");
     void *b = message;
     // ogs_ngap_free(message);
     return b;
@@ -244,3 +234,13 @@ int sgx_test_array(char* str, size_t len)
     return 5;
 }
 
+int printf(const char *fmt, ...)
+{
+    char buf[BUFSIZ] = {'\0'};
+    va_list ap;
+    va_start(ap, fmt);
+    vsnprintf(buf, BUFSIZ, fmt, ap);
+    va_end(ap);
+    ocall_print_string(buf);
+    return 0;
+}

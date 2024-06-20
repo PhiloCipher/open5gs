@@ -86,7 +86,7 @@ typedef struct ogs_log_domain_s {
 
 const char *level_strings[] = {
     NULL,
-    "FATAL", "ERROR", "WARNING", "INFO", "DEBUG", "TRACE",
+    "FATAL", "ERROR","SGX LOG", "WARNING", "INFO", "DEBUG", "TRACE",
 };
 
 static OGS_POOL(log_pool, ogs_log_t);
@@ -369,6 +369,7 @@ static ogs_log_level_e ogs_log_level_from_string(const char *string)
     if (!strcasecmp(string, "none")) level = OGS_LOG_NONE;
     else if (!strcasecmp(string, "fatal")) level = OGS_LOG_FATAL;
     else if (!strcasecmp(string, "error")) level = OGS_LOG_ERROR;
+    else if (!strcasecmp(string, "sgxlog")) level = OGS_LOG_SGXLOG;
     else if (!strcasecmp(string, "warn")) level = OGS_LOG_WARN;
     else if (!strcasecmp(string, "info")) level = OGS_LOG_INFO;
     else if (!strcasecmp(string, "debug")) level = OGS_LOG_DEBUG;
