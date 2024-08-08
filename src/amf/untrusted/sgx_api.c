@@ -63,3 +63,16 @@ int sgx_ngap_decode(ogs_ngap_message_t *message, ogs_pkbuf_t *pkbuf)
     // ogs_error("The number is : %d %s.\n",retval,ali );
     return OGS_OK;
 }
+
+
+int sgx_dtls_recv_and_ngap_decode(ogs_ngap_message_t *message, int fd)
+{
+    ogs_assert(message);
+    void *retval = ogs_malloc(sizeof(ogs_ngap_message_t));
+    ogs_error("calling ecall_dtls_recv_and_ngap_decode" );
+    ecall_dtls_recv_and_ngap_decode(global_eid,&retval, fd);
+    ogs_error("returned ecall_dtls_recv_and_ngap_decode" );
+    *message = *(ogs_ngap_message_t *)retval;
+    // ogs_error("The number is : %d %s.\n",retval,ali );
+    return OGS_OK;
+}

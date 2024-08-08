@@ -19,6 +19,9 @@
 
 #include "ogs-sctp.h"
 
+#include "openssl/ssl.h"
+#include <openssl/err.h>
+
 #undef OGS_LOG_DOMAIN
 #define OGS_LOG_DOMAIN __ogs_sock_domain
 
@@ -143,6 +146,7 @@ ogs_sock_t *ogs_sctp_client(
     while (addr) {
         new = ogs_sctp_socket(addr->ogs_sa_family, type);
         if (new) {
+
             rv = ogs_sctp_peer_addr_params(new, &option);
             ogs_assert(rv == OGS_OK);
 
@@ -165,7 +169,7 @@ ogs_sock_t *ogs_sctp_client(
 
             if (ogs_sock_connect(new, addr) == OGS_OK) {
                 ogs_debug("sctp_client() [%s]:%d",
-                        OGS_ADDR(addr, buf), OGS_PORT(addr));
+                        OGS_ADDR(addr, buf), OGS_PORT(addr));                
                 break;
             }
 

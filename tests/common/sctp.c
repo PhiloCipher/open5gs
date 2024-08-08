@@ -91,6 +91,43 @@ ogs_socknode_t *tests1ap_client(int family)
     return node;
 }
 
+SSL *dtls_client(int fd)
+{
+    ogs_msleep(5000);
+    const long flags = SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_NO_COMPRESSION;
+
+    ogs_error("OPENSSL Version = %s\n", SSLeay_version(SSLEAY_VERSION));
+    OpenSSL_add_ssl_algorithms();
+    OpenSSL_add_all_ciphers();
+    SSL_load_error_strings();
+    SSL_CTX *ctx = SSL_CTX_new(DTLSv1_2_method());
+    if (!ctx) {
+        ogs_error("Unable to create SSL context");
+    }
+    SSL_CTX_set_options(ctx, flags);
+    
+    ogs_error("Connecting to DTLS server:\n");
+
+    SSL *ssl = SSL_new(ctx);
+    SSL_set_fd(ssl, fd);
+    
+    if (SSL_connect(ssl) <= 0) {
+        ogs_error("SSL_connect failed");
+        return NULL;
+    }
+    ogs_error("SSL_connect ok");
+
+    // const cfdl, send_buf, strlen(send_buf) + 1);
+    
+    // const char *send_buf2 = "Bye DTLS Server from untrusted part!";
+    // SSL_write(ssl, send_buf2, strlen(send_buf2) + 1);
+    // ogs_msleep(10000);
+    // SSL_write(ssl, send_buf, strlen(send_buf) + 1);
+
+    return ssl;
+}
+
+
 ogs_socknode_t *testngap_client(int family)
 {
     int rv;
@@ -112,6 +149,12 @@ ogs_socknode_t *testngap_client(int family)
 
     sock = ogs_sctp_client(SOCK_STREAM, node->addr, NULL);
     ogs_assert(sock);
+
+    SSL *ssl = dtls_client(sock->fd);
+    ogs_assert(ssl);
+
+    node->ssl = ssl;
+    
 
     node->sock = sock;
     node->cleanup = ogs_sctp_destroy;
@@ -152,6 +195,11 @@ int testsctp_send(ogs_socknode_t *node, ogs_pkbuf_t *pkbuf,
     ogs_assert(node);
     ogs_assert(node->sock);
     ogs_assert(pkbuf);
+
+    ogs_error("testsctp_send starting...");
+    sent = SSL_write(node->ssl, pkbuf->data, pkbuf->len);
+    ogs_error("testsctp_send done!");
+    ogs_msleep(15000);
 
     sent = ogs_sctp_sendmsg(node->sock, pkbuf->data, pkbuf->len,
             type == 1 ? &last_addr : NULL, ppid, stream_no);

@@ -60,6 +60,7 @@ extern "C" {
 #endif
 
 int sgx_ngap_decode(ogs_ngap_message_t *message, ogs_pkbuf_t *pkbuf);
+int sgx_dtls_recv_and_ngap_decode(ogs_ngap_message_t *message, int fd);
 
 #if defined(__cplusplus)
 }

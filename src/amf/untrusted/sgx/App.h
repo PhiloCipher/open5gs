@@ -72,6 +72,10 @@ int initialize_enclave(void);
 void sgx_terminate(int global_eid);
 int sgx_initialize(void);
 int sgx_test(void);
+int start_dtls_server(int client_fd);
+int dtls_recv_handler(int client_fd);
+int dtls_recv_handler2(void *ret,int client_fd);
+
 
 #if defined(__cplusplus)
 }

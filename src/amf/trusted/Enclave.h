@@ -41,7 +41,9 @@
 extern "C" {
 #endif
 
+#ifndef SGX
 #define SGX
+#endif
 
 #include "ogs-ngap.h"
 
@@ -49,7 +51,9 @@ int printf(const char* fmt, ...);
 int ogs_ngap_decode_sgx(NGAP_NGAP_PDU_t *message, const void *buffer,size_t size);
 int ogs_asn_decode_sgx(const asn_TYPE_descriptor_t *td,
         void *struct_ptr, size_t struct_size, const void *buffer,size_t size);
-
+int ocall_print_errors(const char *str, size_t len, void *u);
+// void add_client_ssl_mapping(int client_fd, SSL *ssl);
+// SSL *get_ssl_by_client_fd(int client_fd);
 #if defined(__cplusplus)
 }
 #endif

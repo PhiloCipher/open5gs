@@ -185,7 +185,7 @@ void ocall_print_string(const char *str)
     /* Proxy/Bridge will check the length and null-terminate 
      * the input string to prevent buffer overflow. 
      */
-    // printf("%s", str);
+    ogs_error("%s", str);
     ogs_sgxlog("%s", str);
 }
 
@@ -246,4 +246,33 @@ int sgx_test()
     return OGS_OK;
 }
 
+
+
+int start_dtls_server(int client_fd)
+{
+    int retval;
+    ogs_error("calling start_dtls_server" );
+    //ecall_start_dtls_server(global_eid,&retval, client_fd);
+
+    ecall_dtls_server_initialization(global_eid,&retval, client_fd);
+    return retval;
+    return OGS_OK;
+}
+
+int dtls_recv_handler(int client_fd)
+{
+    int retval;
+    ogs_error("calling start_dtls_recv_handler" );
+    ecall_dtls_recv_handler(global_eid,&retval, client_fd);
+    return retval;
+    return OGS_OK;
+}
+
+
+int dtls_recv_handler2(void *ret, int client_fd)
+{
+    ogs_error("calling start_dtls_recv_handler" );
+    ecall_dtls_recv_and_ngap_decode(global_eid,ret, client_fd);
+    return OGS_OK;
+}
 

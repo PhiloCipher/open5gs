@@ -24,6 +24,9 @@
 #ifndef OGS_SOCKNODE_H
 #define OGS_SOCKNODE_H
 
+#include "openssl/ssl.h"
+#include <openssl/err.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -38,6 +41,7 @@ typedef struct ogs_socknode_s {
     char *dev;
 
     ogs_sock_t *sock;
+    SSL *ssl;
     void (*cleanup)(ogs_sock_t *sock);
     ogs_poll_t *poll;
 

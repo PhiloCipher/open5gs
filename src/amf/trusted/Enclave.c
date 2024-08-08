@@ -59,7 +59,7 @@
 // #endif /* ASN_INTERNAL_H */
 
 #include "Enclave.h"
-#include "Enclave_t.h" /* print_string */
+
 // #include <stdarg.h>
 // #include <stdio.h> /* vsnprintf */
 
@@ -84,10 +84,10 @@
  *   Invokes OCALL to display the enclave buffer to the terminal.
  */
 
-#ifndef FILE
-#define FILE void  // Define FILE as an opaque type
+// #ifndef FILE
+// #define FILE void  // Define FILE as an opaque type
 
-#endif
+// #endif
 
 
 
@@ -150,7 +150,16 @@ typedef __time_t time_t;
 // #include <string.h>
 
 // #include "ogs-nas-5gs.h"
+#undef FILE
+#undef printf
+#include "Ocall_wrappers.h"
+#include "ssl.h"
+#include "openssl/err.h"
+#include "Enclave_t.h" /* print_string */
 
+
+
+#include "sgx_trts.h" //sgx_is_within_enclave
 
 
 int ogs_asn_decode_sgx(const asn_TYPE_descriptor_t *td,
@@ -219,9 +228,11 @@ int ogs_ngap_decode_sgx(NGAP_NGAP_PDU_t *message, const void *buffer,size_t size
 void *sgx_ngap_decode_ecall(const void *pkbuf_data, size_t pkbuf_size) 
 {
     NGAP_NGAP_PDU_t *message = malloc(sizeof(NGAP_NGAP_PDU_t));
+    int c = sgx_is_within_enclave(message,1);
     int a = ogs_ngap_decode_sgx(message, pkbuf_data, pkbuf_size);
-    printf("ogs_ngap_decode_sgx");
+    // printf("ogs_ngap_decode_sgx");
     void *b = message;
+    int d = sgx_is_within_enclave(message->choice.initiatingMessage,1);
     // ogs_ngap_free(message);
     return b;
 
@@ -234,13 +245,328 @@ int sgx_test_array(char* str, size_t len)
     return 5;
 }
 
-int printf(const char *fmt, ...)
+// int printf(const char *fmt, ...)
+// {
+//     char buf[BUFSIZ] = {'\0'};
+//     va_list ap;
+//     va_start(ap, fmt);
+//     vsnprintf(buf, BUFSIZ, fmt, ap);
+//     va_end(ap);
+//     ocall_print_string(buf);
+//     return 0;
+// }
+
+
+
+// static void init_openssl()
+// {
+// 	OpenSSL_add_ssl_algorithms();
+// 	OpenSSL_add_all_ciphers();
+// 	SSL_load_error_strings();
+// }
+
+// static void cleanup_openssl()
+// {
+//     EVP_cleanup();
+// }
+
+// static SSL_CTX *create_context()
+// {
+//     const SSL_METHOD *method;
+//     SSL_CTX *ctx;
+
+//     method = DTLS_server_method();
+
+//     ctx = SSL_CTX_new(method);
+//     if (!ctx) {
+//         printe("Unable to create SSL context");
+//         exit(EXIT_FAILURE);
+//     }
+//     return ctx;
+// }
+
+// static int password_cb(char *buf, int size, int rwflag, void *password)
+// {
+//     strncpy(buf, (char *)(password), size);
+//     buf[size - 1] = '\0';
+//     return strlen(buf);
+// }
+
+// static EVP_PKEY *generatePrivateKey()
+// {
+//     EVP_PKEY *pkey = NULL;
+//     EVP_PKEY_CTX *pctx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, NULL);
+//     EVP_PKEY_keygen_init(pctx);
+//     EVP_PKEY_CTX_set_rsa_keygen_bits(pctx, 2048);
+//     EVP_PKEY_keygen(pctx, &pkey);
+//     return pkey;
+// }
+
+// static X509 *generateCertificate(EVP_PKEY *pkey)
+// {
+//     X509 *x509 = X509_new();
+//     X509_set_version(x509, 2);
+//     ASN1_INTEGER_set(X509_get_serialNumber(x509), 0);
+//     X509_gmtime_adj(X509_get_notBefore(x509), 0);
+//     X509_gmtime_adj(X509_get_notAfter(x509), (long)60*60*24*365);
+//     X509_set_pubkey(x509, pkey);
+
+//     X509_NAME *name = X509_get_subject_name(x509);
+//     X509_NAME_add_entry_by_txt(name, "C", MBSTRING_ASC, (const unsigned char*)"US", -1, -1, 0);
+//     X509_NAME_add_entry_by_txt(name, "CN", MBSTRING_ASC, (const unsigned char*)"YourCN", -1, -1, 0);
+//     X509_set_issuer_name(x509, name);
+//     X509_sign(x509, pkey, EVP_md5());
+//     return x509;
+// }
+
+// static void configure_context(SSL_CTX *ctx)
+// {
+// 	EVP_PKEY *pkey = generatePrivateKey();
+// 	X509 *x509 = generateCertificate(pkey);
+
+// 	SSL_CTX_use_certificate(ctx, x509);
+// 	SSL_CTX_set_default_passwd_cb(ctx, password_cb);
+// 	SSL_CTX_use_PrivateKey(ctx, pkey);
+
+// 	RSA *rsa=RSA_generate_key(512, RSA_F4, NULL, NULL);
+// 	SSL_CTX_set_tmp_rsa(ctx, rsa);
+// 	RSA_free(rsa);
+
+// 	SSL_CTX_set_verify(ctx, SSL_VERIFY_NONE, 0);
+// }
+
+// static int create_socket_server(int port)
+// {
+//     int s, optval = 1;
+//     struct sockaddr_in addr;
+
+//     addr.sin_family = AF_INET;
+//     addr.sin_port = htons(port);
+//     addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+//     s = socket(AF_INET, SOCK_STREAM, 132); // IPPROTO_SCTP = 132, Stream Control Transmission Protocol.  
+//     if (s < 0) {
+//         printe("sgx_socket");
+//         exit(EXIT_FAILURE);
+//     }
+//     if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (const void *)&optval, sizeof(int)) < 0) {
+//         printe("sgx_setsockopt");
+//         exit(EXIT_FAILURE);
+//     }
+//     if (bind(s, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+//         printe("sgx_bind");
+//         exit(EXIT_FAILURE);
+//     }
+//     if (listen(s, 128) < 0) {
+//         printe("sgx_listen");
+//         exit(EXIT_FAILURE);
+//     }
+//     return s;
+// }
+
+// int ecall_start_dtls_server(int client)
+// {
+//     int sock;
+//     SSL_CTX *ctx;
+
+//     printl("OPENSSL Version = %s", SSLeay_version(SSLEAY_VERSION));
+//     init_openssl();
+//     ctx = create_context();
+//     configure_context(ctx);
+
+//     SSL *cli;
+//     unsigned char read_buf[1024];
+//     int r = 0;
+
+
+//     cli = SSL_new(ctx);
+//     SSL_set_fd(cli, client);
+//     if (SSL_accept(cli) <= 0) {
+//         printe("SSL_accept");
+//         exit(EXIT_FAILURE);
+//     }
+    
+//     printl("ciphersuit: %s", SSL_get_current_cipher(cli)->name);
+//     /* Receive buffer from TLS server */
+//     r = SSL_read(cli, read_buf, sizeof(read_buf));
+//     printl("read_buf: length = %d : %s", r, read_buf);
+//     memset(read_buf, 0, sizeof(read_buf));        
+    
+//     printl("Close DTLS client");
+//     SSL_free(cli);
+//     sgx_close(client);
+//     // }
+
+//     sgx_close(sock);
+//     SSL_CTX_free(ctx);
+//     cleanup_openssl();
+
+//     return 0;
+// }
+
+
+static int password_cb(char *buf, int size, int rwflag, void *password)
 {
-    char buf[BUFSIZ] = {'\0'};
-    va_list ap;
-    va_start(ap, fmt);
-    vsnprintf(buf, BUFSIZ, fmt, ap);
-    va_end(ap);
-    ocall_print_string(buf);
+    strncpy(buf, (char *)(password), size);
+    buf[size - 1] = '\0';
+    return strlen(buf);
+}
+
+
+#define MAX_CLIENTS 1024
+
+typedef struct {
+    int client_fd;
+    SSL *ssl;
+} client_ssl_map_t;
+
+client_ssl_map_t client_ssl_map[MAX_CLIENTS];
+
+void add_client_ssl_mapping(int client_fd, SSL *ssl);
+// Function to add a mapping
+void add_client_ssl_mapping(int client_fd, SSL *ssl) {
+    int i;
+    for (i = 0; i < MAX_CLIENTS; ++i) {
+        if (client_ssl_map[i].client_fd == 0) {
+            client_ssl_map[i].client_fd = client_fd;
+            client_ssl_map[i].ssl = ssl;
+            return;
+        }
+    }
+    printe("Mapping array is full, unable to add more clients");
+}
+
+SSL *get_ssl_by_client_fd(int client_fd);
+
+// Function to retrieve SSL* by client_fd
+SSL *get_ssl_by_client_fd(int client_fd) {
+    int i;
+    for (i = 0; i < MAX_CLIENTS; ++i) {
+        if (client_ssl_map[i].client_fd == client_fd) {
+            return client_ssl_map[i].ssl;
+        }
+    }
+    return NULL;
+}
+
+int ocall_print_errors(const char *str, size_t len, void *u) {
+    char *buffer = (char *)u;
+    strncat(buffer, str, len);
+    return 1;
+}
+
+int ecall_dtls_server_initialization(int client)
+{
+    ocall_print_string("Hi from enclave");
+    printl("OPENSSL Version = %s", SSLeay_version(SSLEAY_VERSION));
+    
+    OpenSSL_add_ssl_algorithms();
+    OpenSSL_add_all_ciphers();
+    SSL_load_error_strings();
+    
+
+    SSL_CTX *ctx = SSL_CTX_new(DTLSv1_2_method());
+    if (!ctx) {
+        printe("Unable to create SSL context");
+        exit(EXIT_FAILURE);
+    }
+    
+	//EVP_PKEY *pkey = generatePrivateKey();
+	EVP_PKEY *pkey = NULL;
+    EVP_PKEY_CTX *pctx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, NULL);
+    EVP_PKEY_keygen_init(pctx);
+    EVP_PKEY_CTX_set_rsa_keygen_bits(pctx, 2048);
+    EVP_PKEY_keygen(pctx, &pkey);
+	//X509 *x509 = generateCertificate(pkey);
+	X509 *x509 = X509_new();
+    X509_set_version(x509, 2);
+    ASN1_INTEGER_set(X509_get_serialNumber(x509), 0);
+    X509_gmtime_adj(X509_get_notBefore(x509), 0);
+    X509_gmtime_adj(X509_get_notAfter(x509), (long)60*60*24*365);
+    X509_set_pubkey(x509, pkey);
+
+    X509_NAME *name = X509_get_subject_name(x509);
+    X509_NAME_add_entry_by_txt(name, "C", MBSTRING_ASC, (const unsigned char*)"US", -1, -1, 0);
+    X509_NAME_add_entry_by_txt(name, "CN", MBSTRING_ASC, (const unsigned char*)"YourCN", -1, -1, 0);
+    X509_set_issuer_name(x509, name);
+    X509_sign(x509, pkey, EVP_md5());
+
+	SSL_CTX_use_certificate(ctx, x509);
+	SSL_CTX_set_default_passwd_cb(ctx, password_cb);
+	SSL_CTX_use_PrivateKey(ctx, pkey);
+
+	RSA *rsa=RSA_generate_key(512, RSA_F4, NULL, NULL);
+	SSL_CTX_set_tmp_rsa(ctx, rsa);
+	RSA_free(rsa);
+
+	SSL_CTX_set_verify(ctx, SSL_VERIFY_NONE, 0);
+	
+    
+
+	SSL *cli = SSL_new(ctx);
+    SSL_set_fd(cli, client);
+    volatile long long int i;
+    for (i = 0; i < 15000000000; i++) {};
+    
+    int ssl_accept_ret = SSL_accept(cli);
+    ocall_print_string("SSL_accept called");
+    
+    
+	if (ssl_accept_ret <= 0) {
+        printe("SSL_accept failed");
+        char err_buffer[1024] = {0};
+        ERR_print_errors_cb(ocall_print_errors, err_buffer);
+        ocall_print_string(err_buffer);
+        exit(EXIT_FAILURE);
+    }
+		
+    printl("ciphersuit: %s", SSL_get_current_cipher(cli)->name);
+
+    add_client_ssl_mapping(client, cli);
+
     return 0;
+    
+    /* Receive buffer from TLS server */
+    unsigned char read_buf[1024];
+    int r = SSL_read(cli, read_buf, sizeof(read_buf));
+    ocall_print_string(read_buf);
+    return r;
+
+    memset(read_buf, 0, sizeof(read_buf));        
+    
+    printl("Close SSL/TLS client");
+    SSL_free(cli);
+
+
+    SSL_CTX_free(ctx);
+    EVP_cleanup();
+
+    return 0;
+}
+
+
+int ecall_dtls_recv_handler(int client_fd){
+
+    SSL *cli = get_ssl_by_client_fd(client_fd);
+
+    const char read_buf[1024];
+    int r = 0;
+    r = SSL_read(cli, read_buf, sizeof(read_buf));
+    ocall_print_string(read_buf);
+    return r;
+
+}
+
+
+void *ecall_dtls_recv_and_ngap_decode(int client_fd){
+
+    SSL *cli = get_ssl_by_client_fd(client_fd);
+
+    const char read_buf[1024];
+    int r = 0;
+    r = SSL_read(cli, read_buf, sizeof(read_buf));
+    ocall_print_string(read_buf);
+    
+    return sgx_ngap_decode_ecall(read_buf, r);
+
 }

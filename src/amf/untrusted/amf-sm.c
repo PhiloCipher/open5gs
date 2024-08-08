@@ -849,7 +849,7 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
             ogs_assert(r != OGS_ERROR);
         }
 
-        //ogs_ngap_free(&ngap_message);
+        //ogs_ngap_free(&ngap_message); // TODO: it seems that fields in ngap_message were allocated in enclave and cannot be freed with talloc_free
         ogs_pkbuf_free(pkbuf);
         break;
 

@@ -53,16 +53,23 @@ endif
 configure_file(output : 'sctp-config.h', configuration : libsctp_conf)
 
 libsctp_inc = include_directories('.')
+openssl_inc = include_directories('/home/mahdi/Desktop/Projects/openssl/include')
+# Specify the OpenSSL library paths
+
+# Find the OpenSSL libraries
+libssl = cc.find_library('ssl', dirs : '/home/mahdi/Desktop/Projects/openssl', required : true)
+libcrypto = cc.find_library('crypto', dirs : '/home/mahdi/Desktop/Projects/openssl', required : true)
+
 
 libsctp = library('ogssctp',
     sources : libsctp_sources,
     version : libogslib_version,
     c_args : '-DOGS_SCTP_COMPILATION',
-    include_directories : [libsctp_inc, libinc],
-    dependencies : [libapp_dep, sctp_dep],
+    include_directories : [libsctp_inc, libinc, openssl_inc],
+    dependencies : [libapp_dep, sctp_dep, libssl,libcrypto],
     install : true)
 
 libsctp_dep = declare_dependency(
     link_with : libsctp,
-    include_directories : [libsctp_inc, libinc],
-    dependencies : [libapp_dep, sctp_dep])
+    include_directories : [libsctp_inc, libinc, openssl_inc],
+    dependencies : [libapp_dep, sctp_dep, libssl,libcrypto])
