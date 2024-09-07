@@ -22,7 +22,7 @@
 #include "ngap-path.h"
 // #include "sgx_api.h"
 #include "App.h"
-
+#include <unistd.h>
 
 
 
@@ -71,6 +71,9 @@ ogs_sock_t *ngap_server(ogs_socknode_t *node)
 
 void ngap_recv_upcall(short when, ogs_socket_t fd, void *data)
 {
+    // ogs_error("start ngap_recv_upcall fd=%d", fd);
+    // int ret = start_dtls_server(fd);
+    // ogs_error("after start_dtls_server ret =%d", ret);
     ogs_sock_t *sock = NULL;
 
     ogs_assert(fd != INVALID_SOCKET);
@@ -99,7 +102,7 @@ static void lksctp_accept_handler(short when, ogs_socket_t fd, void *data)
     ngap_accept_handler(data);
 }
 #endif
-
+int is_up = 0;
 
 void ngap_accept_handler(ogs_sock_t *sock)
 {
@@ -110,9 +113,6 @@ void ngap_accept_handler(ogs_sock_t *sock)
 
     new = ogs_sock_accept(sock);
     if (new) {
-
-        // int ret = start_dtls_server(new->fd);
-        // ogs_error("after start_dtls_server ret =%d", ret);
 
         ogs_sockaddr_t *addr = NULL;
 
@@ -125,40 +125,45 @@ void ngap_accept_handler(ogs_sock_t *sock)
 
         ngap_event_push(AMF_EVENT_NGAP_LO_ACCEPT,
                 new, addr, NULL, 0, 0);
+
+        int ret = 0;
+        //ret = start_dtls_server(new->fd);
+        ogs_error("after start_dtls_server ret =%d fd=%d", ret, new->fd);
+        // is_up = 1;
     } else {
         ogs_log_message(OGS_LOG_ERROR, ogs_socket_errno, "accept() failed");
     }
 }
 
-int is_up = 0;
+
 void ngap_recv_handler(ogs_sock_t *sock)
 {
-    if(is_up)
-    {
-        // dtls_recv_handler(sock->fd);
-        ogs_ngap_message_t ngap_message;
-        // sgx_dtls_recv_and_ngap_decode(&ngap_message, sock->fd);
-    void *retval = ogs_malloc(sizeof(ogs_ngap_message_t));
-    ogs_error("calling ecall_dtls_recv_and_ngap_decode" );
-    dtls_recv_handler2(retval, sock->fd);
-    ogs_error("returned ecall_dtls_recv_and_ngap_decode" );
-    ngap_message = *(ogs_ngap_message_t *)retval;
-    if(ngap_message.choice.initiatingMessage->value.choice.AMFConfigurationUpdate.protocolIEs.list.count == 0)
-        ngap_message = *(ogs_ngap_message_t *)retval;
-    // ogs_error("The number is : %d %s.\n",retval,ali );
-        // int rc = sgx_ngap_decode(&ngap_message, pkbuf);
+    // if(is_up)
+    // {
+    //     // dtls_recv_handler(sock->fd);
+    //     ogs_ngap_message_t ngap_message;
+    //     // sgx_dtls_recv_and_ngap_decode(&ngap_message, sock->fd);
+    // void *retval = ogs_malloc(sizeof(ogs_ngap_message_t));
+    // ogs_error("calling ecall_dtls_recv_and_ngap_decode" );
+    // dtls_recv_handler2(retval, sock->fd);
+    // ogs_error("returned ecall_dtls_recv_and_ngap_decode" );
+    // ngap_message = *(ogs_ngap_message_t *)retval;
+    // if(ngap_message.choice.initiatingMessage->value.choice.AMFConfigurationUpdate.protocolIEs.list.count == 0)
+    //     ngap_message = *(ogs_ngap_message_t *)retval;
+    // // ogs_error("The number is : %d %s.\n",retval,ali );
+    //     // int rc = sgx_ngap_decode(&ngap_message, pkbuf);
 
-        // dtls_recv_handler(sock->fd);
+    //     // dtls_recv_handler(sock->fd);
 
-        return;
-    }
+    //     return;
+    // }
 
     ogs_pkbuf_t *pkbuf;
     int size;
     ogs_sockaddr_t *addr = NULL;
     ogs_sockaddr_t from;
     ogs_sctp_info_t sinfo;
-    int flags = 0;
+    int flags = MSG_PEEK;
 
     ogs_assert(sock);
 
@@ -166,11 +171,10 @@ void ngap_recv_handler(ogs_sock_t *sock)
     ogs_assert(pkbuf);
     ogs_pkbuf_put(pkbuf, OGS_MAX_SDU_LEN);
     
-
     //size = dtls_recv_handler(sock->fd);
     size = ogs_sctp_recvmsg(
            sock, pkbuf->data, pkbuf->len, &from, &sinfo, &flags);
-
+           
     if (size < 0 || size >= OGS_MAX_SDU_LEN) {
         ogs_error("ogs_sctp_recvmsg(%d) failed(%d:%s)",
                 size, errno, strerror(errno));
@@ -198,7 +202,7 @@ void ngap_recv_handler(ogs_sock_t *sock)
                 addr = ogs_calloc(1, sizeof(ogs_sockaddr_t));
                 ogs_assert(addr);
                 memcpy(addr, &from, sizeof(ogs_sockaddr_t));
-                    ogs_msleep(10000);
+                    // ogs_msleep(10000);
 
                 int ret = start_dtls_server(sock->fd);
                 ogs_error("after start_dtls_server ret =%d", ret);
@@ -275,8 +279,8 @@ void ngap_recv_handler(ogs_sock_t *sock)
         addr = ogs_calloc(1, sizeof(ogs_sockaddr_t));
         ogs_assert(addr);
         memcpy(addr, &from, sizeof(ogs_sockaddr_t));
-
-        size = dtls_recv_handler(sock->fd);
+        ogs_error("MSG_EOR");
+        dtls_recv_handler(sock->fd, pkbuf->data, pkbuf->len);
 
         ngap_event_push(AMF_EVENT_NGAP_MESSAGE, sock, addr, pkbuf, 0, 0);
         return;

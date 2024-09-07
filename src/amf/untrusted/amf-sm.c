@@ -832,9 +832,9 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
         ogs_assert(gnb);
         ogs_assert(OGS_FSM_STATE(&gnb->sm));
 
-        //rc = ogs_ngap_decode(&ngap_message, pkbuf);
+        rc = ogs_ngap_decode(&ngap_message, pkbuf);
         // ogs_msleep(12000);
-        rc = sgx_ngap_decode(&ngap_message, pkbuf);
+        // rc = sgx_ngap_decode(&ngap_message, pkbuf);
         
         if (rc == OGS_OK) {
             e->gnb = gnb;

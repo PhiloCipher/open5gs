@@ -73,7 +73,7 @@ void sgx_terminate(int global_eid);
 int sgx_initialize(void);
 int sgx_test(void);
 int start_dtls_server(int client_fd);
-int dtls_recv_handler(int client_fd);
+int dtls_recv_handler(int client_fd, void *msg, size_t len);
 int dtls_recv_handler2(void *ret,int client_fd);
 
 

@@ -83,9 +83,9 @@ ogs_poll_t *ogs_pollset_add(ogs_pollset_t *pollset, short when,
 
     ogs_pool_alloc(&pollset->pool, &poll);
     ogs_assert(poll);
-
+    if(fd != 48){
     rc = ogs_nonblocking(fd);
-    ogs_assert(rc == OGS_OK);
+    ogs_assert(rc == OGS_OK);}
     rc = ogs_closeonexec(fd);
     ogs_assert(rc == OGS_OK);
 
@@ -99,7 +99,7 @@ ogs_poll_t *ogs_pollset_add(ogs_pollset_t *pollset, short when,
         poll->data = data;
 
     poll->pollset = pollset;
-
+    
     rc = ogs_pollset_actions.add(poll);
     if (rc != OGS_OK) {
         ogs_error("cannot add poll");

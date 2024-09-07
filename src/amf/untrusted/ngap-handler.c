@@ -743,6 +743,7 @@ void ngap_handle_uplink_nas_transport(
         UserLocationInformation->choice.userLocationInformationNR;
     ogs_assert(UserLocationInformationNR);
     ogs_ngap_ASN_to_5gs_tai(&UserLocationInformationNR->tAI, &nr_tai);
+    nr_tai.tac.v = 1;
 
     served_tai_index = amf_find_served_tai(&nr_tai);
     if (served_tai_index < 0) {

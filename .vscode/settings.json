@@ -41,6 +41,8 @@
         "system_error": "c",
         "buffer.h": "c",
         "ssl_locl.h": "c",
-        "comp.h": "c"
+        "comp.h": "c",
+        "x509.h": "c",
+        "rand.h": "c"
     }
 }

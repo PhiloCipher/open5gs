@@ -74,7 +74,8 @@ enclave {
     public void * sgx_ngap_decode_ecall([in, size= pkbuf_size] const void *pkbuf_data, size_t pkbuf_size);
 
     public int ecall_dtls_server_initialization(int client);
-    public int ecall_dtls_recv_handler(int client);
+    public int ecall_dtls_recv_handler(int client_fd, [out, size=buf_size] char *output_buf, size_t buf_size);
+    public int ecall_dtls_recv_handler_test(int client);
     public void *ecall_dtls_recv_and_ngap_decode(int client);
 
      };

@@ -259,11 +259,14 @@ int start_dtls_server(int client_fd)
     return OGS_OK;
 }
 
-int dtls_recv_handler(int client_fd)
+int dtls_recv_handler(int client_fd, void *msg, size_t len)
 {
     int retval;
     ogs_error("calling start_dtls_recv_handler" );
-    ecall_dtls_recv_handler(global_eid,&retval, client_fd);
+
+
+    ecall_dtls_recv_handler(global_eid,&retval, client_fd, msg, len);
+    
     return retval;
     return OGS_OK;
 }

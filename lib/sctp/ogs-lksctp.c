@@ -245,7 +245,7 @@ int ogs_sctp_recvmsg(ogs_sock_t *sock, void *msg, size_t len,
     socklen_t addrlen = sizeof(struct sockaddr_storage);
     ogs_sockaddr_t addr;
 
-    int flags = 0;
+    int flags = *msg_flags;
     struct sctp_sndrcvinfo sndrcvinfo;
 
     ogs_assert(sock);
