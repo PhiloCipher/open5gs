@@ -121,6 +121,12 @@ add_project_arguments(
     cc.get_supported_arguments(possible_cc_flags),
     language : 'c')
 
+SGX_SDK = '/home/trusslab/sgxsdk'
+OPENSSL_PATH = '/home/trusslab/mehdi/5G/openssl'
+OPENSSL_SGX = '/home/trusslab/mehdi/5G/SGX-OpenSSL/OpenSSL_SGX'
+LINUX_SGX = '/home/trusslab/mehdi/5G/linux-sgx'
+
+
 subdir('configs')
 subdir('lib')
 subdir('src')

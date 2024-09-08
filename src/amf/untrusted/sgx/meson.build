@@ -1,7 +1,5 @@
 
 
-# Define base directories and flags
-SGX_SDK = '/home/mahdi/Desktop/mysgx/sgxsdk'
 
 
 # Common compiler flags

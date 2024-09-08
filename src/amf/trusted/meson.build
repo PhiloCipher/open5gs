@@ -1,5 +1,3 @@
-SGX_SDK = '/home/mahdi/Desktop/mysgx/sgxsdk'
-OpenSSL = '/home/mahdi/Desktop/Projects/SGX-OpenSSL/OpenSSL_SGX'
 
 gen_Enclave_t = custom_target('gen_Enclave_t',
   output: ['Enclave_t.h', 'Enclave_t.c'],
@@ -13,7 +11,7 @@ Enclave_C_Files = ['./Enclave.c']
 Enclave_Cpp_Files = ['./Edger8rSyntax/Arrays.cpp', './Edger8rSyntax/Functions.cpp', './Edger8rSyntax/Pointers.cpp', './Edger8rSyntax/Types.cpp', './TrustedLibrary/Libc.cpp', './TrustedLibrary/Libcxx.cpp', './TrustedLibrary/Thread.cpp', './Ocall_wrappers.cpp']
 
 
-Enclave_Include_Paths = include_directories('../Include', '.', SGX_SDK + '/include', SGX_SDK + '/include/tlibc',SGX_SDK + '/include/libcxx','../../../lib/ngap','../../../lib', '../../../build/lib','../../../lib/asn1c/ngap','../../../lib/asn1c/common','../../../lib/core', OpenSSL + '/ssl', OpenSSL + '/include', OpenSSL)
+Enclave_Include_Paths = include_directories('../Include', '.', SGX_SDK + '/include', SGX_SDK + '/include/tlibc',SGX_SDK + '/include/libcxx','../../../lib/ngap','../../../lib', '../../../build/lib','../../../lib/asn1c/ngap','../../../lib/asn1c/common','../../../lib/core', OPENSSL_SGX + '/ssl', OPENSSL_SGX + '/include', OPENSSL_SGX)
 
 Enclave_C_Flags = ['-nostdinc', '-fvisibility=hidden', '-fpie', '-ffunction-sections', '-fdata-sections']
 Enclave_Cpp_Flags = Enclave_C_Flags + ['-nostdinc++']
@@ -27,7 +25,7 @@ Enclave_Security_Link_Flags = ['-Wl,-z,relro,-z,now,-z,noexecstack']
 
 Enclave_Link_Flags = Enclave_Security_Link_Flags + ['-Wl,--no-undefined', '-nostdlib', '-nostdinc', '-nodefaultlibs', '-nostartfiles','-L'+SGX_SDK+'/lib64',
 	'-Wl,--whole-archive' ,'-lsgx_trts_sim','-Wl,--no-whole-archive',
-	'-L'+OpenSSL,'-lssl', '-lcrypto',
+	'-L'+OPENSSL_SGX,'-lssl', '-lcrypto',
 	'-Wl,--start-group', '-lsgx_tstdc', '-lsgx_tcxx', '-lsgx_tcrypto','-lsgx_tservice_sim', '-Wl,--end-group',
 	'-Wl,-Bstatic', '-Wl,-Bsymbolic', '-Wl,--no-undefined',
 	'-Wl,-pie','-eenclave_entry', '-Wl,--export-dynamic',
@@ -36,7 +34,7 @@ Enclave_Link_Flags = Enclave_Security_Link_Flags + ['-Wl,--no-undefined', '-nost
 
 libsgx_tprotected_fs = SGX_SDK + '/lib64/libsgx_tprotected_fs.a'
 libsgx_pthread = SGX_SDK + '/lib64/libsgx_pthread.a'
-libtlibc = '/home/mahdi/Desktop/Projects/linux-sgx/sdk/tlibc/libtlibc.a'  
+libtlibc = LINUX_SGX + '/sdk/tlibc/libtlibc.a'  
 
 executable('enclave.so',
   sources: [gen_Enclave_t[1]] + Enclave_Cpp_Files + Enclave_C_Files,

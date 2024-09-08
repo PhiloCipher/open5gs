@@ -1097,7 +1097,6 @@ libasn1c_ngap_dep = declare_dependency(
 
 common_c_flags = ['-m64', '-O0', '-g', '-Wall', '-Wextra', '-Winit-self', '-Wpointer-arith', '-Wreturn-type', '-Waddress', '-Wsequence-point', '-Wformat-security', '-Wmissing-include-dirs', '-Wfloat-equal', '-Wundef', '-Wshadow', '-Wcast-align', '-Wcast-qual', '-Wconversion', '-Wredundant-decls', '-fPIC', '-Wno-attributes', '-DDEBUG', '-UNDEBUG', '-UEDEBUG']
 
-SGX_SDK = '/home/mahdi/Desktop/mysgx/sgxsdk'
 Enclave_Include_Paths = include_directories( '.', SGX_SDK + '/include', SGX_SDK + '/include/tlibc',SGX_SDK + '/include/libcxx')
 
 sgx_linker_flags = ['-L' + SGX_SDK + '/lib64', '-lsgx_uprotected_fs']

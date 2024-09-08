@@ -51,14 +51,13 @@ else
 endif
 
 configure_file(output : 'sctp-config.h', configuration : libsctp_conf)
-
 libsctp_inc = include_directories('.')
-openssl_inc = include_directories('/home/mahdi/Desktop/Projects/openssl/include')
+openssl_inc = include_directories(OPENSSL_PATH+'/include')
 # Specify the OpenSSL library paths
 
 # Find the OpenSSL libraries
-libssl = cc.find_library('ssl', dirs : '/home/mahdi/Desktop/Projects/openssl', required : true)
-libcrypto = cc.find_library('crypto', dirs : '/home/mahdi/Desktop/Projects/openssl', required : true)
+libssl = cc.find_library('ssl', dirs : OPENSSL_PATH, required : true)
+libcrypto = cc.find_library('crypto', dirs : OPENSSL_PATH, required : true)
 
 
 libsctp = library('ogssctp',

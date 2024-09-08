@@ -173,7 +173,6 @@ libasn1c_common_dep = declare_dependency(
 
 
 
-SGX_SDK = '/home/mahdi/Desktop/mysgx/sgxsdk'
 Enclave_Include_Paths = include_directories( '.', SGX_SDK + '/include', SGX_SDK + '/include/tlibc',SGX_SDK + '/include/libcxx')
 
 Enclave_C_Flags = ['-nostdinc', '-fvisibility=hidden', '-fpie', '-ffunction-sections', '-fdata-sections']

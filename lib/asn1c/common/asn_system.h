@@ -29,17 +29,17 @@
 #include <stddef.h>	/* for offsetof and ptrdiff_t */
 #include <inttypes.h>	/* for PRIdMAX */
 #else
-#include <../../../../sgxsdk/include/tlibc/stddef.h> /* for size_t */
-#include <../../../../sgxsdk/include/tlibc/sys/types.h> /* for ssize_t */
-#include <../../../../sgxsdk/include/tlibc/stdlib.h> /* for bsearch */
-#include <../../../../sgxsdk/include/tlibc/string.h> /* for memset */
-#include <../../../../sgxsdk/include/tlibc/sys/limits.h> /* for LONG_MIN */
-#include <../../../../sgxsdk/include/tlibc/stdio.h> /* for snprintf */
+#include <tlibc/stddef.h> /* for size_t */
+#include <tlibc/sys/types.h> /* for ssize_t */
+#include <tlibc/stdlib.h> /* for bsearch */
+#include <tlibc/string.h> /* for memset */
+#include <tlibc/sys/limits.h> /* for LONG_MIN */
+#include <tlibc/stdio.h> /* for snprintf */
 #define FILE void
-#include <../../../../sgxsdk/include/sgx_tprotected_fs.h> /* for sgx_fwrite */
+#include <sgx_tprotected_fs.h> /* for sgx_fwrite */
 #define fwrite sgx_fwrite
 #define fflush sgx_fflush
-#include <../../../../sgxsdk/include/tlibc/pthread.h> /* for pthread_create */
+#include <tlibc/pthread.h> /* for pthread_create */
 #endif
 #ifdef	_WIN32
 
