@@ -1373,7 +1373,7 @@ int ecall_dtls_server_initialization(int client)
         printe("SSL_accept failed");
         char err_buffer[1024] = {0};
         ERR_print_errors_cb(ocall_print_errors, err_buffer);
-        ocall_print_string(err_buffer);
+        error(err_buffer);
         exit(EXIT_FAILURE);
     }
 		

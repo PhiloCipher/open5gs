@@ -189,8 +189,11 @@ void ocall_print_string(const char *str)
     ogs_sgxlog("%s", str);
 }
 
-void error(const char *msg) {
+OGS_GNUC_NORETURN void error(const char *msg) {
+    ogs_error("%s", msg);
     ogs_error("SGX ERROR");
+    sgx_terminate(global_eid);
+    ogs_abort();
     // perror(msg);
     // exit(1);
 }

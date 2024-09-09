@@ -66,7 +66,6 @@ void ecall_libc_functions(void);
 void ecall_libcxx_functions(void);
 void ecall_thread_functions(void);
 
-void error(const char *msg);
 void print_error_message(sgx_status_t ret);
 int initialize_enclave(void);
 void sgx_terminate(int global_eid);

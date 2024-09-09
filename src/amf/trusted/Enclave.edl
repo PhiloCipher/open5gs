@@ -82,6 +82,7 @@ enclave {
      
      
     untrusted {
+        void error([in, string] const char *str);
         void ocall_print_string([in, string] const char *str);
         long ocall_sgx_clock(void); // For performance evaluation
         time_t ocall_sgx_time([out, size=t_len]time_t *timep, int t_len);
