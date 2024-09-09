@@ -196,6 +196,12 @@ int testsctp_send(ogs_socknode_t *node, ogs_pkbuf_t *pkbuf,
     ogs_assert(node->sock);
     ogs_assert(pkbuf);
 
+    // char hex_buffer[pkbuf->len * 2 + 1];
+    // int i ;
+    // for (i = 0; i < pkbuf->len; i++) {
+    //     sprintf(&hex_buffer[i * 2], "%02x", ((unsigned char *)pkbuf->data)[i]);
+    // }
+    // ogs_error("SENDBUF len %d as string: %s\n", pkbuf->len, hex_buffer);
 
 
     sent = ogs_sctp_sendmsg(node->sock, pkbuf->data, pkbuf->len,

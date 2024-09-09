@@ -268,8 +268,13 @@ int dtls_recv_handler(int client_fd, void *msg, size_t len)
     ogs_error("calling start_dtls_recv_handler" );
 
 
-    ecall_dtls_recv_handler(global_eid,&retval, client_fd, msg, len);
-    
+    ecall_dtls_recv_handler(global_eid,&retval, client_fd, msg, len+1);
+    // char hex_buffer[len * 2 + 1];
+    // int i ;
+    // for (i = 0; i < len; i++) {
+    //     sprintf(&hex_buffer[i * 2], "%02x", ((unsigned char *)msg)[i]);
+    // }
+    // ogs_error("RECVBUF len %ld as string: %s\n", len, hex_buffer);
     return retval;
     return OGS_OK;
 }
