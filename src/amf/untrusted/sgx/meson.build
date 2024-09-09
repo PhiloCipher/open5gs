@@ -6,10 +6,6 @@
 common_c_flags = ['-m64', '-O0', '-g', '-Wall', '-Wextra', '-Winit-self', '-Wpointer-arith', '-Wreturn-type', '-Waddress', '-Wsequence-point', '-Wformat-security', '-Wmissing-include-dirs', '-Wfloat-equal', '-Wundef', '-Wshadow', '-Wcast-align', '-Wcast-qual', '-Wconversion', '-Wredundant-decls', '-fPIC', '-Wno-attributes', '-DDEBUG', '-UNDEBUG', '-UEDEBUG']
 common_cpp_flags = common_c_flags + ['-std=c++11']
 
-# Compiler and linker flags specific to SGX
-sgx_linker_flags = ['-L' + SGX_SDK + '/lib64', '-lpthread', '-lsgx_urts_sim']
-
-
 
 SGX_EDGER8R = SGX_SDK + '/bin/x64/sgx_edger8r'
 
@@ -36,7 +32,13 @@ cxx = meson.get_compiler('cpp')
 
 # Assuming gen_enclave is your custom target generating Enclave_u.h
 gen_dependency = declare_dependency(sources: gen_enclave)
-sgx_linker_flags = ['-L' + SGX_SDK + '/lib64', '-lpthread', '-lsgx_urts_sim', '-lsgx_uprotected_fs']
+
+# Conditionally add simulation or hardware libraries based on SGX_MODE
+if SGX_MODE == 'HW'
+    sgx_linker_flags = ['-L' + SGX_SDK + '/lib64', '-lpthread', '-lsgx_urts', '-lsgx_uprotected_fs']
+else
+    sgx_linker_flags = ['-L' + SGX_SDK + '/lib64', '-lpthread', '-lsgx_urts_sim', '-lsgx_uprotected_fs']
+endif
 
 
 libsgx_uprotected_fs = SGX_SDK + '/lib64/libsgx_uprotected_fs.a'
