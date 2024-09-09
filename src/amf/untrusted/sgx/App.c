@@ -262,6 +262,14 @@ int start_dtls_server(int client_fd)
     return OGS_OK;
 }
 
+int dtls_server_close(int client_fd)
+{
+    int retval;
+    ogs_error("calling dtls_server_close" );
+    ecall_dtls_server_close(global_eid,&retval, client_fd);
+    return retval;
+}
+
 int dtls_recv_handler(int client_fd, void *msg, size_t len)
 {
     int retval;

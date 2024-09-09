@@ -238,6 +238,8 @@ void ngap_recv_handler(ogs_sock_t *sock)
             ogs_assert(addr);
             memcpy(addr, &from, sizeof(ogs_sockaddr_t));
 
+            dtls_server_close(sock->fd);
+
             ngap_event_push(AMF_EVENT_NGAP_LO_CONNREFUSED,
                     sock, addr, NULL, 0, 0);
             break;

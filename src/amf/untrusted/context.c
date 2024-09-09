@@ -1213,7 +1213,9 @@ amf_gnb_t *amf_gnb_add(ogs_sock_t *sock, ogs_sockaddr_t *addr)
     gnb->sctp.type = amf_gnb_sock_type(gnb->sctp.sock);
 
     if (gnb->sctp.type == SOCK_STREAM) {
-        gnb->sctp.poll.read = ogs_pollset_add(ogs_app()->pollset,
+        // gnb->sctp.poll.read = ogs_pollset_add(ogs_app()->pollset,
+        //     OGS_POLLIN, sock->fd, ngap_recv_upcall, sock);
+        gnb->sctp.poll.read = ogs_pollset_add_blocking(ogs_app()->pollset,
             OGS_POLLIN, sock->fd, ngap_recv_upcall, sock);
         ogs_assert(gnb->sctp.poll.read);
     }

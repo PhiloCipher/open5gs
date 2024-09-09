@@ -83,9 +83,14 @@ ogs_poll_t *ogs_pollset_add(ogs_pollset_t *pollset, short when,
 
     ogs_pool_alloc(&pollset->pool, &poll);
     ogs_assert(poll);
-    if(fd != 48){
+    // if(fd != 47){
+    // rc = ogs_nonblocking(fd);
+    // ogs_assert(rc == OGS_OK);}
+    // else{
+    //     ogs_error("I am here!");
+    // }
     rc = ogs_nonblocking(fd);
-    ogs_assert(rc == OGS_OK);}
+    ogs_assert(rc == OGS_OK);
     rc = ogs_closeonexec(fd);
     ogs_assert(rc == OGS_OK);
 
@@ -109,6 +114,44 @@ ogs_poll_t *ogs_pollset_add(ogs_pollset_t *pollset, short when,
 
     return poll;
 }
+
+ogs_poll_t *ogs_pollset_add_blocking(ogs_pollset_t *pollset, short when,
+        ogs_socket_t fd, ogs_poll_handler_f handler, void *data)
+{
+    ogs_poll_t *poll = NULL;
+    int rc;
+
+    ogs_assert(pollset);
+
+    ogs_assert(fd != INVALID_SOCKET);
+    ogs_assert(handler);
+
+    ogs_pool_alloc(&pollset->pool, &poll);
+    ogs_assert(poll);
+    rc = ogs_closeonexec(fd);
+    ogs_assert(rc == OGS_OK);
+
+    poll->when = when;
+    poll->fd = fd;
+    poll->handler = handler;
+
+    if (data == &self_handler_data)
+        poll->data = poll;
+    else
+        poll->data = data;
+
+    poll->pollset = pollset;
+    
+    rc = ogs_pollset_actions.add(poll);
+    if (rc != OGS_OK) {
+        ogs_error("cannot add poll");
+        ogs_pool_free(&pollset->pool, poll);
+        return NULL;
+    }
+
+    return poll;
+}
+
 
 void ogs_pollset_remove(ogs_poll_t *poll)
 {

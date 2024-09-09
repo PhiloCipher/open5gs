@@ -258,17 +258,17 @@ int sgx_test_array(char* str, size_t len)
 
 
 
-// static void init_openssl()
-// {
-// 	OpenSSL_add_ssl_algorithms();
-// 	OpenSSL_add_all_ciphers();
-// 	SSL_load_error_strings();
-// }
+static void init_openssl()
+{
+	OpenSSL_add_ssl_algorithms();
+	OpenSSL_add_all_ciphers();
+	SSL_load_error_strings();
+}
 
-// static void cleanup_openssl()
-// {
-//     EVP_cleanup();
-// }
+static void cleanup_openssl()
+{
+    EVP_cleanup();
+}
 
 // static SSL_CTX *create_context()
 // {
@@ -475,11 +475,8 @@ int ecall_dtls_server_initialization(int client)
     ocall_print_string("Hi from enclave");
     printl("OPENSSL Version = %s", SSLeay_version(SSLEAY_VERSION));
     
-    OpenSSL_add_ssl_algorithms();
-    OpenSSL_add_all_ciphers();
-    SSL_load_error_strings();
+    init_openssl();
     
-
     SSL_CTX *ctx = SSL_CTX_new(DTLSv1_2_method());
     if (!ctx) {
         printe("Unable to create SSL context");
@@ -531,6 +528,19 @@ int ecall_dtls_server_initialization(int client)
     return 0;
 }
 
+int ecall_dtls_server_close(int client);
+int ecall_dtls_server_close(int client)
+{
+    SSL *cli = get_ssl_by_client_fd(client);
+    ocall_print_string("Close SSL/TLS client");
+    SSL_free(cli);
+    sgx_close(client);
+
+    // SSL_CTX_free(ctx);
+    cleanup_openssl();
+    return 0;
+
+}
 
 int ecall_dtls_recv_handler(int client_fd, char *output_buf, size_t buf_size) {
 
@@ -538,7 +548,7 @@ int ecall_dtls_recv_handler(int client_fd, char *output_buf, size_t buf_size) {
 
     const char read_buf[8192];
     int r = 0;
-        ocall_print_string("SSL_read starting...!");
+    ocall_print_string("SSL_read starting...!");
     r = SSL_read(cli, read_buf, sizeof(read_buf));
     if (r > 0) {
         size_t copy_size = (r < buf_size) ? r : buf_size - 1;
