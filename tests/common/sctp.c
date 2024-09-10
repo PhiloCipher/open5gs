@@ -206,11 +206,9 @@ int testsctp_send(ogs_socknode_t *node, ogs_pkbuf_t *pkbuf,
 
     sent = ogs_sctp_sendmsg(node->sock, pkbuf->data, pkbuf->len,
             type == 1 ? &last_addr : NULL, ppid, stream_no);
-    ogs_error("SSL_write starting...");
-    // const char *send_buf2 = "Bye DTLS Server from untrusted part!";
-    // sent = SSL_write(node->ssl, send_buf2, strlen(send_buf2) + 1);
+    // ogs_error("SSL_write starting...");
     sent = SSL_write(node->ssl, pkbuf->data, pkbuf->len);
-    ogs_error("SSL_write done!");
+    // ogs_error("SSL_write done!");
     // ogs_msleep(15000);
     if (sent < 0 || sent != pkbuf->len) {
         ogs_error("ogs_sctp_sendmsg error (%d:%s)", errno, strerror(errno));

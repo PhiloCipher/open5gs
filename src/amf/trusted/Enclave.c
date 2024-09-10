@@ -33,7 +33,7 @@
 #ifndef SGX
 #define SGX
 #endif
-#include "../tlibc/stdlib.h"
+// #include "../tlibc/stdlib.h"
 
 
 // #ifndef OGS_CORE_H
@@ -92,36 +92,6 @@
 
 
 
-// #ifndef OGS_CORE_H
-// #define OGS_CORE_H
-
-// #endif
-
-// #define _GNU_SOURCE
-// #include "asn_internal.h"
-// #include "constr_TYPE.h"
-// #if defined __USE_MISC && !defined __ASSEMBLER__
-// be32toh a;
-// #endif
-#define _DEFAULT_SOURCE 1
-#define __USE_MISC     1
-// #if defined __USE_MISC && !defined __ASSEMBLER__
-
-// #define _ENDIAN_H
-// #endif
-
-
-// # if __BYTE_ORDER == __LITTLE_ENDIAN
-// #  define be32toh(x) __bswap_32 (x)
-
-// # endif
-// int a = be32toh(2);
-#include <stdbool.h>
-#include <stdint.h>
-uint32_t a =0;
-
-#include <sys/types.h>	/* For size_t */
-
 // #include <sys/socket.h>
 // #define __U32_TYPE		unsigned int
 // #define __U32_TYPE __socklen_t;
@@ -140,26 +110,10 @@ uint32_t a =0;
 // #include <sgx_tcrypto.h>
 // #include <sgx_tseal.h>
 
-typedef __ssize_t ssize_t;
-typedef __time_t time_t;
-// #include "../lib/sgx/include/tlibc/stdlib.h"
-
-#include "ogs-ngap.h"
-
-#include "../../../../sgxsdk/include/tlibc/string.h"
-// #include <string.h>
-
-// #include "ogs-nas-5gs.h"
-#undef FILE
-#undef printf
-#include "Ocall_wrappers.h"
-#include "ssl.h"
-#include "openssl/err.h"
 #include "Enclave_t.h" /* print_string */
 
 
 
-#include "sgx_trts.h" //sgx_is_within_enclave
 
 
 int ogs_asn_decode_sgx(const asn_TYPE_descriptor_t *td,
@@ -342,35 +296,6 @@ static void configure_context(SSL_CTX *ctx)
 	SSL_CTX_set_verify(ctx, SSL_VERIFY_NONE, 0);
 }
 
-// static int create_socket_server(int port)
-// {
-//     int s, optval = 1;
-//     struct sockaddr_in addr;
-
-//     addr.sin_family = AF_INET;
-//     addr.sin_port = htons(port);
-//     addr.sin_addr.s_addr = htonl(INADDR_ANY);
-
-//     s = socket(AF_INET, SOCK_STREAM, 132); // IPPROTO_SCTP = 132, Stream Control Transmission Protocol.  
-//     if (s < 0) {
-//         printe("sgx_socket");
-//         exit(EXIT_FAILURE);
-//     }
-//     if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (const void *)&optval, sizeof(int)) < 0) {
-//         printe("sgx_setsockopt");
-//         exit(EXIT_FAILURE);
-//     }
-//     if (bind(s, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-//         printe("sgx_bind");
-//         exit(EXIT_FAILURE);
-//     }
-//     if (listen(s, 128) < 0) {
-//         printe("sgx_listen");
-//         exit(EXIT_FAILURE);
-//     }
-//     return s;
-// }
-
 // int ecall_start_dtls_server(int client)
 // {
 //     int sock;
@@ -438,7 +363,6 @@ void add_client_ssl_mapping(int client_fd, SSL *ssl) {
     printe("Mapping array is full, unable to add more clients");
 }
 
-SSL *get_ssl_by_client_fd(int client_fd);
 
 // Function to retrieve SSL* by client_fd
 SSL *get_ssl_by_client_fd(int client_fd) {
@@ -450,6 +374,19 @@ SSL *get_ssl_by_client_fd(int client_fd) {
     }
     return NULL;
 }
+
+int delete_ssl_by_client_fd(int client_fd) {
+    int i;
+    for (i = 0; i < MAX_CLIENTS; ++i) {
+        if (client_ssl_map[i].client_fd == client_fd) {
+            SSL_free(client_ssl_map[i].ssl);
+            client_ssl_map[i].client_fd = 0;
+            return 0;
+        }
+    }
+    return 1;
+}
+
 
 int ocall_print_errors(const char *str, size_t len, void *u) {
     char *buffer = (char *)u;
@@ -528,17 +465,14 @@ int ecall_dtls_server_initialization(int client)
     return 0;
 }
 
-int ecall_dtls_server_close(int client);
 int ecall_dtls_server_close(int client)
 {
-    SSL *cli = get_ssl_by_client_fd(client);
-    ocall_print_string("Close SSL/TLS client");
-    SSL_free(cli);
-    sgx_close(client);
-
+    int ret = delete_ssl_by_client_fd(client);
     // SSL_CTX_free(ctx);
     cleanup_openssl();
-    return 0;
+    ocall_print_string("Close SGX client");
+
+    return ret;
 
 }
 
@@ -548,7 +482,7 @@ int ecall_dtls_recv_handler(int client_fd, char *output_buf, size_t buf_size) {
 
     const char read_buf[8192];
     int r = 0;
-    ocall_print_string("SSL_read starting...!");
+    // ocall_print_string("SSL_read starting...!");
     r = SSL_read(cli, read_buf, sizeof(read_buf));
     if (r > 0) {
         size_t copy_size = (r < buf_size) ? r : buf_size - 1;

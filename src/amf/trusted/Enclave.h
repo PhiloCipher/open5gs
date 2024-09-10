@@ -53,8 +53,65 @@ int ogs_asn_decode_sgx(const asn_TYPE_descriptor_t *td,
         void *struct_ptr, size_t struct_size, const void *buffer,size_t size);
 int ocall_print_errors(const char *str, size_t len, void *u);
 
+
+int delete_ssl_by_client_fd(int client_fd);
 // void add_client_ssl_mapping(int client_fd, SSL *ssl);
 // SSL *get_ssl_by_client_fd(int client_fd);
+
+// #ifndef OGS_CORE_H
+// #define OGS_CORE_H
+
+// #endif
+
+// #define _GNU_SOURCE
+// #include "asn_internal.h"
+// #include "constr_TYPE.h"
+// #if defined __USE_MISC && !defined __ASSEMBLER__
+// be32toh a;
+// #endif
+#define _DEFAULT_SOURCE 1
+#define __USE_MISC     1
+// #if defined __USE_MISC && !defined __ASSEMBLER__
+
+// #define _ENDIAN_H
+// #endif
+
+
+// # if __BYTE_ORDER == __LITTLE_ENDIAN
+// #  define be32toh(x) __bswap_32 (x)
+
+// # endif
+// int a = be32toh(2);
+#include <stdbool.h>
+#include <stdint.h>
+// uint32_t a =0;
+
+#include <sys/types.h>	/* For size_t */
+
+
+typedef __ssize_t ssize_t;
+typedef __time_t time_t;
+// #include "../lib/sgx/include/tlibc/stdlib.h"
+
+#include "ogs-ngap.h"
+
+// #include "../../../../sgxsdk/include/tlibc/string.h"
+// #include <string.h>
+
+
+
+
+// #include "ogs-nas-5gs.h"
+#undef FILE
+#undef printf
+#include "Ocall_wrappers.h"
+#include "ssl.h"
+#include "openssl/err.h"
+
+#include "sgx_trts.h" //sgx_is_within_enclave
+
+SSL *get_ssl_by_client_fd(int client_fd);
+
 #if defined(__cplusplus)
 }
 #endif

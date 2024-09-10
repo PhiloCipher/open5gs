@@ -281,7 +281,7 @@ void ngap_recv_handler(ogs_sock_t *sock)
         addr = ogs_calloc(1, sizeof(ogs_sockaddr_t));
         ogs_assert(addr);
         memcpy(addr, &from, sizeof(ogs_sockaddr_t));
-        ogs_error("MSG_EOR");
+        // ogs_error("MSG_EOR");
         dtls_recv_handler(sock->fd, pkbuf->data, pkbuf->len);
 
         ngap_event_push(AMF_EVENT_NGAP_MESSAGE, sock, addr, pkbuf, 0, 0);

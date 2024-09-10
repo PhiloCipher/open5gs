@@ -273,8 +273,7 @@ int dtls_server_close(int client_fd)
 int dtls_recv_handler(int client_fd, void *msg, size_t len)
 {
     int retval;
-    ogs_error("calling start_dtls_recv_handler" );
-
+    // ogs_error("calling start_dtls_recv_handler" );
 
     ecall_dtls_recv_handler(global_eid,&retval, client_fd, msg, len+1);
     // char hex_buffer[len * 2 + 1];
