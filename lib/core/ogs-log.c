@@ -86,7 +86,7 @@ typedef struct ogs_log_domain_s {
 
 const char *level_strings[] = {
     NULL,
-    "FATAL", "ERROR", "WARNING", "INFO", "DEBUG", "TRACE",
+    "FATAL", "ERROR", "CRITICAL", "INSPECT","WARNING", "INFO", "DEBUG", "TRACE",
 };
 
 static OGS_POOL(log_pool, ogs_log_t);
@@ -369,6 +369,8 @@ static ogs_log_level_e ogs_log_level_from_string(const char *string)
     if (!strcasecmp(string, "none")) level = OGS_LOG_NONE;
     else if (!strcasecmp(string, "fatal")) level = OGS_LOG_FATAL;
     else if (!strcasecmp(string, "error")) level = OGS_LOG_ERROR;
+    else if (!strcasecmp(string, "critical")) level = OGS_LOG_CRITICAL;
+    else if (!strcasecmp(string, "inspect")) level = OGS_LOG_INSPECT;
     else if (!strcasecmp(string, "warn")) level = OGS_LOG_WARN;
     else if (!strcasecmp(string, "info")) level = OGS_LOG_INFO;
     else if (!strcasecmp(string, "debug")) level = OGS_LOG_DEBUG;
@@ -386,7 +388,7 @@ int ogs_log_config_domain(const char *domain, const char *level)
             l = ogs_log_level_from_string(level);
             if (l == OGS_ERROR) {
                 ogs_error("Invalid LOG-LEVEL "
-                        "[none:fatal|error|warn|info|debug|trace]: %s\n",
+                        "[none:fatal|error|critical|inspect|warn|info|debug|trace]: %s\n",
                         level);
                 return OGS_ERROR;
             }
@@ -594,7 +596,7 @@ static char *log_level(char *buf, char *last,
 {
     const char *colors[] = {
         TA_NOR,
-        TA_FGC_BOLD_RED, TA_FGC_BOLD_YELLOW, TA_FGC_BOLD_CYAN,
+        TA_FGC_BOLD_RED, TA_FGC_BOLD_YELLOW, TA_FGC_BOLD_MAGENTA, TA_FGC_YELLOW, TA_FGC_BOLD_CYAN,
         TA_FGC_BOLD_GREEN, TA_FGC_BOLD_WHITE, TA_FGC_WHITE,
     };
 
