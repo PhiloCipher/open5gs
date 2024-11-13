@@ -51,6 +51,9 @@ typedef struct ogs_global_conf_s {
         int no_sepp;
         int no_scp;
         int no_nrf;
+        #ifdef AnonyCore
+        int no_maf;
+        #endif
 
         int amf_count;
         int smf_count;
@@ -61,6 +64,9 @@ typedef struct ogs_global_conf_s {
         int nssf_count;
         int bsf_count;
         int udr_count;
+        #ifdef AnonyCore
+        int maf_count;
+        #endif
 
         /* Network */
         int no_ipv4;

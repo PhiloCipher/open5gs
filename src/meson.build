@@ -52,3 +52,7 @@ subdir('ausf')
 subdir('upf')
 subdir('smf')
 subdir('amf')
+
+if ogs_mode == 'AnonyCore'
+    subdir('maf')
+endif

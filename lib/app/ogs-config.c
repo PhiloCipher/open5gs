@@ -154,7 +154,10 @@ int ogs_app_count_nf_conf_sections(const char *conf_section)
         global_conf.parameter.bsf_count++;
     else if (!strcmp(conf_section, "udr"))
         global_conf.parameter.udr_count++;
-
+    #ifdef AnonyCore
+    else if (!strcmp(conf_section, "maf"))
+        global_conf.parameter.maf_count++;
+    #endif
     return OGS_OK;
 }
 

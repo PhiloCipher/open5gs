@@ -35,7 +35,9 @@ static ogs_thread_t *pcf_threads[OGS_MAX_NF_INSTANCES] = { NULL };
 static ogs_thread_t *nssf_threads[OGS_MAX_NF_INSTANCES] = { NULL };
 static ogs_thread_t *bsf_threads[OGS_MAX_NF_INSTANCES] = { NULL };
 static ogs_thread_t *udr_threads[OGS_MAX_NF_INSTANCES] = { NULL };
-
+#ifdef AnonyCore
+static ogs_thread_t *maf_threads[OGS_MAX_NF_INSTANCES] = { NULL };
+#endif
 
 static void run_threads(const char *nf_name, int count,
         const char *argv_out[], int argv_out_idx, ogs_thread_t *threads[])
@@ -123,7 +125,11 @@ int app_initialize(const char *const argv[])
     if (ogs_global_conf()->parameter.no_udr == 0)
         run_threads("udr", ogs_global_conf()->parameter.udr_count,
                 argv_out, i, udr_threads);
-
+    #ifdef AnonyCore
+    if (ogs_global_conf()->parameter.no_maf == 0)
+        run_threads("maf", ogs_global_conf()->parameter.maf_count,
+                argv_out, i, maf_threads);
+    #endif
     /*
      * Wait for all sockets listening
      * 
@@ -157,6 +163,10 @@ void app_terminate(void)
             ogs_thread_destroy(udm_threads[i]);
         if (ausf_threads[i])
             ogs_thread_destroy(ausf_threads[i]);
+        #ifdef AnonyCore
+        if (maf_threads[i])
+            ogs_thread_destroy(maf_threads[i]);
+        #endif
     }
 
     if (sepp_thread) ogs_thread_destroy(sepp_thread);

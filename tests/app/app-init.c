@@ -36,6 +36,9 @@ static ogs_thread_t *pcf_thread = NULL;
 static ogs_thread_t *nssf_thread = NULL;
 static ogs_thread_t *bsf_thread = NULL;
 static ogs_thread_t *udr_thread = NULL;
+#ifdef AnonyCore
+static ogs_thread_t *maf_thread = NULL;
+#endif
 
 int app_initialize(const char *const argv[])
 {
@@ -95,7 +98,10 @@ int app_initialize(const char *const argv[])
         bsf_thread = test_child_create("bsf", argv_out);
     if (ogs_global_conf()->parameter.no_udr == 0)
         udr_thread = test_child_create("udr", argv_out);
-
+    #ifdef AnonyCore
+    if (ogs_global_conf()->parameter.no_maf == 0)
+        maf_thread = test_child_create("maf", argv_out);
+    #endif
     /*
      * Wait for all sockets listening
      *
@@ -130,6 +136,9 @@ void app_terminate(void)
     if (sepp_thread) ogs_thread_destroy(sepp_thread);
     if (scp_thread) ogs_thread_destroy(scp_thread);
     if (nrf_thread) ogs_thread_destroy(nrf_thread);
+    #ifdef AnonyCore
+    if (maf_thread) ogs_thread_destroy(maf_thread);
+    #endif
 }
 
 void test_app_init(void)

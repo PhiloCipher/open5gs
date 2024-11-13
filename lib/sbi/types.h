@@ -161,6 +161,11 @@ typedef enum {
 #define OGS_SBI_SERVICE_NAME_NAMF_CALLBACK "namf-callback"
 #define OGS_SBI_SERVICE_NAME_NSMF_CALLBACK "nsmf-callback"
 
+#ifdef AnonyCore
+#define OGS_SBI_SERVICE_NAME_NMAF_FIRST "nmaf-first"
+#define OGS_SBI_SERVICE_NAME_NMAF_SECOND "nmaf-second"
+#endif
+
 OpenAPI_nf_type_e ogs_sbi_service_type_to_nf_type(
         ogs_sbi_service_type_e service_type);
 const char *ogs_sbi_service_type_to_name(ogs_sbi_service_type_e service_type);

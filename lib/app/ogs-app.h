@@ -100,6 +100,11 @@ void scp_terminate(void);
 int sepp_initialize(void);
 void sepp_terminate(void);
 
+#ifdef AnonyCore
+int maf_initialize(void);
+void maf_terminate(void);
+#endif
+
 #ifdef __cplusplus
 }
 #endif

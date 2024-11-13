@@ -40,6 +40,10 @@ open5gs_conf = '''
     bsf.yaml
 '''.split()
 
+if ogs_mode == 'AnonyCore'
+    open5gs_conf += 'maf.yaml'
+endif
+
 foreach file : open5gs_conf
     gen = configure_file(
             input : file + '.in',

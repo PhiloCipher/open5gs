@@ -1,2 +1,4 @@
 option('fuzzing', type: 'boolean', value: false, description: 'Enable fuzzing tests')
 option('lib_fuzzing_engine', type : 'string', value : '', description : 'Path to the libFuzzer engine library')
+
+option('OGS_MODE', type : 'combo', choices : ['Vanilla', 'AnonyCore','Gramine'], value : 'AnonyCore', description : 'OGS mode')

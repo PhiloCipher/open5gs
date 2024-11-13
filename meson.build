@@ -121,6 +121,16 @@ add_project_arguments(
     cc.get_supported_arguments(possible_cc_flags),
     language : 'c')
 
+
+ogs_mode = get_option('OGS_MODE') 
+if ogs_mode == 'AnonyCore'
+    anonycore_args = ['-DAnonyCore']
+else
+    anonycore_args = []
+endif
+add_project_arguments(anonycore_args, language : 'c')
+
+
 subdir('configs')
 subdir('lib')
 subdir('src')
