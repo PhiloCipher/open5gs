@@ -2,3 +2,10 @@ option('fuzzing', type: 'boolean', value: false, description: 'Enable fuzzing te
 option('lib_fuzzing_engine', type : 'string', value : '', description : 'Path to the libFuzzer engine library')
 
 option('OGS_MODE', type : 'combo', choices : ['Vanilla', 'AnonyCore','Gramine'], value : 'AnonyCore', description : 'OGS mode')
+
+option('SGX_MODE', type : 'combo', choices : ['HW', 'SIM'], value : 'HW', description : 'SGX mode')
+option('SGX_ARCH', type : 'combo', choices : ['x64', 'x86'], value : 'x64', description : 'SGX architecture')
+option('SGX_DEBUG', type : 'boolean', value : true, description : 'Enable SGX debug')
+option('SGX_PRERELEASE', type : 'boolean', value : false, description : 'Enable SGX pre-release mode')
+option('SGX_SDK', type : 'string', value : '/home/trusslab/sgxsdk', description : 'Path to Intel SGX SDK')
+option('LAv2', type : 'boolean', value : false, description : 'Enable LAv2 for Enclave Initiator')

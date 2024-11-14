@@ -18,6 +18,7 @@
  */
 
 #include "ogs-app.h"
+#include "enclave_api.h"
 
 int app_initialize(const char *const argv[])
 {
@@ -30,11 +31,17 @@ int app_initialize(const char *const argv[])
     }
     ogs_info("MAF initialize...done");
 
+    int r = initialize_enclave();
+    if (r != OGS_OK) {
+        ogs_error("Failed to initialize MAF Enclave");
+        return rv;
+    }
     return OGS_OK;
 }
 
 void app_terminate(void)
 {
+    enclave_terminate();
     maf_terminate();
     ogs_info("MAF terminate...done");
 }
