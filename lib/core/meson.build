@@ -325,3 +325,93 @@ libcore_dep = declare_dependency(
     link_with : libcore,
     include_directories : [libcore_inc, libinc],
     dependencies : [threads, librt, libexecinfo, libsocket, libtalloc_dep])
+
+
+if ogs_mode == 'AnonyCore'
+
+    libcore_sources = files('''
+        ogs-core.h
+
+        ogs-compat.h
+        ogs-macros.h
+        ogs-pool.h
+        ogs-list.h
+        ogs-abort.h
+        ogs-errno.h
+        ogs-strings.h
+        ogs-time.h
+        ogs-conv.h
+        ogs-log.h
+        ogs-pkbuf.h
+        ogs-memory.h
+        ogs-rbtree.h
+        ogs-timer.h
+        ogs-rand.h
+        ogs-uuid.h
+        ogs-thread.h
+        ogs-signal.h
+        ogs-process.h
+        ogs-sockaddr.h
+        ogs-socket.h
+        ogs-sockopt.h
+        ogs-sockpair.h
+        ogs-socknode.h
+        ogs-udp.h
+        ogs-tcp.h
+        ogs-queue.h
+        ogs-poll.h
+        ogs-notify.h
+        ogs-tlv.h
+        ogs-tlv-msg.h
+        ogs-env.h
+        ogs-fsm.h
+        ogs-hash.h
+        ogs-misc.h
+        ogs-getopt.h
+        ogs-file.h
+        abts.h
+
+        ogs-abort.c
+        ogs-errno.c
+        ogs-strings.c
+        ogs-conv.c
+        ogs-pkbuf.c
+        ogs-memory.c
+        ogs-rbtree.c
+        ogs-timer.c
+        ogs-rand.c
+        ogs-thread.c
+        ogs-signal.c
+
+        ogs-tlv.c
+        ogs-tlv-msg.c
+        ogs-env.c
+        ogs-fsm.c
+        ogs-hash.c
+        ogs-getopt.c
+        ogs-file.c
+        ogs-core.c
+    '''.split())
+
+    libsgx_core_conf = configuration_data()
+    libsgx_core_conf.set('HAVE_STRERROR_R', 1,description: 'Define to 1 since sgx supports')
+    libsgx_core_conf.set('HAVE_GETRANDOM', 1,description: 'Define to 1 since sgx supports')
+    libsgx_core_conf.set('HAVE_CTYPE_H', 1,description: 'Define to 1 since sgx supports')
+    libsgx_core_conf.set('HAVE_LIMITS_H', 1,description: 'Define to 1 since sgx supports')
+    configure_file(output : 'sgx-core-config-private.h', configuration : libsgx_core_conf)
+    
+    
+
+    sgx_libcore = static_library('sgx_ogscore',
+    sources : libcore_sources,
+    c_args : sgx_common_cflags + enclave_c_flags + ['-DOGS_CORE_COMPILATION','-DSGX_LIB_COMPILATION'],
+    include_directories : [libcore_inc, libinc, enclave_include_paths],
+    dependencies : [],
+    install : true)
+
+    sgx_libcore_dep = declare_dependency(
+        link_with : sgx_libcore,
+        include_directories : [libcore_inc, libinc, enclave_include_paths],
+        dependencies : [])
+endif
+

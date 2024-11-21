@@ -17,7 +17,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#ifdef SGX_LIB_COMPILATION
+#include "sgx-core-config-private.h"
+#else
 #include "core-config-private.h"
+#endif
 
 #if HAVE_SYS_PARAM_H
 #include <sys/param.h>
@@ -25,6 +29,8 @@
 
 #if HAVE_SYS_RANDOM_H
 #include <sys/random.h>
+#elif SGX_LIB_COMPILATION
+#include "sgx_trts.h"
 #endif
 
 #if HAVE_FCNTL_H
@@ -43,7 +49,11 @@ void ogs_random(void *buf, size_t buflen)
     void arc4random_buf(void *buf, size_t n);
     arc4random_buf(buf, buflen);
 #elif defined(HAVE_GETRANDOM)
+#ifdef SGX_LIB_COMPILATION
+    int rc = sgx_read_rand(buf, buflen);
+#else
     int rc = getrandom(buf, buflen, GRND_NONBLOCK);
+#endif
     if (rc < 0) {
         ogs_log_message(OGS_LOG_FATAL, ogs_errno, "getrandom() failed");
         ogs_assert_if_reached();

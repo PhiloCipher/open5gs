@@ -17,7 +17,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#ifdef SGX_LIB_COMPILATION
+#include "sgx-core-config-private.h"
+#else
 #include "core-config-private.h"
+#endif
 
 #if HAVE_CTYPE_H
 #include <ctype.h>
@@ -117,7 +121,9 @@ void ogs_log_init(void)
     ogs_pool_init(&domain_pool, ogs_core()->log.domain_pool);
 
     ogs_log_add_domain("core", ogs_core()->log.level);
+#ifndef SGX_LIB_COMPILATION
     ogs_log_add_stderr();
+#endif
 }
 
 void ogs_log_final(void)
@@ -147,7 +153,7 @@ void ogs_log_cycle(void)
         }
     }
 }
-
+#ifndef SGX_LIB_COMPILATION
 ogs_log_t *ogs_log_add_stderr(void)
 {
     ogs_log_t *log = NULL;
@@ -164,7 +170,7 @@ ogs_log_t *ogs_log_add_stderr(void)
 
     return log;
 }
-
+#endif
 ogs_log_t *ogs_log_add_file(const char *name)
 {
     FILE *out = NULL;
@@ -415,7 +421,9 @@ void ogs_log_vprintf(ogs_log_level_e level, int id,
     ogs_list_for_each(&log_list, log) {
         domain = ogs_pool_find(&domain_pool, id);
         if (!domain) {
+            #ifndef SGX_LIB_COMPILATION
             fprintf(stderr, "No LogDomain[id:%d] in %s:%d", id, file, line);
+            #endif
             ogs_assert_if_reached();
         }
         if (domain->level < level)
@@ -476,9 +484,10 @@ void ogs_log_vprintf(ogs_log_level_e level, int id,
             p = ogs_slprintf(p, last, " %s()", func);
             p = log_linefeed(p, last);
         }
-
+#ifndef SGX_LIB_COMPILATION
         fprintf(stderr, "%s", logstr);
         fflush(stderr);
+    #endif
     }
 }
 

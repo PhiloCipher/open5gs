@@ -67,7 +67,6 @@ typedef struct ogs_proc_s {
     FILE *stdin_file;
     FILE *stdout_file;
     FILE *stderr_file;
-
 #if defined(_WIN32)
     void *hProcess;
     unsigned long dwProcessId;

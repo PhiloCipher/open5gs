@@ -43,7 +43,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#ifdef SGX_LIB_COMPILATION
+#include "sgx-core-config-private.h"
+#else
 #include "core-config-private.h"
+#endif
 
 #if HAVE_FCNTL_H
 #include <fcntl.h>
@@ -142,7 +146,7 @@ char *ogs_cpystrn(char *dst, const char *src, size_t dst_size)
 
     return (d);
 }
-
+#ifndef SGX_LIB_COMPILATION   
 /*****************************************
  * Memory Pool - Use talloc library
  *****************************************/
@@ -221,7 +225,7 @@ char *ogs_talloc_asprintf_append(char *s, const char *fmt, ...)
 
     return s;
 }
-
+#endif
 
 /*****************************************
  * Memory Pool - Use pkbuf library

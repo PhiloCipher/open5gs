@@ -44,6 +44,12 @@ int initialize_enclave(void)
         print_error_message(ret);
         return -1;
     }
+    // void *retval = ogs_malloc(sizeof(int));
+    // ret = ecall_initialization(global_eid, retval);
+    // if (ret != SGX_SUCCESS) {
+    //     print_error_message(ret);
+    //     return -1;
+    // }
     return 0;
 }
 

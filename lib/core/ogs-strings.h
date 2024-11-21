@@ -81,7 +81,7 @@ char *ogs_slprintf(char *str, char *last, const char *format, ...)
     } while(0)
 
 char *ogs_cpystrn(char *dst, const char *src, size_t dst_size);
-
+#ifndef SGX_LIB_COMPILATION
 char *ogs_talloc_strdup(const void *t, const char *p);
 char *ogs_talloc_strndup(const void *t, const char *p, size_t n);
 void *ogs_talloc_memdup(const void *t, const void *p, size_t size);
@@ -89,7 +89,7 @@ char *ogs_talloc_asprintf(const void *t, const char *fmt, ...)
     OGS_GNUC_PRINTF(2, 3);
 char *ogs_talloc_asprintf_append(char *s, const char *fmt, ...)
     OGS_GNUC_PRINTF(2, 3);
-
+#endif
 char *ogs_strdup_debug(const char *s, const char *file_line);
 char *ogs_strndup_debug(const char *s, size_t n, const char *file_line);
 void *ogs_memdup_debug(const void *m, size_t n, const char *file_line);

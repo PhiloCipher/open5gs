@@ -24,9 +24,54 @@
 
 #define OGS_CORE_INSIDE
 
+
+
+
+#ifdef SGX_LIB_COMPILATION   
+#include "core/ogs-compat.h"
+
+#include "core/ogs-macros.h"
+#include "core/ogs-list.h"
+#include "core/ogs-pool.h"
+#include "core/ogs-abort.h"
+#include "core/ogs-strings.h"
+#include "core/ogs-errno.h"
+#include "core/ogs-time.h"
+#include "core/ogs-conv.h"
+#include "core/ogs-log.h"
+#include "core/ogs-pkbuf.h"
+#include "core/ogs-memory.h"
+#include "core/ogs-rand.h"
+#include "core/ogs-uuid.h"
+#include "core/ogs-rbtree.h"
+#include "core/ogs-timer.h"
+#include "core/ogs-thread.h"
+// #include "core/ogs-process.h"
+#include "core/ogs-signal.h"
+// #include "core/ogs-sockaddr.h"
+// #include "core/ogs-socket.h"
+// #include "core/ogs-sockopt.h"
+// #include "core/ogs-sockpair.h"
+// #include "core/ogs-socknode.h"
+// #include "core/ogs-udp.h"
+// #include "core/ogs-tcp.h"
+// #include "core/ogs-queue.h" // because of ogs_thread_cond_timedwait
+// #include "core/ogs-poll.h"
+// #include "core/ogs-notify.h"
+#include "core/ogs-tlv.h"
+#include "core/ogs-tlv-msg.h"
+#include "core/ogs-env.h"
+#include "core/ogs-fsm.h"
+#include "core/ogs-hash.h"
+#include "core/ogs-misc.h"
+#include "core/ogs-getopt.h"
+#include "core/ogs-file.h"
+
+#else
 #define OGS_USE_TALLOC 1
 
 #include "core/ogs-compat.h"
+
 #include "core/ogs-macros.h"
 #include "core/ogs-list.h"
 #include "core/ogs-pool.h"
@@ -63,6 +108,7 @@
 #include "core/ogs-misc.h"
 #include "core/ogs-getopt.h"
 #include "core/ogs-file.h"
+#endif
 
 #undef OGS_CORE_INSIDE
 

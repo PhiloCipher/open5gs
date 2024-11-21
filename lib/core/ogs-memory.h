@@ -40,9 +40,9 @@ void *ogs_mem_get_mutex(void);
             (__dATA) = NULL; \
         } \
     } while(0)
-
+#ifndef SGX_LIB_COMPILATION
 #include <talloc.h>
-
+#endif
 extern void *__ogs_talloc_core;
 
 void *ogs_talloc_size(const void *ctx, size_t size, const char *name);

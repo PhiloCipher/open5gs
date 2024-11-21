@@ -41,6 +41,7 @@ extern "C" {
 #define ogs_thread_cond_t pthread_cond_t
 #define ogs_thread_cond_init(_n) (void)pthread_cond_init((_n), NULL)
 #define ogs_thread_cond_wait pthread_cond_wait
+#ifndef SGX_LIB_COMPILATION
 static ogs_inline int ogs_thread_cond_timedwait(
         pthread_cond_t *cond, pthread_mutex_t *mutex, ogs_time_t timeout)
 {
@@ -64,6 +65,7 @@ static ogs_inline int ogs_thread_cond_timedwait(
     else 
         return OGS_ERROR;
 }
+#endif
 #define ogs_thread_cond_signal (void)pthread_cond_signal
 #define ogs_thread_cond_broadcast pthread_cond_broadcast
 #define ogs_thread_cond_destroy (void)pthread_cond_destroy

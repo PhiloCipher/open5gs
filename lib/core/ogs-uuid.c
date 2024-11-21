@@ -32,7 +32,11 @@
  * limitations under the License.
  */
 
+#ifdef SGX_LIB_COMPILATION
+#include "sgx-core-config-private.h"
+#else
 #include "core-config-private.h"
+#endif
 
 #if HAVE_CTYPE_H
 #include <ctype.h>

@@ -47,6 +47,32 @@
 
 #else /* !defined(_WIN32) */
 
+
+
+#ifdef SGX_LIB_COMPILATION   
+#include <stdio.h>
+#include "sgx_tprotected_fs.h"
+#define FILE SGX_FILE
+#define fopen sgx_fopen_auto_key
+#define fread sgx_fread
+#define fclose sgx_fclose
+
+#include <stddef.h>
+#include <stdio.h>
+#include <stddef.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdlib.h>
+// #include "libc_override.h" // for malloc, free, realloc
+#include <string.h>
+#include <time.h>
+#include <errno.h>   
+
+#include <pthread.h>
+
+#include <time.h>
+
+#else 
 #include <stdio.h>
 #include <stddef.h>
 #include <stdbool.h>
@@ -54,12 +80,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <errno.h>
+#include <errno.h>    
 #include <arpa/inet.h>
 #include <pthread.h>
 #include <sys/time.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#endif
 
 #endif
 

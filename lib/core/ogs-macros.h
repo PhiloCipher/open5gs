@@ -111,8 +111,26 @@ extern "C" {
 #include <sys/endian.h>
 
 #elif defined(__linux__)
+#ifdef SGX_LIB_COMPILATION
 #include <endian.h>
+/// Transform big endian uint32_t to host uint32_t
+#define be32toh(big_endian_32bits)                                  \
+  ((uint32_t)(((((unsigned char*)&(big_endian_32bits))[0]) << 24) + \
+              ((((unsigned char*)&(big_endian_32bits))[1]) << 16) + \
+              ((((unsigned char*)&(big_endian_32bits))[2]) << 8) +  \
+              (((unsigned char*)&(big_endian_32bits))[3])))
+/// Transform host uint32_t to big endian uint32_t
+#define htobe32(host_32bits)                                 \
+  (uint32_t)(((((uint32_t)(host_32bits)) & 0xFF) << 24) |    \
+             ((((uint32_t)(host_32bits)) & 0xFF00) << 8) |   \
+             ((((uint32_t)(host_32bits)) & 0xFF0000) >> 8) | \
+             ((((uint32_t)(host_32bits)) & 0xFF000000) >> 24))
 
+#  define htobe16(x) __builtin_bswap16(x)
+
+#else
+#include <endian.h>
+#endif
 #endif
 
 #ifndef WORDS_BIGENDIAN

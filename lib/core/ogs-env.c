@@ -17,7 +17,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#ifdef SGX_LIB_COMPILATION
+#include "sgx-core-config-private.h"
+#else
 #include "core-config-private.h"
+#endif
 
 #include "ogs-core.h"
 

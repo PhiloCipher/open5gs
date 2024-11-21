@@ -7,8 +7,8 @@
 int ecall_initialization()
 {
     ocall_print_string("Hi from enclave");
-
-    return 0;
+    ogs_pkbuf_t *pkbuf = NULL;
+    return 5;
 }
 
 int ecall_dtls_server_close()

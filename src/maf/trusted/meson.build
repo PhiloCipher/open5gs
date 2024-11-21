@@ -54,9 +54,10 @@ enclave_file = shared_library(
     enclave_name,
     enclave_source_files,
     include_directories: enclave_include_paths,
-    c_args: sgx_common_cflags + enclave_c_flags,
-    cpp_args: sgx_common_cxxflags + enclave_cpp_flags,
+    c_args: sgx_common_cflags + enclave_c_flags ,
+    cpp_args: sgx_common_cxxflags + enclave_cpp_flags + ['-DSGX_LIB_COMPILATION'],
     link_args: enclave_link_flags,
+    dependencies : sgx_libcore_dep,
     name_prefix: 'lib',
     name_suffix: 'so'
 )

@@ -33,20 +33,22 @@ static ogs_thread_mutex_t mutex;
 void ogs_mem_init(void)
 {
     ogs_thread_mutex_init(&mutex);
-
+#ifndef SGX_LIB_COMPILATION
     talloc_enable_null_tracking();
 
 #define TALLOC_MEMSIZE 1
     __ogs_talloc_core = talloc_named_const(NULL, TALLOC_MEMSIZE, "core");
+#endif
 }
 
 void ogs_mem_final(void)
 {
+#ifndef SGX_LIB_COMPILATION
     if (talloc_total_size(__ogs_talloc_core) != TALLOC_MEMSIZE)
         talloc_report_full(__ogs_talloc_core, stderr);
 
     talloc_free(__ogs_talloc_core);
-
+#endif
     ogs_thread_mutex_destroy(&mutex);
 }
 
@@ -54,7 +56,7 @@ void *ogs_mem_get_mutex(void)
 {
     return &mutex;
 }
-
+#ifndef SGX_LIB_COMPILATION
 void *ogs_talloc_size(const void *ctx, size_t size, const char *name)
 {
     void *ptr = NULL;
@@ -110,7 +112,7 @@ int ogs_talloc_free(void *ptr, const char *location)
 
     return ret;
 }
-
+#endif
 /*****************************************
  * Memory Pool - Use pkbuf library
  *****************************************/
