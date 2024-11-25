@@ -35,7 +35,9 @@ asn_TYPE_outmost_tag(const asn_TYPE_descriptor_t *type_descriptor,
 int
 asn_fprint(FILE *stream, const asn_TYPE_descriptor_t *td,
            const void *struct_ptr) {
+    #ifndef SGX_LIB_COMPILATION   
     if(!stream) stream = stdout;
+    #endif
     if(!td || !struct_ptr) {
         errno = EINVAL;
         return -1;
@@ -91,10 +93,13 @@ _print2fp(const void *buffer, size_t size, void *app_key) {
  * This function is a replacement of ASN_DEBUG() macro.
  */
 void CC_PRINTFLIKE(1, 2) ASN_DEBUG_f(const char *fmt, ...);
+#ifndef SGX_LIB_COMPILATION  
 void ASN_DEBUG_f(const char *fmt, ...) {
 	va_list ap;
 	va_start(ap, fmt);
 	vfprintf(stderr, fmt, ap);
 	fprintf(stderr, "\n");
+
 	va_end(ap);
 }
+#endif

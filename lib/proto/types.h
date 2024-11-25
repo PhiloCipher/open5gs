@@ -357,7 +357,7 @@ ED3(uint8_t ipv4:1;,
     uint8_t ipv6:1;,
     uint8_t reserved:6;)
 } ogs_ip_t;
-
+#ifndef SGX_LIB_COMPILATION   
 int ogs_ip_to_sockaddr(ogs_ip_t *ip, uint16_t port, ogs_sockaddr_t **list);
 int ogs_sockaddr_to_ip(
         ogs_sockaddr_t *addr, ogs_sockaddr_t *addr6, ogs_ip_t *ip);
@@ -369,7 +369,7 @@ int ogs_ipv4_from_string(uint32_t *addr, const char *string);
 int ogs_ipv6addr_from_string(uint8_t *addr6, const char *string);
 int ogs_ipv6prefix_from_string(
         uint8_t *addr6, uint8_t *prefixlen, const char *string);
-
+#endif
 /**************************************************
  * GTPv1-C: TS 29.060 7.7.27 End User Address (EUA) */
 #define OGS_PDP_EUA_ORG_ETSI 0
@@ -792,14 +792,14 @@ ED6(uint8_t     spare:1;,
     char        network_instance[OGS_MAX_APN_LEN+1];
     uint8_t     source_interface;
 } __attribute__ ((packed)) ogs_user_plane_ip_resource_info_t;
-
+#ifndef SGX_LIB_COMPILATION   
 int ogs_sockaddr_to_user_plane_ip_resource_info(
     ogs_sockaddr_t *addr, ogs_sockaddr_t *addr6,
     ogs_user_plane_ip_resource_info_t *info);
 int ogs_user_plane_ip_resource_info_to_sockaddr(
     ogs_user_plane_ip_resource_info_t *info,
     ogs_sockaddr_t **addr, ogs_sockaddr_t **addr6);
-
+#endif
 typedef struct ogs_slice_data_s {
     ogs_s_nssai_t s_nssai;
     bool default_indicator;

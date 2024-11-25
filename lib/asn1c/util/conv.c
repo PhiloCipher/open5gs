@@ -145,7 +145,7 @@ void ogs_asn_BIT_STRING_to_uint32(BIT_STRING_t *bit_string, uint32_t *uint32)
     *uint32 = ogs_buffer_to_uint64(bit_string->buf, bit_string->size)
                     >> bit_string->bits_unused;
 }
-
+#ifndef SGX_LIB_COMPILATION   
 int ogs_asn_BIT_STRING_to_ip(BIT_STRING_t *bit_string, ogs_ip_t *ip)
 {
     char buf[OGS_ADDRSTRLEN], buf2[OGS_ADDRSTRLEN];
@@ -212,7 +212,7 @@ int ogs_asn_ip_to_BIT_STRING(ogs_ip_t *ip, BIT_STRING_t *bit_string)
 
     return OGS_OK;
 }
-
+#endif
 int ogs_asn_copy_ie(const asn_TYPE_descriptor_t *td, void *src, void *dst)
 {
     asn_enc_rval_t enc_ret = {0};

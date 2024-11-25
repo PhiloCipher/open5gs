@@ -36,3 +36,20 @@ libngap_dep = declare_dependency(
     link_with : libngap,
     include_directories : [libngap_inc, libinc],
     dependencies : libasn1c_ngap_dep)
+
+if ogs_mode == 'AnonyCore'
+
+    sgx_libngap = static_library('sgx_ogsngap',
+        sources : libngap_sources,
+        c_args : sgx_common_cflags + enclave_c_flags + ['-DSGX_LIB_COMPILATION' ,'-DOGS_NGAP_COMPILATION'],
+        include_directories : [libngap_inc, libinc],
+        dependencies : sgx_libasn1c_ngap_dep,
+        install_rpath : libdir,
+        install : true)
+
+    sgx_libngap_dep = declare_dependency(
+        link_with : sgx_libngap,
+        include_directories : [libngap_inc, libinc],
+        dependencies : sgx_libasn1c_ngap_dep)
+
+endif

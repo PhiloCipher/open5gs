@@ -168,3 +168,21 @@ libasn1c_common_dep = declare_dependency(
     link_with : libasn1c_common,
     include_directories : libasn1c_common_inc,
     dependencies : libcore_dep)
+
+
+
+if ogs_mode == 'AnonyCore'
+
+    sgx_libasn1c_common = static_library('sgx_ogsasn1c-common',
+        sources : libasn1c_common_sources,
+        c_args : sgx_common_cflags + enclave_c_flags + libasn1c_common_cc_flags + ['-DSGX_LIB_COMPILATION'],
+        include_directories : libasn1c_common_inc,
+        dependencies : sgx_libcore_dep,
+        install : true)
+
+    sgx_libasn1c_common_dep = declare_dependency(
+        link_with : sgx_libasn1c_common,
+        include_directories : libasn1c_common_inc,
+        dependencies : sgx_libcore_dep)
+
+endif

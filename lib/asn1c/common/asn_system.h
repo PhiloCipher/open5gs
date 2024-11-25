@@ -19,7 +19,22 @@
 #ifndef _BSD_SOURCE
 #define _BSD_SOURCE /* for snprintf() on some linux systems  */
 #endif
+#ifdef SGX_LIB_COMPILATION   
+#include <stdio.h>	/* For snprintf(3) */
+#include <stdlib.h>	/* For *alloc(3) */
+#include "sgx_tprotected_fs.h"
+#define FILE SGX_FILE
+#define fopen sgx_fopen_auto_key
+#define fread sgx_fread
+#define fclose sgx_fclose
+#include <string.h>	/* For memcpy(3) */
+#include <sys/types.h>	/* For size_t */
+#include <limits.h>	/* For LONG_MAX */
+#include <stdarg.h>	/* For va_start */
+#include <stddef.h>	/* for offsetof and ptrdiff_t */
+#include <inttypes.h>	/* for PRIdMAX */
 
+#else 
 #include <stdio.h>	/* For snprintf(3) */
 #include <stdlib.h>	/* For *alloc(3) */
 #include <string.h>	/* For memcpy(3) */
@@ -28,6 +43,7 @@
 #include <stdarg.h>	/* For va_start */
 #include <stddef.h>	/* for offsetof and ptrdiff_t */
 #include <inttypes.h>	/* for PRIdMAX */
+#endif
 
 #ifdef	_WIN32
 

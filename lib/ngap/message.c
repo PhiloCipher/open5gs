@@ -26,10 +26,10 @@ ogs_pkbuf_t *ogs_ngap_encode(ogs_ngap_message_t *message)
     ogs_pkbuf_t *pkbuf = NULL;
 
     ogs_assert(message);
-
+#ifndef SGX_LIB_COMPILATION   
     if (ogs_log_get_domain_level(OGS_LOG_DOMAIN) >= OGS_LOG_TRACE)
         asn_fprint(stdout, &asn_DEF_NGAP_NGAP_PDU, message);
-
+#endif
     pkbuf = ogs_asn_encode(&asn_DEF_NGAP_NGAP_PDU, message);
     if (!pkbuf) {
         ogs_error("ogs_asn_encode() failed");
@@ -53,10 +53,10 @@ int ogs_ngap_decode(ogs_ngap_message_t *message, ogs_pkbuf_t *pkbuf)
         ogs_warn("Failed to decode NGAP-PDU");
         return rv;
     }
-
+#ifndef SGX_LIB_COMPILATION   
     if (ogs_log_get_domain_level(OGS_LOG_DOMAIN) >= OGS_LOG_TRACE)
         asn_fprint(stdout, &asn_DEF_NGAP_NGAP_PDU, message);
-
+#endif
     return OGS_OK;
 }
 
