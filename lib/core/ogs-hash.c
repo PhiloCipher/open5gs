@@ -69,7 +69,11 @@ static ogs_hash_entry_t **alloc_array(ogs_hash_t *ht, unsigned int max)
 ogs_hash_t *ogs_hash_make(void)
 {
     ogs_hash_t *ht;
+    #ifdef SGX_LIB_COMPILATION
+    ogs_time_t now = rand();
+    #else
     ogs_time_t now = ogs_get_monotonic_time();
+    #endif
 
     ht = ogs_malloc(sizeof(ogs_hash_t));
     if (!ht) {

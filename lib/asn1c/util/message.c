@@ -32,7 +32,12 @@ ogs_pkbuf_t *ogs_asn_encode(const asn_TYPE_descriptor_t *td, void *sptr)
         ogs_error("ogs_pkbuf_alloc() failed");
         return NULL;
     }
+    #ifndef SGX_LIB_COMPILATION
     ogs_pkbuf_put(pkbuf, OGS_MAX_SDU_LEN);
+    #else
+    pkbuf->tail = OGS_MAX_SDU_LEN;
+    pkbuf->len = OGS_MAX_SDU_LEN;
+    #endif
 
     enc_ret = aper_encode_to_buffer(td, NULL,
                     sptr, pkbuf->data, OGS_MAX_SDU_LEN);

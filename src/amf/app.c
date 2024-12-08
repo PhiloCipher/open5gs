@@ -20,6 +20,10 @@
 #include "ogs-sctp.h"
 #include "ogs-app.h"
 
+#ifdef AnonyCore
+#include "enclave_api.h"
+#endif
+
 int app_initialize(const char *const argv[])
 {
     int rv;
@@ -32,11 +36,23 @@ int app_initialize(const char *const argv[])
     }
     ogs_info("AMF initialize...done");
 
+    #ifdef AnonyCore
+    int r = initialize_enclave();
+    if (r != OGS_OK) {
+        ogs_error("Failed to initialize AMF Enclave");
+        return rv;
+    }
+    #endif
+
     return OGS_OK;
 }
 
 void app_terminate(void)
 {
+    #ifdef AnonyCore
+    enclave_terminate();
+    #endif
+    
     amf_terminate();
     ogs_sctp_final();
     ogs_info("AMF terminate...done");

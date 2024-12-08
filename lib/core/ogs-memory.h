@@ -77,11 +77,17 @@ int ogs_free_debug(void *ptr);
 /*****************************************
  * Memory Pool - Use pkbuf library
  *****************************************/
-
+#ifdef SGX_LIB_COMPILATION   
+#define ogs_malloc(size) malloc(size)
+#define ogs_calloc(nmemb, size) calloc(nmemb, size)
+#define ogs_realloc(ptr, size) realloc(ptr, size)
+#define ogs_free(ptr) free(ptr)
+#else
 #define ogs_malloc(size) ogs_malloc_debug(size, OGS_FILE_LINE)
 #define ogs_calloc(nmemb, size) ogs_calloc_debug(nmemb, size, OGS_FILE_LINE)
 #define ogs_realloc(ptr, size) ogs_realloc_debug(ptr, size, OGS_FILE_LINE)
 #define ogs_free(ptr) ogs_free_debug(ptr)
+#endif
 
 #endif
 

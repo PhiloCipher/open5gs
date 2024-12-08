@@ -39,19 +39,20 @@ static ogs_core_context_t self = {
 void ogs_core_initialize(void)
 {
     ogs_mem_init();
+    #ifndef SGX_LIB_COMPILATION
     ogs_log_init();
     ogs_pkbuf_init();
-    #ifndef SGX_LIB_COMPILATION
     ogs_socket_init();
     #endif
     ogs_tlv_init();
-
+    #ifndef SGX_LIB_COMPILATION
     ogs_log_install_domain(&__ogs_mem_domain, "mem", ogs_core()->log.level);
     ogs_log_install_domain(&__ogs_sock_domain, "sock", ogs_core()->log.level);
     ogs_log_install_domain(&__ogs_event_domain, "event", ogs_core()->log.level);
     ogs_log_install_domain(&__ogs_thread_domain,
             "thread", ogs_core()->log.level);
     ogs_log_install_domain(&__ogs_tlv_domain, "tlv", ogs_core()->log.level);
+    #endif
 }
 
 void ogs_core_terminate(void)

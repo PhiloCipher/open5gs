@@ -63,6 +63,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+#define rand sgx_rand
+int sgx_rand(void);
 // #include "libc_override.h" // for malloc, free, realloc
 #include <string.h>
 #include <time.h>
@@ -72,7 +74,8 @@
 
 #include <time.h>
 
-#else 
+
+#else
 #include <stdio.h>
 #include <stddef.h>
 #include <stdbool.h>

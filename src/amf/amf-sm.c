@@ -27,6 +27,10 @@
 #include "nnssf-handler.h"
 #include "nas-security.h"
 
+#ifdef AnonyCore
+#include "enclave_api.h"
+#endif
+
 void amf_state_initial(ogs_fsm_t *s, amf_event_t *e)
 {
     amf_sm_debug(e);
@@ -894,7 +898,15 @@ void amf_state_operational(ogs_fsm_t *s, amf_event_t *e)
         ogs_assert(gnb);
         ogs_assert(OGS_FSM_STATE(&gnb->sm));
 
-        rc = ogs_ngap_decode(&ngap_message, pkbuf);
+        #ifndef AnonyCore
+            rc = ogs_ngap_decode(&ngap_message, pkbuf);
+        #else
+            ogs_pkbuf_t *pkbuf_out = ogs_pkbuf_alloc(NULL, pkbuf->len);
+            pkbuf_out->len = pkbuf->len;
+            int tmp = sgx_ogs_ngap_process(pkbuf, pkbuf_out);
+            ogs_critical("tmp: %d", tmp);
+            rc = ogs_ngap_decode(&ngap_message, pkbuf_out);
+        #endif
         if (rc == OGS_OK) {
             e->gnb_id = gnb->id;
             e->ngap.message = &ngap_message;
