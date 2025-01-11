@@ -69,9 +69,7 @@ static ogs_hash_entry_t **alloc_array(ogs_hash_t *ht, unsigned int max)
 ogs_hash_t *ogs_hash_make(void)
 {
     ogs_hash_t *ht;
-    #ifdef SGX_LIB_COMPILATION
-    ogs_time_t now = rand();
-    #else
+    #ifndef SGX_LIB_COMPILATION
     ogs_time_t now = ogs_get_monotonic_time();
     #endif
 
@@ -84,8 +82,12 @@ ogs_hash_t *ogs_hash_make(void)
     ht->free = NULL;
     ht->count = 0;
     ht->max = INITIAL_MAX;
+    #ifndef SGX_LIB_COMPILATION
     ht->seed = (unsigned int)((now >> 32) ^ now ^ 
                               (uintptr_t)ht ^ (uintptr_t)&now) - 1;
+    #else
+    ht->seed = (unsigned int)((rand() ^ (uintptr_t)ht ^ (uintptr_t)&ht) - 1);
+    #endif
     ht->array = alloc_array(ht, ht->max);
     ht->hash_func = NULL;
 

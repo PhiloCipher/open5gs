@@ -375,6 +375,7 @@ if ogs_mode == 'AnonyCore'
         ogs-errno.c
         ogs-strings.c
         ogs-conv.c
+        ogs-pkbuf.c
         ogs-memory.c
         ogs-rbtree.c
         ogs-timer.c

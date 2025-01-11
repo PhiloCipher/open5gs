@@ -115,7 +115,16 @@ void ogs_pkbuf_default_init(ogs_pkbuf_config_t *config)
 #if OGS_USE_TALLOC == 0
     ogs_assert(config);
     memset(config, 0, sizeof *config);
-
+    #ifdef SGX_LIB_COMPILATION
+    config->cluster_128_pool = 65536/8;
+    config->cluster_256_pool = 16384/8;
+    config->cluster_512_pool = 4096/8;
+    config->cluster_1024_pool = 2048/8;
+    config->cluster_2048_pool = 1024/8;
+    config->cluster_8192_pool = 256/8;
+    config->cluster_32768_pool = 64/8;
+    config->cluster_big_pool = 8/8;
+    #else
     config->cluster_128_pool = 65536;
     config->cluster_256_pool = 16384;
     config->cluster_512_pool = 4096;
@@ -124,6 +133,7 @@ void ogs_pkbuf_default_init(ogs_pkbuf_config_t *config)
     config->cluster_8192_pool = 256;
     config->cluster_32768_pool = 64;
     config->cluster_big_pool = 8;
+    #endif
 #endif
 }
 

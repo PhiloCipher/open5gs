@@ -86,15 +86,11 @@ void ogs_pkbuf_pool_destroy(ogs_pkbuf_pool_t *pool);
 #define ogs_pkbuf_alloc(pool, size) \
     ogs_pkbuf_alloc_debug(pool, size, OGS_FILE_LINE)
 
-#ifndef SGX_LIB_COMPILATION   
+
 ogs_pkbuf_t *ogs_pkbuf_alloc_debug(
         ogs_pkbuf_pool_t *pool, unsigned int size, const char *file_line);
 void ogs_pkbuf_free(ogs_pkbuf_t *pkbuf);
-#else
-ogs_pkbuf_t *ogs_pkbuf_alloc_debug(
-        ogs_pkbuf_pool_t *pool, unsigned int size, const char *file_line);
-void ogs_pkbuf_free(ogs_pkbuf_t *pkbuf);
-#endif
+
 
 void *ogs_pkbuf_put_data(
         ogs_pkbuf_t *pkbuf, const void *data, unsigned int len);

@@ -41,7 +41,9 @@ void ogs_core_initialize(void)
     ogs_mem_init();
     #ifndef SGX_LIB_COMPILATION
     ogs_log_init();
+    #endif
     ogs_pkbuf_init();
+    #ifndef SGX_LIB_COMPILATION
     ogs_socket_init();
     #endif
     ogs_tlv_init();
