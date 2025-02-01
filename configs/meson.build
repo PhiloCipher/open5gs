@@ -30,6 +30,13 @@ build_subprojects_freeDiameter_extensions_dir = join_paths(
 conf_data.set('build_subprojects_freeDiameter_extensions_dir',
         build_subprojects_freeDiameter_extensions_dir)
 
+
+if get_option('MONGODB_SGX')
+    conf_data.set('db_uri', 'mongodb://127.0.0.1:28017/open5gs')
+else
+    conf_data.set('db_uri', 'mongodb://localhost/open5gs')
+endif
+
 example_conf = '''
     sample.yaml
     310014.yaml
