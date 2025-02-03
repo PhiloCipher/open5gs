@@ -1,0 +1,112 @@
+
+libos.entrypoint = "/src/udr/open5gs-udrd"
+loader.log_level = "{{ gramine_log_level }}"
+
+loader.env.LD_LIBRARY_PATH = "/lib:{{ build_path }}/lib:/lib/shared"
+
+loader.argv = ["open5gs-udrd", "{{ config_flag }}", "{{ config_path }}", "{{ log_flag }}", "{{ log_level }}"]
+
+
+fs.mounts = [
+  { path = "/lib", uri = "file:{{ gramine.runtimedir() }}" },
+  { path = "/src/udr/udr", uri = "file:src/udr/open5gs-udrd" },
+  { path = "{{ build_path }}/configs/sample.yaml", uri = "file:{{ build_path }}/configs/sample.yaml" },
+  { path = "/lib/libogssbi.so.2", uri = "file:{{ build_path }}/lib/sbi/libogssbi.so.2" },
+  { path = "/lib/libogsproto.so.2", uri = "file:{{ build_path }}/lib/proto/libogsproto.so.2" },
+  { path = "/lib/libogscore.so.2", uri = "file:{{ build_path }}/lib/core/libogscore.so.2" },
+  { path = "/lib/libogsapp.so.2", uri = "file:{{ build_path }}/lib/app/libogsapp.so.2" },
+  { path = "/lib/libogssbi-openapi.so.2", uri = "file:{{ build_path }}/lib/sbi/openapi/libogssbi-openapi.so.2" },
+  { path = "/lib/libogscrypt.so.2", uri = "file:{{ build_path }}/lib/crypt/libogscrypt.so.2" },
+  { path = "/lib/libogsipfw.so.2", uri = "file:{{ build_path }}/lib/ipfw/libogsipfw.so.2" },
+  { path = "/lib/libogsdbi.so.2", uri = "file:{{ build_path }}/lib/dbi/libogsdbi.so.2" },
+  { path = "/lib/libogssctp.so.2", uri = "file:{{ build_path }}/lib/sctp/libogssctp.so.2" },
+  { path = "/lib/libogsgtp.so.2", uri = "file:{{ build_path }}/lib/gtp/libogsgtp.so.2" },
+  { path = "/lib/libogsasn1c-common.so.2", uri = "file:{{ build_path }}/lib/asn1c/common/libogsasn1c-common.so.2" },
+  { path = "/lib/libogsasn1c-util.so.2", uri = "file:{{ build_path }}/lib/asn1c/util/libogsasn1c-util.so.2" },
+  { path = "/lib/libogsngap.so.2", uri = "file:{{ build_path }}/lib/ngap/libogsngap.so.2" },
+  { path = "/lib/libogsasn1c-ngap.so.2", uri = "file:{{ build_path }}/lib/asn1c/ngap/libogsasn1c-ngap.so.2" },
+  { path = "/lib/libogsnas-eps.so.2", uri = "file:{{ build_path }}/lib/nas/eps/libogsnas-eps.so.2" },
+  { path = "/lib/libogsnas-common.so.2", uri = "file:{{ build_path }}/lib/nas/common/libogsnas-common.so.2" },
+  { path = "/lib/libogsnas-5gs.so.2", uri = "file:{{ build_path }}/lib/nas/5gs/libogsnas-5gs.so.2" },
+  { path = "/lib/libogsmetrics.so.2", uri = "file:{{ build_path }}/lib/metrics/libogsmetrics.so.2" },
+  { path = "/lib/libprom.so", uri = "file:{{ build_path }}/subprojects/prometheus-client-c/libprom.so" },
+
+  { path = "/lib/shared", uri = "file:{{ shared_lib_path }}" },
+
+
+]
+
+sgx.debug = false
+sgx.edmm_enable = {{ 'true' if env.get('EDMM', '0') == '1' else 'false' }}
+sgx.max_threads = 20
+
+sgx.trusted_files = [
+  "file:{{ gramine.runtimedir() }}/",
+  "file:src/udr/open5gs-udrd",
+  "file:{{ build_path }}/lib/metrics/libogsmetrics.so.2",
+  "file:{{ build_path }}/subprojects/prometheus-client-c/libprom.so",
+  "file:{{ build_path }}/configs/sample.yaml",
+  "file:{{ build_path }}/lib/ipfw/libogsipfw.so.2",
+  "file:{{ build_path }}/lib/dbi/libogsdbi.so.2",
+  "file:{{ build_path }}/lib/sctp/libogssctp.so.2",
+  "file:{{ build_path }}/lib/gtp/libogsgtp.so.2",
+  "file:{{ build_path }}/lib/asn1c/common/libogsasn1c-common.so.2",
+  "file:{{ build_path }}/lib/asn1c/util/libogsasn1c-util.so.2",
+  "file:{{ build_path }}/lib/ngap/libogsngap.so.2",
+  "file:{{ build_path }}/lib/asn1c/ngap/libogsasn1c-ngap.so.2",
+  "file:{{ build_path }}/lib/nas/eps/libogsnas-eps.so.2",
+  "file:{{ build_path }}/lib/nas/common/libogsnas-common.so.2",
+  "file:{{ build_path }}/lib/nas/5gs/libogsnas-5gs.so.2",
+  "file:{{ build_path }}/lib/sbi/libogssbi.so.2",
+  "file:{{ build_path }}/lib/proto/libogsproto.so.2",
+  "file:{{ build_path }}/lib/core/libogscore.so.2",
+  "file:{{ build_path }}/lib/app/libogsapp.so.2",
+  "file:{{ build_path }}/lib/sbi/openapi/libogssbi-openapi.so.2", 
+  "file:{{ build_path }}/lib/crypt/libogscrypt.so.2",
+
+  "file:{{ shared_lib_path }}/libtalloc.so.2", 
+  "file:{{ shared_lib_path }}/libssl.so.3",
+  "file:{{ shared_lib_path }}/libcrypto.so.3",
+  "file:{{ shared_lib_path }}/libnghttp2.so.14",
+  "file:{{ shared_lib_path }}/libmicrohttpd.so.12",
+  "file:{{ shared_lib_path }}/libcurl.so.4",
+  "file:{{ shared_lib_path }}/libyaml-0.so.2",
+  "file:{{ shared_lib_path }}/libgnutls.so.30",
+  "file:{{ shared_lib_path }}/libidn2.so.0",
+  "file:{{ shared_lib_path }}/librtmp.so.1",
+  "file:{{ shared_lib_path }}/libssh.so.4",
+  "file:{{ shared_lib_path }}/libpsl.so.5",
+  "file:{{ shared_lib_path }}/libgssapi_krb5.so.2",
+  "file:{{ shared_lib_path }}/libldap.so.2",
+  "file:{{ shared_lib_path }}/liblber.so.2",
+  "file:{{ shared_lib_path }}/libzstd.so.1",
+  "file:{{ shared_lib_path }}/libbrotlidec.so.1",
+  "file:{{ shared_lib_path }}/libz.so.1",
+  "file:{{ shared_lib_path }}/libp11-kit.so.0",
+  "file:{{ shared_lib_path }}/libunistring.so.5",
+  "file:{{ shared_lib_path }}/libtasn1.so.6",
+  "file:{{ shared_lib_path }}/libnettle.so.8",
+  "file:{{ shared_lib_path }}/libhogweed.so.6",
+  "file:{{ shared_lib_path }}/libgmp.so.10",
+  "file:{{ shared_lib_path }}/libkrb5.so.3",
+  "file:{{ shared_lib_path }}/libk5crypto.so.3",
+  "file:{{ shared_lib_path }}/libcom_err.so.2",
+  "file:{{ shared_lib_path }}/libkrb5support.so.0",
+  "file:{{ shared_lib_path }}/libsasl2.so.2",
+  "file:{{ shared_lib_path }}/libbrotlicommon.so.1",
+  "file:{{ shared_lib_path }}/libffi.so.8",
+  "file:{{ shared_lib_path }}/libkeyutils.so.1",
+  "file:{{ shared_lib_path }}/libmongoc-1.0.so.0",
+  "file:{{ shared_lib_path }}/libbson-1.0.so.0",
+  "file:{{ shared_lib_path }}/libsctp.so.1",
+  "file:{{ shared_lib_path }}/libsnappy.so.1",
+  "file:{{ shared_lib_path }}/libicuuc.so.74",
+  "file:{{ shared_lib_path }}/libmongocrypt.so.0",
+  "file:{{ shared_lib_path }}/libstdc++.so.6",
+  "file:{{ shared_lib_path }}/libgcc_s.so.1",
+  "file:{{ shared_lib_path }}/libicudata.so.74",
+  "file:{{ shared_lib_path }}/libutf8proc.so.3",
+  "file:{{ shared_lib_path }}/libcurl-gnutls.so.4",
+
+]
+

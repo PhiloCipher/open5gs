@@ -69,6 +69,38 @@ static void run_threads(const char *nf_name, int count,
     argv_out[argv_out_idx] = NULL;
 }
 
+static void run_gramine_threads(const char *nf_name, int count,
+        const char *argv_out[], int argv_out_idx, ogs_thread_t *threads[])
+{
+    int i;
+
+    threads[0] = test_child_gramine_create(nf_name, argv_out);
+
+    for (i = 1; i < count; i++) {
+        const char *idx_string = NULL;;
+
+        switch (i) {
+            case 1: idx_string = "1"; break;
+            case 2: idx_string = "2"; break;
+            case 3: idx_string = "3"; break;
+            default:
+                idx_string = ogs_msprintf("%d", i);
+                ogs_warn("Missing static conversion of integer to string");
+                break;
+        }
+        ogs_assert(idx_string);
+
+        argv_out[argv_out_idx + 0] = "-k";
+        argv_out[argv_out_idx + 1] = idx_string;
+        argv_out[argv_out_idx + 2] = NULL;
+
+        threads[i] = test_child_create(nf_name, argv_out);
+    }
+
+    // reset argv_out and remove the added "-k" parameter
+    argv_out[argv_out_idx] = NULL;
+}
+
 int app_initialize(const char *const argv[])
 {
     const char *argv_out[OGS_ARG_MAX];
@@ -121,8 +153,13 @@ int app_initialize(const char *const argv[])
         run_threads("bsf", ogs_global_conf()->parameter.bsf_count,
                 argv_out, i, bsf_threads);
     if (ogs_global_conf()->parameter.no_udr == 0)
+    #ifdef UDR_SGX
+        run_gramine_threads("udr", ogs_global_conf()->parameter.udr_count,
+                argv_out, i, udr_threads);
+    #else
         run_threads("udr", ogs_global_conf()->parameter.udr_count,
                 argv_out, i, udr_threads);
+    #endif
 
     /*
      * Wait for all sockets listening
